@@ -1,38 +1,52 @@
 package pokey.websocket
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 sealed trait Request
 sealed case class InvalidRequest(json: JsValue) extends Request
 
+object InvalidRequest {
+  implicit val reader: Reads[Request] = Reads.of[JsValue].map(InvalidRequest(_))
+}
+
 object Request {
-  implicit val formatter = new Format[Request] {
-    import pokey.websocket.Requests._
+  import pokey.websocket.Requests._
 
-    override def reads(json: JsValue): JsResult[Request] = {
-      val messageType = for {
-        jsObject <- json.asOpt[JsObject]
-        messageValue <- jsObject.value.get("request")
-        message <- messageValue.asOpt[String]
-      } yield message
-
-      messageType.map {
-        case RequestType.setName => SetName.reader.reads(json)
-      }.getOrElse(JsSuccess(InvalidRequest(json)))
-    }
-
-    override def writes(req: Request): JsValue = ???
-  }
+  implicit val formatter = Format[Request](
+    SetName.reader
+      orElse JoinRoom.reader
+      orElse InvalidRequest.reader,
+    Writes[Request](_ => ???)
+  )
 }
 
 object Requests {
   object RequestType {
     val setName = "setName"
+    val joinRoom = "joinRoom"
   }
 
   case class SetName(name: String) extends Request
 
-  object SetName {
-    implicit val reader: Reads[SetName] = (JsPath \ "name").read[String].map(SetName(_))
+  def is[A](dat: A)(implicit r: Reads[A]): Reads[A] = Reads.of[A].flatMap {
+    case dis if dis == dat => Reads.pure(dis)
+    case dis => Reads(_ => JsError(s"$dis must equal $dat"))
   }
+
+  object SetName {
+    val reader: Reads[Request] =
+      ((JsPath \ "request").read[String](is(RequestType.setName)) andKeep
+        (JsPath \ "name").read[String]).map(SetName(_))
+  }
+
+  case class JoinRoom(id: String) extends Request
+
+  object JoinRoom {
+    val reader: Reads[Request] =
+      ((JsPath \ "request").read(RequestType.joinRoom)
+        andKeep (JsPath \ "id").read[String]).map(JoinRoom(_))
+  }
+
+  case object CreateRoom
 }

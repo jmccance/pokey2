@@ -7,6 +7,7 @@ import pokey.websocket.Responses._
 class SocketHandler(sessionId: String, client: ActorRef) extends Actor with ActorLogging {
   override def receive: Receive = {
     case SetName(name) => log.info("session_id={}, name_change={}", sessionId, name)
+    case JoinRoom(roomId) => log.info("session_id={}, room_id={}", sessionId, roomId)
     case InvalidRequest(json) => client ! ErrorResponse("Invalid request")
   }
 }
