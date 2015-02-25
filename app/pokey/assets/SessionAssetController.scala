@@ -17,8 +17,7 @@ class SessionAssetController(implicit inj: Injector) extends Controller with Inj
       case Some(sessionId) =>
         sessionService.isValid(sessionId).flatMap {
           case true => Future.successful(request.session)
-          case false =>
-            newPokeySession(request.session)
+          case false => newPokeySession(request.session)
         }
 
       case None => newPokeySession(request.session)

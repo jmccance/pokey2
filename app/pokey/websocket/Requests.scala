@@ -29,14 +29,9 @@ object Requests {
 
   case class SetName(name: String) extends Request
 
-  def is[A](dat: A)(implicit r: Reads[A]): Reads[A] = Reads.of[A].flatMap {
-    case dis if dis == dat => Reads.pure(dis)
-    case dis => Reads(_ => JsError(s"$dis must equal $dat"))
-  }
-
   object SetName {
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String](is(RequestType.setName)) andKeep
+      ((JsPath \ "request").read[String].filter(_ == RequestType.setName) andKeep
         (JsPath \ "name").read[String]).map(SetName(_))
   }
 
@@ -44,7 +39,7 @@ object Requests {
 
   object JoinRoom {
     val reader: Reads[Request] =
-      ((JsPath \ "request").read(RequestType.joinRoom)
+      ((JsPath \ "request").read[String].filter(_ == RequestType.joinRoom)
         andKeep (JsPath \ "id").read[String]).map(JoinRoom(_))
   }
 
