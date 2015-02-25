@@ -1,0 +1,89 @@
+<div class="row" data-ng-show="room">
+    <form name="estimate"
+          class="form-inline"
+          data-role="form"
+          data-ng-submit="submitEstimate(estimate)"
+          novalidate>
+        <label class="control-label col-md-1"
+               for="estimate.hours">
+            Estimate
+        </label>
+
+        <div class="form-group col-md-2">
+            <input id="estimate.hours"
+                   data-ng-model="estimate.hours"
+                   class="form-control"
+                   type="number"
+                   min="1"
+                   max="12"
+                   step="1"/>
+        </div>
+        <label class="control-label col-md-1" for="estimate.comment">
+            Comment
+        </label>
+
+        <div class="form-group col-md-5">
+            <input id="estimate.comment"
+                   data-ng-model="estimate.comment"
+                   class="form-control"
+                   data-ng-required="!estimate.hours"
+                   pattern=".*\w.*"
+                   type="text"
+                   maxlength="255"/>
+        </div>
+
+        <div class="btn-toolbar col-md-3" data-role="toolbar">
+            <div class="btn-group">
+                <button class="btn btn-primary"
+                        data-ng-disabled="estimate.$invalid"
+                        type="submit">
+                    Submit
+                </button>
+            </div>
+            <div class="btn-group" data-ng-show="isOwner">
+                <button type="button"
+                        data-ng-click="revealEstimates()"
+                        class="btn btn-info">
+                    Reveal
+                </button>
+                <button type="button"
+                        data-ng-click="clearEstimates()"
+                        class="btn btn-warning">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- TODO Do the CSS properly. -->
+<div class="row">&nbsp;</div>
+
+<div class="row" data-ng-show="room">
+    <div class="col-md-5">
+        <table class="table table-striped">
+            <tr>
+                <th>User</th>
+                <th>Estimate</th>
+                <th>Comment</th>
+            </tr>
+
+            <tr data-ng-repeat="(id, user) in room.members">
+                <td>{{user.name}}</td>
+                <td>
+                    <span data-ng-show="user.estimate && !room.isRevealed"><span
+                            class="glyphicon glyphicon-ok text-success"></span></span>
+                    <span data-ng-show="user.estimate.hours">{{user.estimate.hours}}h</span>
+                </td>
+                <td>
+                    {{user.estimate.comment}}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="col-md-7"
+         data-node-name="chart"
+         data-ng-show="room.isRevealed">
+    </div>
+</div>

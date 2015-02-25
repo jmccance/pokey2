@@ -1,0 +1,16 @@
+{
+  "name": "pokey-client",
+  "version": "1.0.0-SNAPSHOT",
+
+  "dependencies": {
+    "angular": "1.2.15",
+    "angular-bootstrap": "0.10.0",
+    "angular-cookies": "1.2.15",
+    "angular-route": "1.2.15",
+    "bean": "1.0.6",
+    "bootstrap": "3.0.3",
+    "jquery": "1.9.1",
+    "underscore": "1.5.2",
+    "requirejs": "2.1.9"
+  }
+}
