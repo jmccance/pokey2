@@ -2,6 +2,7 @@ package pokey.websocket
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.mvc.WebSocket.FrameFormatter
 
 sealed trait Request
 sealed case class InvalidRequest(json: JsValue) extends Request
@@ -24,6 +25,9 @@ object Request {
       orElse InvalidRequest.reader,
     Writes[Request](_ => ???)
   )
+
+  implicit val requestFrameFormatter: FrameFormatter[Request] =
+    FrameFormatter.jsonFrame[Request]
 }
 
 object Requests {

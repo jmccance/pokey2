@@ -2,6 +2,7 @@ package pokey.websocket
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.mvc.WebSocket.FrameFormatter
 
 sealed trait Response
 
@@ -15,6 +16,9 @@ object Response {
       case resp: ErrorResponse => ErrorResponse.writer.writes(resp)
     }
   }
+
+  implicit val responseFrameFormatter: FrameFormatter[Response] =
+    FrameFormatter.jsonFrame[Response]
 }
 
 object Responses {

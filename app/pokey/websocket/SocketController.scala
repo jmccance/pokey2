@@ -1,8 +1,6 @@
 package pokey.websocket
 
 import akka.actor.ActorRef
-import play.api.mvc.WebSocket.FrameFormatter
-import play.api.mvc.WebSocket.FrameFormatter._
 import play.api.mvc._
 import play.api.{Application, Logger}
 import pokey.session.SessionService
@@ -17,9 +15,6 @@ class SocketController(implicit inj: Injector) extends Controller with Injectabl
   private[this] implicit val executionContext = inject [ExecutionContext]
   private[this] implicit val application = inject [Application]
 
-  implicit val requestFrameFormatter: FrameFormatter[Request] = jsonFrame[Request]
-  implicit val responseFrameFormatter: FrameFormatter[Response] = jsonFrame[Response]
-
   def socket = WebSocket.tryAcceptWithActor[Request, Response] { request =>
     log.info("Received attempted websocket connection")
     val oSessionId = request.session.get("session_id")
@@ -29,7 +24,8 @@ class SocketController(implicit inj: Injector) extends Controller with Injectabl
           case true => Right(SocketHandler.props(sessionId, _: ActorRef))
           case false => Left(Unauthorized("Invalid session id"))
         }
-      case None => Future.successful(Left(Unauthorized("No session id specified")))
+
+      case None => Future.successful(Left(Unauthorized("Invalid session id")))
     }
 
   }
