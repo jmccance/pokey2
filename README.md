@@ -1,6 +1,8 @@
 Pokey v2
 ========
 
+**NOTE: Pokey v2 is still in development and is not functional in any way, shape, or form.**
+
 ## Implementation
 
 ### Terminology
