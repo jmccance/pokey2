@@ -22,9 +22,6 @@ class SocketHandler(sessionId: String, client: ActorRef) extends Actor with Acto
     case Reveal(roomId) =>
       log.info("sessionId={}, reveal, roomId={}", sessionId, roomId)
 
-    case Hide(roomId) =>
-      log.info("sessionId={}, hide, roomId={}", sessionId, roomId)
-
     case Clear(roomId) =>
       log.info("sessionId={}, clear, roomId={}", sessionId, roomId)
 

@@ -20,7 +20,6 @@ object Request {
       orElse JoinRoom.reader
       orElse Estimate.reader
       orElse Reveal.reader
-      orElse Hide.reader
       orElse Clear.reader
       orElse InvalidRequest.reader,
     Writes[Request](_ => ???)
@@ -37,7 +36,6 @@ object Requests {
     val joinRoom = "joinRoom"
     val estimate = "estimate"
     val reveal = "reveal"
-    val hide = "hide"
     val clear = "clear"
   }
 
@@ -81,16 +79,8 @@ object Requests {
         andKeep (JsPath \ "roomId").read[String]).map(Reveal(_))
   }
   
-  case class Hide(roomId: String) extends Request
-  
-  object Hide {
-    val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.hide)
-        andKeep (JsPath \ "roomId").read[String]).map(Hide(_))
-  }
-  
   case class Clear(roomId: String) extends Request
-  
+
   object Clear {
     val reader: Reads[Request] =
       ((JsPath \ "request").read[String].filter(_ == RequestType.clear)
