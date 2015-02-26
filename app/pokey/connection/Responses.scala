@@ -1,4 +1,4 @@
-package pokey.websocket
+package pokey.connection
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -7,7 +7,7 @@ import play.api.mvc.WebSocket.FrameFormatter
 sealed trait Response
 
 object Response {
-  import pokey.websocket.Responses._
+  import pokey.connection.Responses._
 
   implicit val formatter = new Format[Response] {
     override def reads(json: JsValue): JsResult[Response] = ???

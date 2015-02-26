@@ -1,4 +1,4 @@
-package pokey.websocket
+package pokey.connection
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -12,7 +12,7 @@ object InvalidRequest {
 }
 
 object Request {
-  import pokey.websocket.Requests._
+  import pokey.connection.Requests._
 
   implicit val formatter = Format[Request](
     SetName.reader

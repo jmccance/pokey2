@@ -1,10 +1,10 @@
-package pokey.websocket
+package pokey.connection
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import pokey.websocket.Requests._
-import pokey.websocket.Responses._
+import pokey.connection.Requests._
+import pokey.connection.Responses._
 
-class SocketHandler(sessionId: String, client: ActorRef) extends Actor with ActorLogging {
+class ConnectionHandler(sessionId: String, client: ActorRef) extends Actor with ActorLogging {
   override def receive: Receive = {
     case SetName(name) =>
       log.info("sessionId={}, setName, name={}", sessionId, name)
@@ -31,6 +31,6 @@ class SocketHandler(sessionId: String, client: ActorRef) extends Actor with Acto
   }
 }
 
-object SocketHandler {
-  def props(sessionId: String, client: ActorRef) = Props(new SocketHandler(sessionId, client))
+object ConnectionHandler {
+  def props(sessionId: String, client: ActorRef) = Props(new ConnectionHandler(sessionId, client))
 }
