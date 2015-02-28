@@ -32,10 +32,6 @@ class DefaultUserService(userRegistry: ActorRef) extends UserService {
   override def unsubscribe(id: String, subscriber: ActorRef): Future[Unit] = ???
 
   override def getUserWithSocket(id: String)
-                                (implicit ec: ExecutionContext): Future[(User, ActorRef)] = {
-    (userRegistry ? UserRegistry.GetUserForConnection(id)).map {
-      case (user: User, pub: ActorRef) => (user, pub)
-      case other => throw new IllegalStateException(s"Expected (User, ActorRef); got: $other")
-    }
-  }
+                                (implicit ec: ExecutionContext): Future[(User, ActorRef)] =
+    (userRegistry ? UserRegistry.GetUserForConnection(id)).mapTo[(User, ActorRef)]
 }
