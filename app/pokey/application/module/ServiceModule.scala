@@ -10,5 +10,7 @@ class ServiceModule extends Module {
     system.actorOf(UserRegistry.props, "user-registry")
   }
 
-  bind [UserService] to new DefaultUserService
+  bind [UserService] to injected [DefaultUserService] (
+    'userRegistry -> inject [ActorRef] (identified by UserRegistry.identifier)
+  )
 }

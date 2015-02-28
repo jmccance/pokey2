@@ -4,8 +4,6 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import pokey.util.Subscribable
-import scaldi.Injectable._
-import scaldi.Injector
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,10 +22,8 @@ trait UserService extends Subscribable[String] {
                        (implicit ec: ExecutionContext): Future[(User, ActorRef)]
 }
 
-class DefaultUserService(implicit inj: Injector) extends UserService {
+class DefaultUserService(userRegistry: ActorRef) extends UserService {
   implicit val timeout = Timeout(2.seconds)
-
-  val userRegistry: ActorRef = inject [ActorRef] (identified by UserRegistry.identifier)
 
   override def nextUserId(): String = new java.rmi.server.UID().toString
 

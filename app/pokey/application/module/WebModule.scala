@@ -5,6 +5,6 @@ import pokey.connection.ConnectionController
 import scaldi._
 
 class WebModule extends Module {
-  binding to new AssetController
-  binding to new ConnectionController
+  binding to injected [AssetController]
+  binding to injected [ConnectionController]
 }
