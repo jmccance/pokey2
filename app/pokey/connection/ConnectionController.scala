@@ -18,7 +18,7 @@ class ConnectionController(userService: UserService,
     log.info("Received WebSocket connection request")
     request.session.get("user_id") match {
       case Some(userId) =>
-        userService.newConnection(userId).map { user =>
+        userService.startConnection(userId).map { user =>
           Right(connectionHandlerProps(userId))
         }
 

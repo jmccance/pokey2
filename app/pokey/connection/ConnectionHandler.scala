@@ -43,6 +43,8 @@ class ConnectionHandler(userId: String,
 
     case pokey.user.events.UserUpdated(user) => client ! UserUpdated(user)
   }
+
+  override def postStop() = userService.endConnection(userId)
 }
 
 object ConnectionHandler {

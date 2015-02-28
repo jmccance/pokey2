@@ -21,7 +21,9 @@ trait UserService extends Subscribable[String] {
    * @param id the id of the user
    * @return
    */
-  def newConnection(id: String)(implicit ec: ExecutionContext): Future[User]
+  def startConnection(id: String)(implicit ec: ExecutionContext): Future[User]
+  
+  def endConnection(id: String): Unit
 
   def setName(id: String, name: String): Unit
 }
@@ -31,14 +33,16 @@ class DefaultUserService(userRegistry: ActorRef) extends UserService {
 
   override def nextUserId(): String = new java.rmi.server.UID().toString
 
+  override def startConnection(id: String)(implicit ec: ExecutionContext): Future[User] =
+    (userRegistry ? UserRegistry.StartConnection(id)).mapTo[User]
+  
+  override def endConnection(id: String): Unit = userRegistry ! UserRegistry.EndConnection(id)
+
   override def subscribe(id: String, subscriber: ActorRef): Unit =
     userRegistry ! UserRegistry.Subscribe(id, subscriber)
 
   override def unsubscribe(id: String, subscriber: ActorRef): Unit =
     userRegistry ! UserRegistry.Unsubscribe(id, subscriber)
-
-  override def newConnection(id: String)(implicit ec: ExecutionContext): Future[User] =
-    (userRegistry ? UserRegistry.NewConnection(id)).mapTo[User]
 
   override def setName(id: String, name: String): Unit =
     userRegistry ! UserRegistry.SetName(id, name)
