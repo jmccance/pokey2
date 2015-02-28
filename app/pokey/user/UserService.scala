@@ -9,6 +9,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserService extends Subscribable[String] {
+  /**
+   * @return a new, unique-to-this-instance identifier for a user
+   */
   def nextUserId(): String
 
   /**
@@ -18,8 +21,9 @@ trait UserService extends Subscribable[String] {
    * @param id the id of the user
    * @return
    */
-  def getUserWithSocket(id: String)
-                       (implicit ec: ExecutionContext): Future[(User, ActorRef)]
+  def newConnection(id: String)(implicit ec: ExecutionContext): Future[User]
+
+  def setName(id: String, name: String): Unit
 }
 
 class DefaultUserService(userRegistry: ActorRef) extends UserService {
@@ -27,11 +31,15 @@ class DefaultUserService(userRegistry: ActorRef) extends UserService {
 
   override def nextUserId(): String = new java.rmi.server.UID().toString
 
-  override def subscribe(id: String, subscriber: ActorRef): Future[Unit] = ???
+  override def subscribe(id: String, subscriber: ActorRef): Unit =
+    userRegistry ! UserRegistry.Subscribe(id, subscriber)
 
-  override def unsubscribe(id: String, subscriber: ActorRef): Future[Unit] = ???
+  override def unsubscribe(id: String, subscriber: ActorRef): Unit =
+    userRegistry ! UserRegistry.Unsubscribe(id, subscriber)
 
-  override def getUserWithSocket(id: String)
-                                (implicit ec: ExecutionContext): Future[(User, ActorRef)] =
-    (userRegistry ? UserRegistry.GetUserForConnection(id)).mapTo[(User, ActorRef)]
+  override def newConnection(id: String)(implicit ec: ExecutionContext): Future[User] =
+    (userRegistry ? UserRegistry.NewConnection(id)).mapTo[User]
+
+  override def setName(id: String, name: String): Unit =
+    userRegistry ! UserRegistry.SetName(id, name)
 }

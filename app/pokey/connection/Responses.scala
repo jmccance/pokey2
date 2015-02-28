@@ -13,9 +13,9 @@ object Response {
   implicit val formatter = Format[Response](
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
     // a reads.
-    ???,
+    Reads.pure[Response](???),
     Writes[Response] {
-      case r: NameChange => NameChange.writer.writes(r)
+      case r: UserUpdated => UserUpdated.writer.writes(r)
       case r: RoomCreated => RoomCreated.writer.writes(r)
       case r: RoomInfo => RoomInfo.writer.writes(r)
       case r: RoomState => RoomState.writer.writes(r)
@@ -29,13 +29,13 @@ object Response {
 
 object Responses {
 
-  case class NameChange(name: String) extends Response
+  case class UserUpdated(user: User) extends Response
 
-  object NameChange {
-    val writer = Writes[NameChange] { resp =>
+  object UserUpdated {
+    val writer = Writes[UserUpdated] { resp =>
       Json.obj(
-        "response" -> "nameChange",
-        "name" -> resp.name
+        "response" -> "userUpdated",
+        "user" -> resp.user
       )
     }
   }

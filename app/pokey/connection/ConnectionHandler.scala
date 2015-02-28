@@ -3,34 +3,48 @@ package pokey.connection
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import pokey.connection.Requests._
 import pokey.connection.Responses._
+import pokey.user.UserService
 
-class ConnectionHandler(sessionId: String, client: ActorRef) extends Actor with ActorLogging {
+class ConnectionHandler(userId: String,
+                        client: ActorRef,
+                        userService: UserService) extends Actor with ActorLogging {
+
+  userService.subscribe(userId, self)
+
   override def receive: Receive = {
-    case SetName(name) =>
-      log.info("sessionId={}, setName, name={}", sessionId, name)
+    case req: Request =>
+      req match {
+        case SetName(name) =>
+          log.info("userId={}, setName, name={}", userId, name)
+          userService.setName(userId, name)
 
-    case CreateRoom =>
-      log.info("sessionId={}, createRoom", sessionId)
+        case CreateRoom =>
+          log.info("userId={}, createRoom", userId)
 
-    case JoinRoom(roomId) =>
-      log.info("sessionId={}, joinRoom, roomId={}", sessionId, roomId)
+        case JoinRoom(roomId) =>
+          log.info("userId={}, joinRoom, roomId={}", userId, roomId)
 
-    case Estimate(roomId, value, comment) =>
-      log.info("sessionId={}, estimate, roomId={}, value={}, comment={}",
-        sessionId, roomId, value, comment)
+        case Estimate(roomId, value, comment) =>
+          log.info("userId={}, estimate, roomId={}, value={}, comment={}",
+            userId, roomId, value, comment)
 
-    case Reveal(roomId) =>
-      log.info("sessionId={}, reveal, roomId={}", sessionId, roomId)
+        case Reveal(roomId) =>
+          log.info("userId={}, reveal, roomId={}", userId, roomId)
 
-    case Clear(roomId) =>
-      log.info("sessionId={}, clear, roomId={}", sessionId, roomId)
+        case Clear(roomId) =>
+          log.info("userId={}, clear, roomId={}", userId, roomId)
 
-    case InvalidRequest(json) =>
-      log.error("sessionId={}, invalidRequest={}", sessionId, json.toString())
-      client ! ErrorResponse("Invalid request")
+        case InvalidRequest(json) =>
+          log.error("userId={}, invalidRequest={}", userId, json.toString())
+          client ! ErrorResponse("Invalid request")
+      }
+
+    case pokey.user.events.UserUpdated(user) => client ! UserUpdated(user)
   }
 }
 
 object ConnectionHandler {
-  def props(sessionId: String, client: ActorRef) = Props(new ConnectionHandler(sessionId, client))
+  def props(userId: String,
+            client: ActorRef,
+            userService: UserService) = Props(new ConnectionHandler(userId, client, userService))
 }

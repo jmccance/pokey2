@@ -14,16 +14,13 @@ class ConnectionController(userService: UserService) extends Controller {
 
   def connect = WebSocket.tryAcceptWithActor[Request, Response] { request =>
     log.info("Received WebSocket connection request")
-    val oUserId = request.session.get("user_id")
-    oUserId match {
-      case Some(sessionId) =>
-        userService.getUserWithSocket(sessionId).map {
-          case (user, publisher) =>
-            Right(ConnectionHandler.props(sessionId, _: ActorRef))
+    request.session.get("user_id") match {
+      case Some(userId) =>
+        userService.newConnection(userId).map {
+          case user => Right(ConnectionHandler.props(user.id, _: ActorRef, userService))
         }
 
       case None => Future.successful(Left(Unauthorized("Missing user id")))
     }
-
   }
 }

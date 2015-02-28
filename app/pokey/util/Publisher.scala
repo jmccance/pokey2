@@ -14,6 +14,7 @@ class Publisher extends Actor with ActorLogging {
       context.become(withSubscribers(subscribers - subscriber))
       sender ! Unsubscribed(subscriber)
 
+    case message => subscribers.foreach(_ ! message)
   }
 
   def receive = withSubscribers(Set.empty)
