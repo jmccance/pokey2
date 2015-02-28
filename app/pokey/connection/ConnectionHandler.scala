@@ -3,11 +3,13 @@ package pokey.connection
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import pokey.connection.Requests._
 import pokey.connection.Responses._
+import pokey.room.RoomService
 import pokey.user.UserService
 
 class ConnectionHandler(userId: String,
                         client: ActorRef,
-                        userService: UserService) extends Actor with ActorLogging {
+                        userService: UserService,
+                        roomService: RoomService) extends Actor with ActorLogging {
 
   userService.subscribe(userId, self)
 
@@ -44,7 +46,16 @@ class ConnectionHandler(userId: String,
 }
 
 object ConnectionHandler {
+  val propsIdentifier = 'connectionHandlerProps
+
   def props(userId: String,
             client: ActorRef,
-            userService: UserService) = Props(new ConnectionHandler(userId, client, userService))
+            userService: UserService,
+            roomService: RoomService) = Props {
+    new ConnectionHandler(
+      userId,
+      client,
+      userService,
+      roomService)
+  }
 }
