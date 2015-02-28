@@ -15,27 +15,27 @@ class ConnectionHandler(userId: String,
     case req: Request =>
       req match {
         case SetName(name) =>
-          log.info("userId={}, setName, name={}", userId, name)
+          log.info("userId: {}, request: setName, name: {}", userId, name)
           userService.setName(userId, name)
 
         case CreateRoom =>
-          log.info("userId={}, createRoom", userId)
+          log.info("userId: {}, request: createRoom", userId)
 
         case JoinRoom(roomId) =>
-          log.info("userId={}, joinRoom, roomId={}", userId, roomId)
+          log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
 
         case Estimate(roomId, value, comment) =>
-          log.info("userId={}, estimate, roomId={}, value={}, comment={}",
+          log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
             userId, roomId, value, comment)
 
         case Reveal(roomId) =>
-          log.info("userId={}, reveal, roomId={}", userId, roomId)
+          log.info("userId: {}, request: reveal, roomId: {}", userId, roomId)
 
         case Clear(roomId) =>
-          log.info("userId={}, clear, roomId={}", userId, roomId)
+          log.info("userId: {}, request: clear, roomId: {}", userId, roomId)
 
         case InvalidRequest(json) =>
-          log.error("userId={}, invalidRequest={}", userId, json.toString())
+          log.error("userId: {}, request: invalidRequest: {}", userId, json.toString())
           client ! ErrorResponse("Invalid request")
       }
 
