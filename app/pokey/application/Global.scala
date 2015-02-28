@@ -1,14 +1,23 @@
 package pokey.application
 
+import _root_.akka.actor.ActorSystem
 import _root_.play.api.libs.concurrent.Akka
-import _root_.play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.GlobalSettings
 import play.api.Play.current
-import pokey.application.module.{DomainModule, WebModule}
+import play.api.libs.concurrent.Execution.Implicits
+import pokey.application.module.{ServiceModule, WebModule}
 import scaldi._
 import scaldi.play.ScaldiSupport
 
+import scala.concurrent.ExecutionContext
+
 object Global extends GlobalSettings with ScaldiSupport {
-  implicit lazy val system = Akka.system
-  override def applicationModule: Injector = new WebModule :: new DomainModule
+  override def applicationModule: Injector = {
+    val contextModule = new Module {
+      bind [ActorSystem] to Akka.system
+      bind [ExecutionContext] to Implicits.defaultContext
+    }
+
+    contextModule :: new ServiceModule :: new WebModule
+  }
 }

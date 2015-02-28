@@ -1,5 +1,45 @@
 package pokey.user
 
+import akka.actor.ActorRef
+import akka.pattern.ask
+import akka.util.Timeout
 import pokey.util.Subscribable
+import scaldi.Injectable._
+import scaldi.Injector
 
-trait UserService extends Subscribable
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
+
+trait UserService extends Subscribable[String] {
+  def nextUserId(): String
+
+  /**
+   * Returns the specified user as well as an ActorRef "socket" for publishing events for that user.
+   * Messages sent to the socket will be broadcast to all subscribers to this user.
+   *
+   * @param id the id of the user
+   * @return
+   */
+  def getUserWithSocket(id: String)
+                       (implicit ec: ExecutionContext): Future[(User, ActorRef)]
+}
+
+class DefaultUserService(implicit inj: Injector) extends UserService {
+  implicit val timeout = Timeout(2.seconds)
+
+  val userRegistry: ActorRef = inject [ActorRef] (identified by UserRegistry.identifier)
+
+  override def nextUserId(): String = new java.rmi.server.UID().toString
+
+  override def subscribe(id: String, subscriber: ActorRef): Future[Unit] = ???
+
+  override def unsubscribe(id: String, subscriber: ActorRef): Future[Unit] = ???
+
+  override def getUserWithSocket(id: String)
+                                (implicit ec: ExecutionContext): Future[(User, ActorRef)] = {
+    (userRegistry ? UserRegistry.GetUserForConnection(id)).map {
+      case (user: User, pub: ActorRef) => (user, pub)
+      case other => throw new IllegalStateException(s"Expected (User, ActorRef); got: $other")
+    }
+  }
+}
