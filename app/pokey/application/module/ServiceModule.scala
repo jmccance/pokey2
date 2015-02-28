@@ -5,7 +5,7 @@ import pokey.user.{DefaultUserService, UserRegistry, UserService}
 import scaldi.Module
 
 class ServiceModule extends Module {
-  bind [ActorRef] identifiedBy UserRegistry.identifier to {
+  bind [ActorRef] identifiedBy required(UserRegistry.identifier) to {
     implicit val system = inject [ActorSystem]
     system.actorOf(UserRegistry.props, "user-registry")
   }
