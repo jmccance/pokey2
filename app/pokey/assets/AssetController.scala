@@ -4,9 +4,10 @@ import controllers.Assets
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import pokey.user.UserService
-import scaldi.{Injectable, Injector}
+import scaldi.Injectable._
+import scaldi.Injector
 
-class AssetController(implicit inj: Injector) extends Controller with Injectable {
+class AssetController(implicit inj: Injector) extends Controller {
 
   val userService = inject [UserService]
 
