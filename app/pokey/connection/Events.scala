@@ -5,31 +5,31 @@ import play.api.mvc.WebSocket.FrameFormatter
 import pokey.room.Estimate
 import pokey.user.User
 
-sealed trait Response
+sealed trait Event
 
-object Response {
-  import pokey.connection.Responses._
+object Event {
+  import pokey.connection.Events._
 
-  implicit val formatter = Format[Response](
+  implicit val formatter = Format[Event](
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
     // a reads.
-    Reads.pure[Response](???),
-    Writes[Response] {
+    Reads.pure[Event](???),
+    Writes[Event] {
       case r: UserUpdated => UserUpdated.writer.writes(r)
       case r: RoomCreated => RoomCreated.writer.writes(r)
       case r: RoomInfo => RoomInfo.writer.writes(r)
       case r: RoomState => RoomState.writer.writes(r)
-      case r: ErrorResponse => ErrorResponse.writer.writes(r)
+      case r: ErrorEvent => ErrorEvent.writer.writes(r)
     }
   )
 
-  implicit val responseFrameFormatter: FrameFormatter[Response] =
-    FrameFormatter.jsonFrame[Response]
+  implicit val responseFrameFormatter: FrameFormatter[Event] =
+    FrameFormatter.jsonFrame[Event]
 }
 
-object Responses {
+object Events {
 
-  case class UserUpdated(user: User) extends Response
+  case class UserUpdated(user: User) extends Event
 
   object UserUpdated {
     val writer = Writes[UserUpdated] { resp =>
@@ -40,7 +40,7 @@ object Responses {
     }
   }
 
-  case class RoomCreated(id: String) extends Response
+  case class RoomCreated(id: String) extends Event
 
   object RoomCreated {
     val writer = Writes[RoomCreated] { resp =>
@@ -104,10 +104,10 @@ object Responses {
     }
   }
 
-  case class ErrorResponse(message: String) extends Response
+  case class ErrorEvent(message: String) extends Event
 
-  object ErrorResponse {
-    val writer = Writes[ErrorResponse] { resp =>
+  object ErrorEvent {
+    val writer = Writes[ErrorEvent] { resp =>
       Json.obj(
         "response" -> "error",
         "message" -> resp.message

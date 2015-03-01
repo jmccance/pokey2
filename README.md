@@ -20,27 +20,38 @@ be done by the room's owner.
 A user will only persist for a finite interval after their last connection is closed. If a user
 *expires*, their rooms will as well, meaning that room membership and estimates will not persist.
 
-> Could provide some fake durability here. Say that a room is calculated from the owner id and the
-> timestamp of creation. If the user expires but someone joins the room, we could theoretically let
-> them join it and have the user with that session id own it when they next connect.
+### Client/Server View
 
-### Protocol
+The client initially acquires a user id by accessing any asset (e.g., `GET /`). The user id is
+stored in the Play session cookie, which is signed by the application to prevent tampering. Once the
+ client has a user id, it can establish a WebSocket connection with the `/connect` endpoint.
 
-The client initially acquires a *session id* by accessing any asset. The session id is stored in the
-Play session cookie, which is signed by the application to prevent tampering.
+Once the connection is granted, the client interacts with the application by sending and receiving
+JSON objects over the WebSocket connection. Requests and server events are defined in the Requests
+and Events objects in the pokey.connection package.
 
-The session id provides a unique identifier for the user. On connecting to the websocket endpoint at
-`/connect`, the session id will be validated or else the connection will be rejected.
+### Requests
 
-Once the connection is granted, the client can send one of a number of requests. Each request type
-is distinguished by the "request" field. All requests are defined in pokey.websocket.Requests.
+* SetName - Update the name that will be displayed to other users.
+* CreateRoom - Creates a new room, owned by the current user, that other users can join and submit
+               estimates. Note that creating a room and joining a room are separate requests.
+* JoinRoom - Joins the specified estimation room. Required in order to send estimates to that room.
+* Estimate - Submit an estimate to the specified room. Client must have joined the room first.
+* Reveal - Reveal all members' estimates in the specified room to all members of the room. User must
+           be the room owner in order to reveal.
+* Clear - Reset all members' estimates in the specified room and hide the estimates. User must be
+          the owner in order to clear.
 
-* SetName - Changes the user's displayed name
-* CreateRoom - Creates a new room, owned by the current user, that other user's can join and submit
-               estimates.
-* JoinRoom - Joins the specified room. The user will show up in the room's status updates.
-* Estimate - Submit an estimate to the specified room. If the room is revealed, the estimate is
-             displayed. If the room is not revealed, the room's status update will simply indicate
-             that the user has submitted an estimate.
-* Reveal - Reveal all members' estimates in the specified room to all members of the room.
-* Clear - Reset all members' estimates in the specified room and hide the estimates.
+### Events
+
+* UserUpdated - Emitted when a user has changed. Clients will receive UserUpdated messages for their
+                own user, as well as any users in any rooms the connection has joined.
+* RoomCreated - Emitted when the connection successfully creates a room via a CreateRoom request.
+* RoomInfo - Emitted both when the connection first joins the room and whenever the room info
+             changes. Room info includes the room id, the room owner's user id, and the roster of
+             connected users (names and ids).
+* RoomState - Emitted both when the connection first joins (after the RoomInfo message is emitted)
+              and whenever the room state changes. Contains the room id, whether the room is
+              revealed, and a map from user ids to their (optional) estimates.
+* ErrorEvent - Sent whenever an error needs to be communicated to the client. Generally when a
+               request is sent that is either invalid or not completable.

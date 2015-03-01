@@ -1,8 +1,8 @@
 package pokey.connection
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import pokey.connection.Events._
 import pokey.connection.Requests._
-import pokey.connection.Responses._
 import pokey.user.UserProxy
 
 class ConnectionHandler(userId: String,
@@ -36,7 +36,7 @@ class ConnectionHandler(userId: String,
 
         case InvalidRequest(json) =>
           log.error("userId: {}, request: invalidRequest: {}", userId, json.toString())
-          client ! ErrorResponse("Invalid request")
+          client ! ErrorEvent("Invalid request")
       }
 
     case UserProxy.UserUpdated(user) => client ! UserUpdated(user)
