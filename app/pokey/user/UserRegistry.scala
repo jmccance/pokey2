@@ -1,69 +1,46 @@
 package pokey.user
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import pokey.util.Publisher
+import akka.actor._
 
 class UserRegistry extends Actor with ActorLogging {
   import pokey.user.UserRegistry._
-  import pokey.user.events._
 
-  private[this] case class MetaUser(user: User, publisher: ActorRef, connectionCount: Int) {
-    def incrementConnectionCount() = this.copy(connectionCount = connectionCount + 1)
-    def decrementConnectionCount() = this.copy(connectionCount = connectionCount - 1)
-  }
+  def withUsers(users: Map[String, ActorRef]): Receive = {
+    case GetUserProxy(id) if users.contains(id) => sender ! users(id)
 
-  def withRecords(records: Map[String, MetaUser]): Receive = {
-    case Subscribe(id, subscriber) =>
-      log.info("subscribe: (id: {}, subscriber: {})", id, subscriber)
-      records(id).publisher ! Publisher.Subscribe(subscriber)
+    case GetUserProxy(id) if !users.contains(id) =>
+      val user = User(id, "Guest")
+      val userProxy = context.actorOf(UserProxy.props(user), s"user-proxy-$id")
+      context.watch(userProxy)
+      log.info("new_user: {}", user)
+      become(users + (id -> userProxy))
+      sender ! userProxy
 
-    case StartConnection(id) if records.contains(id) =>
-      val metaUser = records(id).incrementConnectionCount()
-      context.become(withRecords(records + (id -> metaUser)))
-      sender ! records(id).user
-
-    case StartConnection(id) if !records.contains(id) =>
-      val user = User(id, "J. Doe")
-      val publisher = context.actorOf(Publisher.props)
-      context.become(withRecords(records + (id -> MetaUser(user, publisher, 0))))
-      sender ! user
-
-    case EndConnection(id) if records.contains(id) =>
-      val metaUser = records(id).decrementConnectionCount()
-      context.become(withRecords(records + (id -> metaUser)))
-      if (metaUser.connectionCount <= 0) {
-        log.info("user_cleanup_scheduled, user_id: {}", id)
-        // TODO Schedule user cleanup after last connection is terminated
-        // TODO Capture scheduled event so we can cancel if user reconnects before the timeout.
+    case Terminated(userProxy) =>
+      val deadUser = users.find {
+        case (_, proxy) => proxy == userProxy
       }
 
-    case SetName(id, name) =>
-      log.info("set_name: (id: {}, name: {})", id, name)
-
-      val metaUser = records(id)
-      val user = metaUser.user.copy(name = name)
-      val updatedMetaUser = metaUser.copy(user = user)
-
-      context.become(withRecords(records + (id -> updatedMetaUser)))
-      metaUser.publisher ! UserUpdated(user)
+      deadUser.map {
+        case (id, proxy) =>
+          log.info("user_pruned: {}", id)
+          become(users - id)
+      }.orElse {
+        log.warning("unknown_user_terminated: {}", userProxy)
+        None
+      }
   }
 
-  def receive = withRecords(Map.empty)
+  def receive = withUsers(Map.empty)
+
+  private[this] def become(users: Map[String, ActorRef]) = context.become(withUsers(users))
 }
 
 object UserRegistry {
   /** Identifier for injecting with Scaldi. */
   val identifier = 'userRegistry
 
-  case class StartConnection(id: String)
-
-  case class EndConnection(id: String)
-  
-  case class Subscribe(id: String, subscriber: ActorRef)
-
-  case class Unsubscribe(id: String, subscriber: ActorRef)
-
-  case class SetName(id: String, name: String)
+  case class GetUserProxy(id: String)
 
   def props = Props(new UserRegistry)
 }

@@ -3,22 +3,20 @@ package pokey.connection
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import pokey.connection.Requests._
 import pokey.connection.Responses._
-import pokey.room.RoomService
-import pokey.user.UserService
+import pokey.user.UserProxy
 
 class ConnectionHandler(userId: String,
-                        client: ActorRef,
-                        userService: UserService,
-                        roomService: RoomService) extends Actor with ActorLogging {
+                        userProxy: ActorRef,
+                        client: ActorRef) extends Actor with ActorLogging {
 
-  userService.subscribe(userId, self)
+  userProxy ! UserProxy.NewConnection(self)
 
   override def receive: Receive = {
     case req: Request =>
       req match {
         case SetName(name) =>
           log.info("userId: {}, request: setName, name: {}", userId, name)
-          userService.setName(userId, name)
+          userProxy ! UserProxy.SetName(name)
 
         case CreateRoom =>
           log.info("userId: {}, request: createRoom", userId)
@@ -41,23 +39,19 @@ class ConnectionHandler(userId: String,
           client ! ErrorResponse("Invalid request")
       }
 
-    case pokey.user.events.UserUpdated(user) => client ! UserUpdated(user)
+    case UserProxy.UserUpdated(user) => client ! UserUpdated(user)
   }
-
-  override def postStop() = userService.endConnection(userId)
 }
 
 object ConnectionHandler {
   val propsIdentifier = 'connectionHandlerProps
 
   def props(userId: String,
-            client: ActorRef,
-            userService: UserService,
-            roomService: RoomService) = Props {
+            userProxy: ActorRef,
+            client: ActorRef) = Props {
     new ConnectionHandler(
       userId,
-      client,
-      userService,
-      roomService)
+      userProxy,
+      client)
   }
 }
