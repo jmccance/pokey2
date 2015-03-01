@@ -10,7 +10,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
   def receive = withRooms(Map.empty)
 
   private[this] def withRooms(rooms: Map[String, ActorRef]): Receive = {
-    case GetRoomProxy(id) if rooms.contains(id) => sender ! rooms(id)
+    case GetRoomProxy(id) => sender ! rooms.get(id)
 
     case CreateRoomFor(ownerId) =>
       val querent = sender()
@@ -27,7 +27,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
       context.watch(roomProxy)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
-      querent ! roomProxy
+      querent ! (room.id, roomProxy)
 
     case Terminated(roomProxy) =>
       val deadRoom = rooms.find {
