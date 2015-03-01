@@ -27,7 +27,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
       context.watch(roomProxy)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
-      querent ! (room.id, roomProxy)
+      querent ! room.id
 
     case Terminated(roomProxy) =>
       val deadRoom = rooms.find {

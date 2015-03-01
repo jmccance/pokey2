@@ -61,14 +61,16 @@ object Requests {
         andKeep (JsPath \ "roomId").read[String]).map(JoinRoom(_))
   }
 
-  case class Estimate(roomId: String, value: String, comment: String) extends Request
+  case class Estimate(roomId: String,
+                      value: Option[String],
+                      comment: Option[String]) extends Request
 
   object Estimate {
     val reader: Reads[Request] =
       ((JsPath \ "request").read[String].filter(_ == RequestType.estimate)
         andKeep (JsPath \ "roomId").read[String]
-        and (JsPath \ "value").read[String]
-        and (JsPath \ "comment").read[String])(Estimate.apply _)
+        and (JsPath \ "value").readNullable[String]
+        and (JsPath \ "comment").readNullable[String])(Estimate.apply _)
   }
   
   case class Reveal(roomId: String) extends Request
