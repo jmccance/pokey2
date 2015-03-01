@@ -21,8 +21,11 @@ class ConnectionController(userService: UserService,
     log.info("Received WebSocket connection request")
     request.session.get("user_id") match {
       case Some(userId) =>
-        userService.getUserProxy(userId).map { userProxy =>
-          Right(connectionHandlerProps(userId, userProxy))
+        userService.getUserProxy(userId, create = true).map {
+          case Some(userProxy) => Right(connectionHandlerProps(userId, userProxy))
+          case None =>
+            // Since the create flag is true, this branch should never occur.
+            throw new IllegalStateException("Failed to create user proxy")
         }
 
       case None => Future.successful(Left(Unauthorized("Missing user id")))

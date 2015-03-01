@@ -6,15 +6,17 @@ class UserRegistry extends Actor with ActorLogging {
   import pokey.user.UserRegistry._
 
   def withUsers(users: Map[String, ActorRef]): Receive = {
-    case GetUserProxy(id) if users.contains(id) => sender ! users(id)
+    case GetUserProxy(id, _) if users.contains(id) => sender ! Some(users(id))
 
-    case GetUserProxy(id) if !users.contains(id) =>
+    case GetUserProxy(id, true) if !users.contains(id) =>
       val user = User(id, "Guest")
       val userProxy = context.actorOf(UserProxy.props(user), s"user-proxy-$id")
       context.watch(userProxy)
-      log.info("new_user: {}", user)
       become(users + (id -> userProxy))
+      log.info("new_user: {}", user)
       sender ! userProxy
+
+    case GetUserProxy(id, false) if !users.contains(id) => sender ! None
 
     case Terminated(userProxy) =>
       val deadUser = users.find {
@@ -40,7 +42,7 @@ object UserRegistry {
   /** Identifier for injecting with Scaldi. */
   val identifier = 'userRegistry
 
-  case class GetUserProxy(id: String)
+  case class GetUserProxy(id: String, create: Boolean = false)
 
   def props = Props(new UserRegistry)
 }
