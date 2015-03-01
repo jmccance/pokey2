@@ -14,7 +14,7 @@ class UserRegistry extends Actor with ActorLogging {
       context.watch(userProxy)
       become(users + (id -> userProxy))
       log.info("new_user: {}", user)
-      sender ! userProxy
+      sender ! Some(userProxy)
 
     case GetUserProxy(id, false) if !users.contains(id) => sender ! None
 
