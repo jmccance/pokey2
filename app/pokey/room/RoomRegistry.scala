@@ -1,6 +1,6 @@
 package pokey.room
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor._
 import pokey.user.UserService
 
 class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
@@ -21,13 +21,27 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
           querent ! CreateRoomError(s"Could not create room for nonexistent user $ownerId")
       }
 
-    case CreateRoomProxy(querent, ownerId, userProxy) =>
+    case CreateRoomProxy(querent, ownerId, ownerProxy) =>
       val room = Room(nextId(), ownerId)
-      context.watch(userProxy)
-      val roomProxy = context.actorOf(RoomProxy.props(room))
+      val roomProxy = context.actorOf(RoomProxy.props(room, ownerProxy))
+      context.watch(roomProxy)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
       querent ! roomProxy
+
+    case Terminated(roomProxy) =>
+      val deadRoom = rooms.find {
+        case (_, proxy) => proxy == roomProxy
+      }
+
+      deadRoom.map {
+        case (id, proxy) =>
+          log.info("room_closed: {}", id)
+          become(rooms - id)
+      }.orElse {
+        log.warning("unknown_room_closed: {}", roomProxy)
+        None
+      }
   }
 
   private[this] def nextId(): String = new java.rmi.server.UID().toString
@@ -50,9 +64,9 @@ object RoomRegistry {
    *
    * @param querent the original actor that asked for the room to be created
    * @param ownerId the id of the user who should own the room
-   * @param userProxy the user proxy corresponding to the owner id
+   * @param ownerProxy the user proxy corresponding to the owner id
    */
-  private[room] case class CreateRoomProxy(querent: ActorRef, ownerId: String, userProxy: ActorRef)
+  private[room] case class CreateRoomProxy(querent: ActorRef, ownerId: String, ownerProxy: ActorRef)
 
   case class CreateRoomError(message: String)
 }
