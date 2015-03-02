@@ -1,7 +1,7 @@
 package pokey.room
 
 import akka.actor._
-import pokey.user.UserProxy
+import pokey.user.{UserProxy, UserProxyActor}
 import pokey.util.{Subscribable, TopicProtocol}
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
@@ -17,11 +17,14 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
   override def receive: Receive = withRoom(initialRoom)
 
   private[this] def withRoom(room: Room): Receive = handleSubscriptions orElse {
-    case JoinRoom(userId: String) =>
-      // Validate user is not already a member. No-op if so.
-      // Subscribe the sender.
-      // Add the user to the room.
-      // Publish updated RoomInfo and RoomState events.
+    case JoinRoom(userProxy) =>
+      if (!room.contains(userProxy.id)) {
+        // Get the current user state via an ask.
+        // Subscribe the user in order to get updates to names.
+        userProxy.actor ! UserProxyActor.Subscribe(self)
+        // Add the user to the room.
+        // Publish updated RoomInfo and RoomState events.
+      }
 
     case LeaveRoom(userId) =>
       // Validate the user is a member. No-op if not.
@@ -56,7 +59,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 object RoomProxyActor extends TopicProtocol {
   def props(room: Room, ownerProxy: UserProxy) = Props(new RoomProxyActor(room, ownerProxy))
 
-  case class JoinRoom(userId: String)
+  case class JoinRoom(userProxy: UserProxy)
 
   case class LeaveRoom(userId: String)
 

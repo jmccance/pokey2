@@ -37,7 +37,7 @@ class ConnectionHandler(userProxy: UserProxy,
           log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
           roomService.getRoom(roomId).map {
             case Some(roomProxy) =>
-              roomProxy.actor ! RoomProxyActor.JoinRoom(userId)
+              roomProxy.actor ! RoomProxyActor.JoinRoom(userProxy)
               self ! RoomJoined(roomId, roomProxy.actor)
 
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
