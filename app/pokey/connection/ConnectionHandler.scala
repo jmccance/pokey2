@@ -3,8 +3,7 @@ package pokey.connection
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
 import pokey.room
-import pokey.room.{RoomProxy, RoomService}
-import pokey.user.UserProxy
+import pokey.room.RoomService
 
 class ConnectionHandler(userId: String,
                         userProxy: ActorRef,
@@ -15,7 +14,7 @@ class ConnectionHandler(userId: String,
 
   private[this] var rooms: Map[String, ActorRef] = Map.empty
 
-  userProxy ! UserProxy.NewConnection(self)
+  userProxy ! UserProxyActor.NewConnection(self)
 
   def receive: Receive = {
     case req: Request =>
@@ -24,7 +23,7 @@ class ConnectionHandler(userId: String,
       req match {
         case SetName(name) =>
           log.info("userId: {}, request: setName, name: {}", userId, name)
-          userProxy ! UserProxy.SetName(name)
+          userProxy ! UserProxyActor.SetName(name)
 
         case CreateRoom =>
           log.info("userId: {}, request: createRoom", userId)
@@ -36,7 +35,7 @@ class ConnectionHandler(userId: String,
           log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
           roomService.getRoomProxy(roomId).map {
             case Some(roomProxy: ActorRef) =>
-              roomProxy ! RoomProxy.JoinRoom(userId)
+              roomProxy ! RoomProxyActor.JoinRoom(userId)
               self ! RoomJoined(roomId, roomProxy)
 
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
@@ -45,22 +44,22 @@ class ConnectionHandler(userId: String,
         case Estimate(roomId, value, comment) =>
           log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
             userId, roomId, value, comment)
-          rooms(roomId) ! RoomProxy.SubmitEstimate(userId, room.Estimate(value, comment))
+          rooms(roomId) ! RoomProxyActor.SubmitEstimate(userId, room.Estimate(value, comment))
 
         case Reveal(roomId) =>
           log.info("userId: {}, request: reveal, roomId: {}", userId, roomId)
-          rooms(roomId) ! RoomProxy.Reveal(userId)
+          rooms(roomId) ! RoomProxyActor.Reveal(userId)
 
         case Clear(roomId) =>
           log.info("userId: {}, request: clear, roomId: {}", userId, roomId)
-          rooms(roomId) ! RoomProxy.Clear(userId)
+          rooms(roomId) ! RoomProxyActor.Clear(userId)
 
         case InvalidRequest(json) =>
           log.error("userId: {}, request: invalidRequest: {}", userId, json.toString())
           client ! Events.ErrorEvent("Invalid request")
       }
 
-    case UserProxy.UserUpdated(user) => client ! Events.UserUpdated(user)
+    case UserProxyActor.UserUpdated(user) => client ! Events.UserUpdated(user)
 
     case RoomJoined(id, proxy) => rooms += (id -> proxy)
   }
@@ -71,7 +70,7 @@ class ConnectionHandler(userId: String,
    */
   override def postStop(): Unit = {
     rooms.foreach {
-      case (_, proxy) => proxy ! RoomProxy.LeaveRoom(userId)
+      case (_, proxy) => proxy ! RoomProxyActor.LeaveRoom(userId)
     }
   }
 }

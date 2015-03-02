@@ -10,7 +10,7 @@ class UserRegistry extends Actor with ActorLogging {
 
     case CreateProxyForId(id) if !users.contains(id) =>
       val user = User(id, "Guest")
-      val userProxy = context.actorOf(UserProxy.props(user), s"user-proxy-$id")
+      val userProxy = context.actorOf(UserProxyActor.props(user), s"user-proxy-$id")
       context.watch(userProxy)
       become(users + (id -> userProxy))
       log.info("new_user: {}", user)

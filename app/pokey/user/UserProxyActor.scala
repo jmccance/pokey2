@@ -3,10 +3,10 @@ package pokey.user
 import akka.actor._
 import pokey.util.{Subscribable, TopicProtocol}
 
-class UserProxy(user: User) extends Actor with ActorLogging with Subscribable {
-  import pokey.user.UserProxy._
+class UserProxyActor(user: User) extends Actor with ActorLogging with Subscribable {
+  import pokey.user.UserProxyActor._
 
-  protected val protocol = UserProxy
+  protected val protocol = UserProxyActor
 
   private[this] case class State(user: User, connections: Set[ActorRef]) {
     def withUser(user: User) = this.copy(user = user)
@@ -47,8 +47,8 @@ class UserProxy(user: User) extends Actor with ActorLogging with Subscribable {
   private[this] def become(state: State) = context.become(withState(state))
 }
 
-object UserProxy extends TopicProtocol {
-  def props(user: User) = Props(new UserProxy(user))
+object UserProxyActor extends TopicProtocol {
+  def props(user: User) = Props(new UserProxyActor(user))
 
   case class NewConnection(conn: ActorRef)
 

@@ -23,7 +23,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
 
     case CreateRoomProxy(querent, ownerId, ownerProxy) =>
       val room = Room(nextId(), ownerId)
-      val roomProxy = context.actorOf(RoomProxy.props(room, ownerProxy))
+      val roomProxy = context.actorOf(RoomProxyActor.props(room, ownerProxy))
       context.watch(roomProxy)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
