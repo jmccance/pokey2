@@ -28,16 +28,17 @@ class ConnectionHandler(userId: String,
 
         case CreateRoom =>
           log.info("userId: {}, request: createRoom", userId)
-          roomService.createRoomProxy(userId).map {
-            case roomId: String => Events.RoomCreated(roomId)
-          }.pipeTo(client)
+          roomService
+            .createRoom(userId)
+            .map(proxy => Events.RoomCreated(proxy.id))
+            .pipeTo(client)
 
         case JoinRoom(roomId) =>
           log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
-          roomService.getRoomProxy(roomId).map {
-            case Some(roomProxy: ActorRef) =>
-              roomProxy ! RoomProxyActor.JoinRoom(userId)
-              self ! RoomJoined(roomId, roomProxy)
+          roomService.getRoom(roomId).map {
+            case Some(roomProxy) =>
+              roomProxy.actor ! RoomProxyActor.JoinRoom(userId)
+              self ! RoomJoined(roomId, roomProxy.actor)
 
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
           }

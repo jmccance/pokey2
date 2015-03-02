@@ -9,7 +9,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
   
   def receive = withRooms(Map.empty)
 
-  private[this] def withRooms(rooms: Map[String, ActorRef]): Receive = {
+  private[this] def withRooms(rooms: Map[String, RoomProxy]): Receive = {
     case GetRoomProxy(id) => sender ! rooms.get(id)
 
     case CreateRoomFor(ownerId) =>
@@ -23,15 +23,15 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
 
     case CreateRoomProxy(querent, ownerId, ownerProxy) =>
       val room = Room(nextId(), ownerId)
-      val roomProxy = context.actorOf(RoomProxyActor.props(room, ownerProxy))
-      context.watch(roomProxy)
+      val roomProxy = RoomProxy(room.id, context.actorOf(RoomProxyActor.props(room, ownerProxy)))
+      context.watch(roomProxy.actor)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
-      querent ! room.id
+      querent ! roomProxy
 
-    case Terminated(roomProxy) =>
+    case Terminated(deadActor) =>
       val deadRoom = rooms.find {
-        case (_, proxy) => proxy == roomProxy
+        case (_, proxy) => proxy.actor == deadActor
       }
 
       deadRoom.map {
@@ -39,14 +39,14 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
           log.info("room_closed: {}", id)
           become(rooms - id)
       }.orElse {
-        log.warning("unknown_room_closed: {}", roomProxy)
+        log.warning("unknown_room_closed: {}", deadActor)
         None
       }
   }
 
   private[this] def nextId(): String = new java.rmi.server.UID().toString
 
-  private[this] def become(rooms: Map[String, ActorRef]) = context.become(withRooms(rooms))
+  private[this] def become(rooms: Map[String, RoomProxy]) = context.become(withRooms(rooms))
 }
 
 object RoomRegistry {

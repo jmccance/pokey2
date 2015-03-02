@@ -12,22 +12,22 @@ trait RoomService {
    * @param ownerId the user id that should own this room
    * @return a Future with the id of a newly created room owned by the specified user id
    */
-  def createRoomProxy(ownerId: String)(implicit ec: ExecutionContext): Future[String]
+  def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy]
 
   /**
    * @param id the id of the room proxy to retrieve
    * @return a Future containing the proxy for this room, if it exists
    */
-  def getRoomProxy(id: String)(implicit ec: ExecutionContext): Future[Option[ActorRef]]
+  def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]]
 }
 
 class DefaultRoomService(roomRegistry: ActorRef) extends RoomService {
   private[this] implicit val timeout = Timeout(2.seconds)
 
-  override def createRoomProxy(ownerId: String)
-                              (implicit ec: ExecutionContext): Future[String] =
-    (roomRegistry ? RoomRegistry.CreateRoomFor(ownerId)).mapTo[String]
+  override def createRoom(ownerId: String)
+                         (implicit ec: ExecutionContext): Future[RoomProxy] =
+    (roomRegistry ? RoomRegistry.CreateRoomFor(ownerId)).mapTo[RoomProxy]
 
-  override def getRoomProxy(id: String)(implicit ec: ExecutionContext): Future[Option[ActorRef]] =
-    (roomRegistry ? RoomRegistry.GetRoomProxy(id)).mapTo[Option[ActorRef]]
+  override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
+    (roomRegistry ? RoomRegistry.GetRoomProxy(id)).mapTo[Option[RoomProxy]]
 }
