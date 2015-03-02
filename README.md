@@ -30,7 +30,7 @@ Once the connection is granted, the client interacts with the application by sen
 JSON objects over the WebSocket connection. Requests and server events are defined in the Requests
 and Events objects in the pokey.connection package.
 
-### Requests
+#### Requests
 
 * SetName - Update the name that will be displayed to other users.
 * CreateRoom - Creates a new room, owned by the current user, that other users can join and submit
@@ -42,7 +42,7 @@ and Events objects in the pokey.connection package.
 * Clear - Reset all members' estimates in the specified room and hide the estimates. User must be
           the owner in order to clear.
 
-### Events
+#### Events
 
 * UserUpdated - Emitted when a user has changed. Clients will receive UserUpdated messages for their
                 own user, as well as any users in any rooms the connection has joined.
@@ -55,3 +55,11 @@ and Events objects in the pokey.connection package.
               revealed, and a map from user ids to their (optional) estimates.
 * ErrorEvent - Sent whenever an error needs to be communicated to the client. Generally when a
                request is sent that is either invalid or not completable.
+
+### Backend Architecture
+
+> Topics to cover:
+> * Proxy/Registry/Service pattern
+> * Subscribable trait
+> * The event-sourcing-ish approach we're using.
+
