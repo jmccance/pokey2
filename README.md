@@ -3,6 +3,12 @@ Pokey v2
 
 **NOTE: Pokey v2 is still in development and is not functional in any way, shape, or form.**
 
+## Roadmap
+
+* 2.0 - Feature parity with Pokey 1.0 with rewritten back-end (and necessary changes to front-end).
+* 2.1 - Support for alternative estimating schemes, including integer ranges, Fibonacci numbers,
+        and t-shirt sizing.
+
 ## Implementation
 
 ### Terminology
