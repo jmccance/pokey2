@@ -3,7 +3,8 @@ package pokey.connection
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
 import pokey.room
-import pokey.room.RoomService
+import pokey.room.{RoomProxyActor, RoomService}
+import pokey.user.UserProxyActor
 
 class ConnectionHandler(userId: String,
                         userProxy: ActorRef,
