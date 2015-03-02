@@ -35,7 +35,7 @@ class UserProxy(user: User) extends Actor with ActorLogging with Subscribable {
         val updatedConnections = connections - conn
         become(state.withConnections(updatedConnections))
         if (updatedConnections.isEmpty) {
-          log.info("user_cleanup_scheduled, user_id: {}", user.id)
+          log.info("(NYI) user_cleanup_scheduled, user_id: {}", user.id)
           // TODO Schedule user cleanup after last connection is terminated
           // TODO Capture scheduled event so we can cancel if user reconnects before the timeout.
         }
