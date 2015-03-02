@@ -3,7 +3,7 @@ package pokey.room
 import akka.actor._
 import pokey.util.{Subscribable, TopicProtocol}
 
-class RoomProxy(room: Room, ownerProxy: ActorRef)
+class RoomProxy(initialRoom: Room, ownerProxy: ActorRef)
   extends Actor
   with ActorLogging
   with Subscribable {
@@ -13,7 +13,9 @@ class RoomProxy(room: Room, ownerProxy: ActorRef)
 
   override def preStart(): Unit = context.watch(ownerProxy)
 
-  override def receive: Receive = handleSubscriptions orElse {
+  override def receive: Receive = withRoom(initialRoom)
+
+  private[this] def withRoom(room: Room): Receive = handleSubscriptions orElse {
     case JoinRoom(userId: String) =>
       // Validate user is not already a member. No-op if so.
       // Subscribe the sender.
@@ -46,6 +48,8 @@ class RoomProxy(room: Room, ownerProxy: ActorRef)
       publish(RoomClosed(room.id))
       context.stop(self)
   }
+
+  private[this] def become(room: Room) = context.become(withRoom(room))
 }
 
 object RoomProxy extends TopicProtocol {

@@ -14,18 +14,14 @@ class ConnectionController(userService: UserService,
                            connectionHandlerProps: HandlerPropsFactory)
   extends Controller {
 
-
   private[this] val log = Logger(this.getClass)
 
   def connect = WebSocket.tryAcceptWithActor[Request, Event] { request =>
     log.info("Received WebSocket connection request")
     request.session.get("user_id") match {
       case Some(userId) =>
-        userService.getUserProxy(userId, create = true).map {
-          case Some(userProxy) => Right(connectionHandlerProps(userId, userProxy))
-          case None =>
-            // Since the create flag is true, this branch should never occur.
-            throw new IllegalStateException("Failed to create user proxy")
+        userService.createProxyForId(userId).map {
+          case userProxy => Right(connectionHandlerProps(userId, userProxy))
         }
 
       case None => Future.successful(Left(Unauthorized("Missing user id")))
