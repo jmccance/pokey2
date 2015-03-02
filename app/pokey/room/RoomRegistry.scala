@@ -1,7 +1,7 @@
 package pokey.room
 
 import akka.actor._
-import pokey.user.UserService
+import pokey.user.{UserProxy, UserService}
 
 class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
   import context.dispatcher
@@ -15,15 +15,17 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
     case CreateRoomFor(ownerId) =>
       val querent = sender()
       userService.getUserProxy(ownerId).map {
-        case Some(userProxy) => self ! CreateRoomProxy(querent, ownerId, userProxy)
+        case Some(userProxy) => self ! CreateRoomProxy(querent, userProxy)
 
         case None =>
           querent ! CreateRoomError(s"Could not create room for nonexistent user $ownerId")
       }
 
-    case CreateRoomProxy(querent, ownerId, ownerProxy) =>
-      val room = Room(nextId(), ownerId)
-      val roomProxy = RoomProxy(room.id, context.actorOf(RoomProxyActor.props(room, ownerProxy)))
+    case CreateRoomProxy(querent, ownerProxy) =>
+      val room = Room(nextId(), ownerProxy.id)
+      val roomProxy = RoomProxy(
+        room.id,
+        context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id}"))
       context.watch(roomProxy.actor)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
@@ -36,7 +38,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
 
       deadRoom.map {
         case (id, proxy) =>
-          log.info("room_closed: {}", id)
+          log.info("room_closed: {}", proxy)
           become(rooms - id)
       }.orElse {
         log.warning("unknown_room_closed: {}", deadActor)
@@ -63,10 +65,9 @@ object RoomRegistry {
    * owner's proxy.
    *
    * @param querent the original actor that asked for the room to be created
-   * @param ownerId the id of the user who should own the room
    * @param ownerProxy the user proxy corresponding to the owner id
    */
-  private[room] case class CreateRoomProxy(querent: ActorRef, ownerId: String, ownerProxy: ActorRef)
+  private[room] case class CreateRoomProxy(querent: ActorRef, ownerProxy: UserProxy)
 
   case class CreateRoomError(message: String)
 }

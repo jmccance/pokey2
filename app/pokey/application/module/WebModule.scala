@@ -4,7 +4,7 @@ import _root_.akka.actor.ActorRef
 import pokey.assets.AssetController
 import pokey.connection.{ConnectionController, ConnectionHandler}
 import pokey.room.RoomService
-import pokey.user.UserService
+import pokey.user.{UserProxy, UserService}
 import scaldi._
 
 class WebModule extends Module {
@@ -22,11 +22,10 @@ class WebModule extends Module {
     toProvider {
     val roomService = inject [RoomService]
 
-    (userId: String, userProxy: ActorRef) =>
+    (userProxy: UserProxy) =>
       // Take advantage of partial function application to convert the ConnectionHandler.props
       // method to the appropriate signature for a WebSocket.HandlerProps.
       ConnectionHandler.props(
-        userId,
         userProxy,
         roomService,
         _: ActorRef)

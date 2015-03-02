@@ -1,12 +1,11 @@
 package pokey.connection
 
-import akka.actor.ActorRef
 import play.api.Logger
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc._
 import pokey.connection.ConnectionController.HandlerPropsFactory
-import pokey.user.UserService
+import pokey.user.{UserProxy, UserService}
 
 import scala.concurrent.Future
 
@@ -21,7 +20,7 @@ class ConnectionController(userService: UserService,
     request.session.get("user_id") match {
       case Some(userId) =>
         userService.createProxyForId(userId).map {
-          case userProxy => Right(connectionHandlerProps(userId, userProxy))
+          case userProxy => Right(connectionHandlerProps(userProxy))
         }
 
       case None => Future.successful(Left(Unauthorized("Missing user id")))
@@ -30,5 +29,5 @@ class ConnectionController(userService: UserService,
 }
 
 object ConnectionController {
-  type HandlerPropsFactory = ((String, ActorRef) => WebSocket.HandlerProps)
+  type HandlerPropsFactory = ((UserProxy) => WebSocket.HandlerProps)
 }

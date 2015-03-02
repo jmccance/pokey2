@@ -14,10 +14,10 @@ trait UserService {
   def nextUserId(): String
 
   def createProxyForId(id: String)
-                      (implicit ec: ExecutionContext): Future[ActorRef]
+                      (implicit ec: ExecutionContext): Future[UserProxy]
 
   def getUserProxy(id: String)
-                  (implicit ec: ExecutionContext): Future[Option[ActorRef]]
+                  (implicit ec: ExecutionContext): Future[Option[UserProxy]]
 }
 
 class DefaultUserService(userRegistry: ActorRef) extends UserService {
@@ -25,12 +25,11 @@ class DefaultUserService(userRegistry: ActorRef) extends UserService {
 
   override def nextUserId(): String = new java.rmi.server.UID().toString
 
-
   override def createProxyForId(id: String)
-                               (implicit ec: ExecutionContext): Future[ActorRef] =
-    (userRegistry ? UserRegistry.CreateProxyForId(id)).mapTo[ActorRef]
+                               (implicit ec: ExecutionContext): Future[UserProxy] =
+    (userRegistry ? UserRegistry.CreateProxyForId(id)).mapTo[UserProxy]
 
   override def getUserProxy(id: String)
-                           (implicit ec: ExecutionContext): Future[Option[ActorRef]] =
-    (userRegistry ? UserRegistry.GetUserProxy(id)).mapTo[Option[ActorRef]]
+                           (implicit ec: ExecutionContext): Future[Option[UserProxy]] =
+    (userRegistry ? UserRegistry.GetUserProxy(id)).mapTo[Option[UserProxy]]
 }

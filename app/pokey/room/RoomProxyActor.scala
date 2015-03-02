@@ -1,9 +1,10 @@
 package pokey.room
 
 import akka.actor._
+import pokey.user.UserProxy
 import pokey.util.{Subscribable, TopicProtocol}
 
-class RoomProxyActor(initialRoom: Room, ownerProxy: ActorRef)
+class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
   extends Actor
   with ActorLogging
   with Subscribable {
@@ -11,7 +12,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: ActorRef)
 
   override protected val protocol: TopicProtocol = RoomProxyActor
 
-  override def preStart(): Unit = context.watch(ownerProxy)
+  override def preStart(): Unit = context.watch(ownerProxy.actor)
 
   override def receive: Receive = withRoom(initialRoom)
 
@@ -43,7 +44,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: ActorRef)
       // Update the room.
       // Publish a RoomState event.
 
-    case Terminated(`ownerProxy`) =>
+    case Terminated(ownerProxy.actor) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       publish(RoomClosed(room.id))
       context.stop(self)
@@ -53,7 +54,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: ActorRef)
 }
 
 object RoomProxyActor extends TopicProtocol {
-  def props(room: Room, ownerProxy: ActorRef) = Props(new RoomProxyActor(room, ownerProxy))
+  def props(room: Room, ownerProxy: UserProxy) = Props(new RoomProxyActor(room, ownerProxy))
 
   case class JoinRoom(userId: String)
 

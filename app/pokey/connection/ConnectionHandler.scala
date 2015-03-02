@@ -4,18 +4,18 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
 import pokey.room
 import pokey.room.{RoomProxyActor, RoomService}
-import pokey.user.UserProxyActor
+import pokey.user.{UserProxy, UserProxyActor}
 
-class ConnectionHandler(userId: String,
-                        userProxy: ActorRef,
+class ConnectionHandler(userProxy: UserProxy,
                         roomService: RoomService,
                         client: ActorRef) extends Actor with ActorLogging {
   import context.dispatcher
   import pokey.connection.ConnectionHandler._
 
+  private[this] val userId = userProxy.id
   private[this] var rooms: Map[String, ActorRef] = Map.empty
 
-  userProxy ! UserProxyActor.NewConnection(self)
+  userProxy.actor ! UserProxyActor.NewConnection(self)
 
   def receive: Receive = {
     case req: Request =>
@@ -24,7 +24,7 @@ class ConnectionHandler(userId: String,
       req match {
         case SetName(name) =>
           log.info("userId: {}, request: setName, name: {}", userId, name)
-          userProxy ! UserProxyActor.SetName(name)
+          userProxy.actor ! UserProxyActor.SetName(name)
 
         case CreateRoom =>
           log.info("userId: {}, request: createRoom", userId)
@@ -80,11 +80,10 @@ class ConnectionHandler(userId: String,
 object ConnectionHandler {
   val propsIdentifier = 'connectionHandlerProps
 
-  def props(userId: String,
-            userProxy: ActorRef,
+  def props(userProxy: UserProxy,
             roomService: RoomService,
             client: ActorRef) = Props {
-    new ConnectionHandler(userId, userProxy, roomService, client)
+    new ConnectionHandler(userProxy, roomService, client)
   }
 
   private[connection] case class RoomJoined(id: String, proxy: ActorRef)
