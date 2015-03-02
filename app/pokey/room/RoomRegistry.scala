@@ -14,7 +14,7 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
 
     case CreateRoomFor(ownerId) =>
       val querent = sender()
-      userService.getUserProxy(ownerId).map {
+      userService.getUser(ownerId).map {
         case Some(userProxy) => self ! CreateRoomProxy(querent, userProxy)
 
         case None =>

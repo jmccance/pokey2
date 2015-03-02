@@ -19,7 +19,7 @@ class ConnectionController(userService: UserService,
     log.info("Received WebSocket connection request")
     request.session.get("user_id") match {
       case Some(userId) =>
-        userService.createProxyForId(userId).map {
+        userService.createUserForId(userId).map {
           case userProxy => Right(connectionHandlerProps(userProxy))
         }
 
