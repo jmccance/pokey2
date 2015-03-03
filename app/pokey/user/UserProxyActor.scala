@@ -8,43 +8,36 @@ class UserProxyActor(initialUser: User) extends Actor with ActorLogging with Sub
 
   protected val protocol = UserProxyActor
 
-  private[this] case class State(user: User, connections: Set[ActorRef]) {
-    def withUser(user: User) = this.copy(user = user)
+  private[this] var user: User = initialUser
+  private[this] var connections: Set[ActorRef] = Set.empty
 
-    def withConnections(connections: Set[ActorRef]) = this.copy(connections = connections)
+  /**
+   * When someone subscribes to us, immediately send them the current user state.
+   *
+   * @param subscriber the subscribing ActorRef
+   */
+  override def onSubscribe(subscriber: ActorRef) = subscriber ! user
+
+  def receive = handleSubscriptions orElse {
+    case SetName(name) =>
+      user = user.copy(name = name)
+      publish(UserUpdated(user))
+      log.info("user_updated: {}", user)
+
+    case NewConnection(conn) =>
+      self ! Subscribe(conn)
+      context.watch(conn)
+      connections += conn
+      log.info("new_connection: {}", conn)
+
+    case Terminated(conn) if connections.contains(conn) =>
+      connections = connections - conn
+      if (connections.isEmpty) {
+        log.info("(NYI) user_cleanup_scheduled, user_id: {}", user.id)
+        // TODO Schedule user cleanup after last connection is terminated
+        // TODO Capture scheduled event so we can cancel if user reconnects before the timeout.
+      }
   }
-
-  def receive = withState(State(initialUser, Set.empty))
-
-  private[this] def withState(state: State): Receive = {
-    val user = state.user
-    val connections = state.connections
-
-    handleSubscriptions orElse {
-      case SetName(name) =>
-        val updatedUser = user.copy(name = name)
-        become(state.withUser(updatedUser))
-        publish(UserUpdated(updatedUser))
-        log.info("user_updated: {}", updatedUser)
-
-      case NewConnection(conn) =>
-        self ! Subscribe(conn)
-        context.watch(conn)
-        become(state.withConnections(connections + conn))
-        log.info("new_connection: {}", conn)
-
-      case Terminated(conn) if connections.contains(conn) =>
-        val updatedConnections = connections - conn
-        become(state.withConnections(updatedConnections))
-        if (updatedConnections.isEmpty) {
-          log.info("(NYI) user_cleanup_scheduled, user_id: {}", user.id)
-          // TODO Schedule user cleanup after last connection is terminated
-          // TODO Capture scheduled event so we can cancel if user reconnects before the timeout.
-        }
-    }
-  }
-
-  private[this] def become(state: State) = context.become(withState(state))
 }
 
 object UserProxyActor extends TopicProtocol {

@@ -72,7 +72,7 @@ class ConnectionHandler(userProxy: UserProxy,
    */
   override def postStop(): Unit = {
     rooms.foreach {
-      case (_, proxy) => proxy ! RoomProxyActor.LeaveRoom(userId)
+      case (_, proxy) => proxy ! RoomProxyActor.LeaveRoom(userProxy)
     }
   }
 }

@@ -1,7 +1,7 @@
 package pokey.room
 
 import akka.actor._
-import pokey.user.{UserProxy, UserProxyActor}
+import pokey.user.{User, UserProxy, UserProxyActor}
 import pokey.util.{Subscribable, TopicProtocol}
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
@@ -14,46 +14,73 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
   override def preStart(): Unit = context.watch(ownerProxy.actor)
 
-  override def receive: Receive = withRoom(initialRoom)
+  private[this] var room: Room = initialRoom
 
-  private[this] def withRoom(room: Room): Receive = handleSubscriptions orElse {
+  def receive: Receive = handleSubscriptions orElse {
     case JoinRoom(userProxy) =>
       if (!room.contains(userProxy.id)) {
-        // Get the current user state via an ask.
-        // Subscribe the user in order to get updates to names.
+        // Subscribe to the user in order to get updates to names.
         userProxy.actor ! UserProxyActor.Subscribe(self)
-        // Add the user to the room.
-        // Publish updated RoomInfo and RoomState events.
+        // Subscribe the connection to ourselves so they get updates
+        self ! Subscribe(sender())
+        // Add a stub user to the room.
+        room += User(userProxy.id, "")
       }
 
-    case LeaveRoom(userId) =>
-      // Validate the user is a member. No-op if not.
-      // Unsubscribe the sender
-      // Remove the user from the room.
-      // Publish updated RoomInfo and RoomState events.
+    case user: User =>
+      if (room.contains(user.id)) {
+        room += user
+        publish(RoomUpdated(room))
+      }
+
+    case LeaveRoom(userProxy) =>
+      if (room.contains(userProxy.id)) {
+        // Stop getting updates from the user
+        userProxy.actor ! UserProxyActor.Unsubscribe(self)
+
+        // Stop sending updates to the connection
+        self ! Unsubscribe(sender())
+
+        // Remove the user from the room.
+        room -= userProxy.id
+
+        // Update members of the change
+        publish(RoomUpdated(room))
+      }
 
     case SubmitEstimate(userId, estimate) =>
-      // Validate user is a member. Otherwise reply with an error.
-      // Update the room.
-      // Publish a RoomState event.
+      room.withEstimate(userId, estimate).map { updatedRoom =>
+        room = updatedRoom
+        publish(RoomUpdated(room))
+      } recover {
+        case e => // TODO Reply with error
+      }
 
     case Reveal(userId: String) =>
-      // Validate user is owner. Otherwise reply with an error.
-      // Update the room.
-      // Publish a RoomState event.
+      if (room.ownerId == userId) {
+        if (!room.isRevealed) {
+          room = room.revealed()
+          publish(RoomUpdated(room))
+        }
+      } else {
+        // TODO Reply with error about room ownership
+        // Should change method to move validation of ownership into the model. See withEstimate.
+      }
 
     case Clear(userId: String) =>
-      // Validate user is owner. Otherwise reply with an error.
-      // Update the room.
-      // Publish a RoomState event.
+      if (room.ownerId == userId) {
+        room = room.cleared()
+        publish(RoomUpdated(room))
+      } else {
+        // TODO Reply with error about room ownership
+        // Should change method to move validation of ownership into the model
+      }
 
     case Terminated(ownerProxy.actor) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       publish(RoomClosed(room.id))
       context.stop(self)
   }
-
-  private[this] def become(room: Room) = context.become(withRoom(room))
 }
 
 object RoomProxyActor extends TopicProtocol {
@@ -61,7 +88,7 @@ object RoomProxyActor extends TopicProtocol {
 
   case class JoinRoom(userProxy: UserProxy)
 
-  case class LeaveRoom(userId: String)
+  case class LeaveRoom(userProxy: UserProxy)
 
   case class SubmitEstimate(userId: String, estimate: Estimate)
 
@@ -70,4 +97,6 @@ object RoomProxyActor extends TopicProtocol {
   case class Clear(userId: String)
 
   case class RoomClosed(roomId: String)
+
+  case class RoomUpdated(room: Room)
 }
