@@ -19,7 +19,7 @@ class WebModule extends Module {
 
   (bind [ConnectionController.HandlerPropsFactory]
     identifiedBy required(ConnectionHandler.propsIdentifier)
-    toProvider {
+    to {
     val roomService = inject [RoomService]
 
     (userProxy: UserProxy) =>
