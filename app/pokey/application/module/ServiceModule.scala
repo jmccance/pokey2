@@ -23,6 +23,6 @@ class ServiceModule extends Module {
     implicit val system = inject [ActorSystem]
     val userService = inject [UserService]
 
-    system.actorOf(RoomRegistry.props(userService))
+    system.actorOf(RoomRegistry.props(userService), "room-registry")
   }
 }
