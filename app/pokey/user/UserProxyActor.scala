@@ -16,7 +16,7 @@ class UserProxyActor(initialUser: User) extends Actor with ActorLogging with Sub
 
   def receive = withState(State(initialUser, Set.empty))
 
-  def withState(state: State): Receive = {
+  private[this] def withState(state: State): Receive = {
     val user = state.user
     val connections = state.connections
 
