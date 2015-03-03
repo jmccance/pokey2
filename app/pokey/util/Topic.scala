@@ -25,16 +25,22 @@ object Topic {
 }
 
 trait Subscribable {
+  this: Actor =>
+
   protected val protocol: TopicProtocol
   private[this] var topic: Topic = Topic()
   import protocol._
 
-  def handleSubscriptions: Actor.Receive = {
+  def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
     case Subscribe(subscriber) =>
       topic = topic.subscribe(subscriber)
+      onSubscribe(subscriber)
+      sender ! Subscribed(subscriber)
 
     case Unsubscribe(subscriber) =>
       topic = topic.unsubscribe(subscriber)
+      onUnsubscribe(subscriber)
+      sender ! Unsubscribed(subscriber)
   }
 
   def onSubscribe(subscriber: ActorRef): Unit = ()
