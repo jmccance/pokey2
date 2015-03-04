@@ -1,10 +1,11 @@
-package pokey.user
+package pokey.user.actor
 
 import akka.actor._
+import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
 
 class UserProxyActor(initialUser: User) extends Actor with ActorLogging with Subscribable {
-  import pokey.user.UserProxyActor._
+  import UserProxyActor._
 
   protected val protocol = UserProxyActor
 

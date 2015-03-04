@@ -1,4 +1,4 @@
-package pokey.user
+package pokey.user.model
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._

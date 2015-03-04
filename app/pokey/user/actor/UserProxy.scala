@@ -1,4 +1,4 @@
-package pokey.user
+package pokey.user.actor
 
 import akka.actor.ActorRef
 

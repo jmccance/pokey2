@@ -1,14 +1,16 @@
-package pokey.room
+package pokey.room.actor
 
 import akka.actor._
-import pokey.user.{User, UserProxy, UserProxyActor}
+import pokey.room.model.{Estimate, Room}
+import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
   extends Actor
   with ActorLogging
   with Subscribable {
-  import pokey.room.RoomProxyActor._
+  import pokey.room.actor.RoomProxyActor._
 
   override protected val protocol: TopicProtocol = RoomProxyActor
 

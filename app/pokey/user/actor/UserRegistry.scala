@@ -1,9 +1,10 @@
-package pokey.user
+package pokey.user.actor
 
 import akka.actor._
+import pokey.user.model.User
 
 class UserRegistry extends Actor with ActorLogging {
-  import pokey.user.UserRegistry._
+  import UserRegistry._
 
   def withUsers(users: Map[String, UserProxy]): Receive = {
     case CreateProxyForId(id) if users.contains(id) => sender ! users(id)

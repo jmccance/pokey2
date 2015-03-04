@@ -1,11 +1,13 @@
-package pokey.room
+package pokey.room.actor
 
 import akka.actor._
-import pokey.user.{UserProxy, UserService}
+import pokey.room.model.Room
+import pokey.user.actor.UserProxy
+import pokey.user.service.UserService
 
 class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
+  import RoomRegistry._
   import context.dispatcher
-  import pokey.room.RoomRegistry._
   
   def receive = withRooms(Map.empty)
 

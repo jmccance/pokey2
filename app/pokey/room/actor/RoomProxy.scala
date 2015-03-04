@@ -1,4 +1,4 @@
-package pokey.room
+package pokey.room.actor
 
 import akka.actor.ActorRef
 

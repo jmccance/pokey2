@@ -1,9 +1,9 @@
-package pokey.assets
+package pokey.assets.controller
 
 import controllers.Assets
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
-import pokey.user.UserService
+import pokey.user.service.UserService
 
 class AssetController(userService: UserService) extends Controller {
 

@@ -1,6 +1,6 @@
-package pokey.room
+package pokey.room.model
 
-import pokey.user.User
+import pokey.user.model.User
 
 import scala.util.{Failure, Success, Try}
 

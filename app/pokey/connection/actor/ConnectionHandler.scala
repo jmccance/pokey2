@@ -1,16 +1,18 @@
-package pokey.connection
+package pokey.connection.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
-import pokey.room
-import pokey.room.{RoomProxyActor, RoomService}
-import pokey.user.{UserProxy, UserProxyActor}
+import pokey.connection.model.{Events, InvalidRequest, Request}
+import pokey.room.actor.RoomProxyActor
+import pokey.room.model.Estimate
+import pokey.room.service.RoomService
+import pokey.user.actor.{UserProxy, UserProxyActor}
 
 class ConnectionHandler(userProxy: UserProxy,
                         roomService: RoomService,
                         client: ActorRef) extends Actor with ActorLogging {
+  import ConnectionHandler._
   import context.dispatcher
-  import pokey.connection.ConnectionHandler._
 
   private[this] val userId = userProxy.id
   private[this] var rooms: Map[String, ActorRef] = Map.empty
@@ -19,21 +21,21 @@ class ConnectionHandler(userProxy: UserProxy,
 
   def receive: Receive = {
     case req: Request =>
-      import pokey.connection.Requests._
+      import pokey.connection.model.Requests._
 
       req match {
-        case SetName(name) =>
+        case SetNameRequest(name) =>
           log.info("userId: {}, request: setName, name: {}", userId, name)
           userProxy.actor ! UserProxyActor.SetName(name)
 
-        case CreateRoom =>
+        case CreateRoomRequest =>
           log.info("userId: {}, request: createRoom", userId)
           roomService
             .createRoom(userId)
             .map(proxy => Events.RoomCreated(proxy.id))
             .pipeTo(client)
 
-        case JoinRoom(roomId) =>
+        case JoinRoomRequest(roomId) =>
           log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
           roomService.getRoom(roomId).map {
             case Some(roomProxy) =>
@@ -43,16 +45,16 @@ class ConnectionHandler(userProxy: UserProxy,
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
-        case Estimate(roomId, value, comment) =>
+        case SubmitEstimateRequest(roomId, value, comment) =>
           log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
             userId, roomId, value, comment)
-          rooms(roomId) ! RoomProxyActor.SubmitEstimate(userId, room.Estimate(value, comment))
+          rooms(roomId) ! RoomProxyActor.SubmitEstimate(userId, Estimate(value, comment))
 
-        case Reveal(roomId) =>
+        case RevealRoomRequest(roomId) =>
           log.info("userId: {}, request: reveal, roomId: {}", userId, roomId)
           rooms(roomId) ! RoomProxyActor.Reveal(userId)
 
-        case Clear(roomId) =>
+        case ClearRoomRequest(roomId) =>
           log.info("userId: {}, request: clear, roomId: {}", userId, roomId)
           rooms(roomId) ! RoomProxyActor.Clear(userId)
 

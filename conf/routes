@@ -2,7 +2,7 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /connect             @pokey.connection.ConnectionController.connect
+GET     /connect             @pokey.connection.controller.ConnectionController.connect
 # Map static resources from the /public folder to the /assets URL path
-GET     /                    @pokey.assets.AssetController.assets(path="/public", file="index.html")
-GET     /*file               @pokey.assets.AssetController.assets(path="/public", file)
+GET     /                    @pokey.assets.controller.AssetController.assets(path="/public", file="index.html")
+GET     /*file               @pokey.assets.controller.AssetController.assets(path="/public", file)

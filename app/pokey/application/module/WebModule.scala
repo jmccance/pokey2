@@ -1,10 +1,12 @@
 package pokey.application.module
 
 import _root_.akka.actor.ActorRef
-import pokey.assets.AssetController
-import pokey.connection.{ConnectionController, ConnectionHandler}
-import pokey.room.RoomService
-import pokey.user.{UserProxy, UserService}
+import pokey.assets.controller.AssetController
+import pokey.connection.actor.ConnectionHandler
+import pokey.connection.controller.ConnectionController
+import pokey.room.service.RoomService
+import pokey.user.actor.UserProxy
+import pokey.user.service.UserService
 import scaldi._
 
 class WebModule extends Module {

@@ -1,14 +1,14 @@
-package pokey.connection
+package pokey.connection.model
 
 import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
-import pokey.room.Estimate
-import pokey.user.User
+import pokey.room.model.Estimate
+import pokey.user.model.User
 
 sealed trait Event
 
 object Event {
-  import pokey.connection.Events._
+  import Events._
 
   implicit val formatter = Format[Event](
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
