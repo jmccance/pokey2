@@ -21,7 +21,7 @@ class UserProxyActor(initialUser: User) extends Actor with ActorLogging with Sub
   def receive = handleSubscriptions orElse {
     case SetName(name) =>
       user = user.copy(name = name)
-      publish(UserUpdated(user))
+      self ! Publish(UserUpdated(user))
       log.info("user_updated: {}", user)
 
     case NewConnection(conn) =>

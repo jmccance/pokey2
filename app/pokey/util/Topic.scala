@@ -10,6 +10,8 @@ trait TopicProtocol {
   case class Unsubscribe(subscriber: ActorRef)
 
   case class Unsubscribed(subscriber: ActorRef)
+
+  case class Publish(message: Any)
 }
 
 class Topic private(subscribers: Set[ActorRef]) {
@@ -28,8 +30,9 @@ trait Subscribable {
   this: Actor =>
 
   protected val protocol: TopicProtocol
-  private[this] var topic: Topic = Topic()
   import protocol._
+
+  private[this] var topic: Topic = Topic()
 
   def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
     case Subscribe(subscriber) =>
@@ -41,9 +44,10 @@ trait Subscribable {
       topic = topic.unsubscribe(subscriber)
       onUnsubscribe(subscriber)
       sender ! Unsubscribed(subscriber)
+
+    case Publish(message) if sender == self => topic.publish(message)
   }
 
   def onSubscribe(subscriber: ActorRef): Unit = ()
   def onUnsubscribe(subscriber: ActorRef): Unit = ()
-  def publish(message: Any): Unit = topic.publish(message)
 }

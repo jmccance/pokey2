@@ -30,7 +30,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case user: User =>
       if (room.contains(user.id)) {
         room += user
-        publish(RoomUpdated(room))
+        self ! Publish(RoomUpdated(room))
       }
 
     case LeaveRoom(userProxy) =>
@@ -45,13 +45,13 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         room -= userProxy.id
 
         // Update members of the change
-        publish(RoomUpdated(room))
+        self ! Publish(RoomUpdated(room))
       }
 
     case SubmitEstimate(userId, estimate) =>
       room.withEstimate(userId, estimate).map { updatedRoom =>
         room = updatedRoom
-        publish(RoomUpdated(room))
+        self ! Publish(RoomUpdated(room))
       } recover {
         case e => // TODO Reply with error
       }
@@ -60,7 +60,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
       if (room.ownerId == userId) {
         if (!room.isRevealed) {
           room = room.revealed()
-          publish(RoomUpdated(room))
+          self ! Publish(RoomUpdated(room))
         }
       } else {
         // TODO Reply with error about room ownership
@@ -70,7 +70,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case Clear(userId: String) =>
       if (room.ownerId == userId) {
         room = room.cleared()
-        publish(RoomUpdated(room))
+        self ! Publish(RoomUpdated(room))
       } else {
         // TODO Reply with error about room ownership
         // Should change method to move validation of ownership into the model
@@ -78,7 +78,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
     case Terminated(ownerProxy.actor) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
-      publish(RoomClosed(room.id))
+      self ! Publish(RoomClosed(room.id))
       context.stop(self)
   }
 }
