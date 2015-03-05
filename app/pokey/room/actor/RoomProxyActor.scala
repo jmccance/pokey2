@@ -54,27 +54,19 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
       room.withEstimate(userId, estimate).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(RoomUpdated(room))
-      } recover { sender ! _}
+      } recover(sender ! _)
 
     case Reveal(userId: String) =>
-      if (room.ownerId == userId) {
-        if (!room.isRevealed) {
-          room = room.revealed()
-          self ! Publish(RoomUpdated(room))
-        }
-      } else {
-        // TODO Reply with error about room ownership
-        // Should change method to move validation of ownership into the model. See withEstimate.
-      }
+      room.revealedBy(userId).map { updatedRoom =>
+        room = updatedRoom
+        self ! Publish(RoomUpdated(room))
+      } recover(sender ! _)
 
     case Clear(userId: String) =>
-      if (room.ownerId == userId) {
-        room = room.cleared()
+      room.clearedBy(userId).map { updatedRoom =>
+        room = updatedRoom
         self ! Publish(RoomUpdated(room))
-      } else {
-        // TODO Reply with error about room ownership
-        // Should change method to move validation of ownership into the model
-      }
+      } recover(sender ! _)
 
     case Terminated(ownerProxy.actor) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)

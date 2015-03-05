@@ -36,9 +36,13 @@ case class Room(id: String,
       .withEstimate(userId, estimate)
       .map(newState => this.copy(state = newState))
 
-  def cleared(): Room = this.copy(state = state.cleared())
+  def clearedBy(userId: String): Room Or UnauthorizedErr =
+    if (userId == ownerId) Good(this.copy(state = state.cleared()))
+    else Bad(UnauthorizedErr("Only the room owner may clear the room's estimates"))
 
-  def revealed(): Room = this.copy(state = state.revealed())
+  def revealedBy(userId: String): Room Or UnauthorizedErr =
+    if (userId == ownerId) Good(this.copy(state = state.revealed()))
+    else Bad(UnauthorizedErr("Only the room owner may reveal the room's estimates."))
 }
 
 case class RoomState(isRevealed: Boolean, estimates: Map[String, Option[Estimate]]) {
@@ -57,7 +61,7 @@ case class RoomState(isRevealed: Boolean, estimates: Map[String, Option[Estimate
       val updatedEstimates = estimates + (userId -> Some(estimate))
       Good(this.copy(estimates = updatedEstimates))
     } else {
-      Bad(UnauthorizedErr(s"Only a member of a room may submit an estimate to it"))
+      Bad(UnauthorizedErr("Only a member of a room may submit an estimate to it"))
     }
   }
 
