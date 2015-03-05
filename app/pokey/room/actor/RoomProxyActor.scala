@@ -54,9 +54,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
       room.withEstimate(userId, estimate).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(RoomUpdated(room))
-      } recover {
-        case e => // TODO Reply with error
-      }
+      } recover { sender ! _}
 
     case Reveal(userId: String) =>
       if (room.ownerId == userId) {

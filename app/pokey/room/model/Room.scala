@@ -1,8 +1,8 @@
 package pokey.room.model
 
+import org.scalactic.{Bad, Good, Or}
+import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
-
-import scala.util.{Failure, Success, Try}
 
 case class Room(id: String,
                 ownerId: String,
@@ -31,11 +31,11 @@ case class Room(id: String,
 
   def contains(userId: String): Boolean = users.exists(_.id == userId)
 
-  def withEstimate(userId: String, estimate: Estimate): Try[Room] = 
+  def withEstimate(userId: String, estimate: Estimate): Room Or UnauthorizedErr =
     state
       .withEstimate(userId, estimate)
       .map(newState => this.copy(state = newState))
-  
+
   def cleared(): Room = this.copy(state = state.cleared())
 
   def revealed(): Room = this.copy(state = state.revealed())
@@ -52,11 +52,13 @@ case class RoomState(isRevealed: Boolean, estimates: Map[String, Option[Estimate
 
   def -(userId: String): RoomState = this.copy(estimates = estimates - userId)
 
-  def withEstimate(userId: String, estimate: Estimate): Try[RoomState] = {
+  def withEstimate(userId: String, estimate: Estimate): RoomState Or UnauthorizedErr = {
     if (estimates.contains(userId)) {
       val updatedEstimates = estimates + (userId -> Some(estimate))
-      Success(this.copy(estimates = updatedEstimates))
-    } else Failure(new NoSuchElementException(userId))
+      Good(this.copy(estimates = updatedEstimates))
+    } else {
+      Bad(UnauthorizedErr(s"Only a member of a room may submit an estimate to it"))
+    }
   }
 
   def cleared(): RoomState = RoomState(isRevealed = false, estimates.mapValues(_ => None))
