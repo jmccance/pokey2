@@ -12,6 +12,10 @@ case class Room(id: String,
                 estimates: Map[String, Option[Estimate]] = Map.empty) {
   def roomInfo: RoomInfo = RoomInfo(id, ownerId, isRevealed)
 
+  lazy val publicEstimates: Map[String, Option[PublicEstimate]] =
+    if (isRevealed) estimates.mapValues(_.map(_.asRevealed))
+    else estimates.mapValues(_.map(_.asHidden))
+
   def apply(userId: String): (User, Option[Estimate]) = this.get(userId).get
 
   def get(userId: String): Option[(User, Option[Estimate])] = {
@@ -60,7 +64,7 @@ case class Room(id: String,
 case class RoomInfo(id: String, ownerId: String, isRevealed: Boolean)
 
 object RoomInfo {
-  implicit val writer = Writes[RoomInfo] {
+  implicit val writer: Writes[RoomInfo] = Writes[RoomInfo] {
     case RoomInfo(id, ownerId, isRevealed) =>
       Json.obj(
         "id" -> id,
