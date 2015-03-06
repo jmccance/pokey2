@@ -78,6 +78,9 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 object RoomProxyActor extends TopicProtocol {
   def props(room: Room, ownerProxy: UserProxy) = Props(new RoomProxyActor(room, ownerProxy))
 
+  /////////////
+  // Commands
+
   case class JoinRoom(userProxy: UserProxy)
 
   case class LeaveRoom(userProxy: UserProxy)
@@ -88,7 +91,10 @@ object RoomProxyActor extends TopicProtocol {
 
   case class Clear(userId: String)
 
-  case class RoomClosed(roomId: String)
+  ///////////
+  // Events
 
   case class RoomUpdated(room: Room)
+
+  case class RoomClosed(roomId: String)
 }
