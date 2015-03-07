@@ -1,7 +1,7 @@
 package pokey.room.model
 
 import org.scalactic.{Bad, Good, Or}
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OWrites}
 import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
 
@@ -64,7 +64,7 @@ case class Room(id: String,
 case class RoomInfo(id: String, ownerId: String, isRevealed: Boolean)
 
 object RoomInfo {
-  implicit val writer: Writes[RoomInfo] = Writes[RoomInfo] {
+  implicit val writer: OWrites[RoomInfo] = OWrites[RoomInfo] {
     case RoomInfo(id, ownerId, isRevealed) =>
       Json.obj(
         "id" -> id,

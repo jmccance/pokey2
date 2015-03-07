@@ -10,11 +10,11 @@ sealed trait Event
 object Event {
   import Events._
 
-  implicit val formatter = Format[Event](
+  implicit val formatter = OFormat[Event](
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
     // a reads.
     Reads.pure[Event](???),
-    Writes[Event] {
+    OWrites[Event] {
       case r: UserUpdated => UserUpdated.writer.writes(r)
       case r: RoomCreated => RoomCreated.writer.writes(r)
       case r: RoomInfo => RoomInfo.writer.writes(r)
@@ -32,7 +32,7 @@ object Events {
   case class UserUpdated(user: User) extends Event
 
   object UserUpdated {
-    val writer = Writes[UserUpdated] { resp =>
+    val writer = OWrites[UserUpdated] { resp =>
       Json.obj(
         "response" -> "userUpdated",
         "user" -> resp.user
@@ -43,7 +43,7 @@ object Events {
   case class RoomCreated(id: String) extends Event
 
   object RoomCreated {
-    val writer = Writes[RoomCreated] { resp =>
+    val writer = OWrites[RoomCreated] { resp =>
       Json.obj(
         "response" -> "roomCreated",
         "id" -> resp.id
@@ -63,7 +63,7 @@ object Events {
   case class RoomInfo(id: String, ownerId: String)
 
   object RoomInfo {
-    val writer = Writes[RoomInfo] { resp =>
+    val writer = OWrites[RoomInfo] { resp =>
       Json.obj(
         "response" -> "roomInfo",
         "id" -> resp.id,
@@ -79,7 +79,7 @@ object Events {
       implicit val writes = Writes[HiddenEstimate.type](_ => Json.obj())
     }
 
-    val writer = Writes[RoomState] { resp =>
+    val writer = OWrites[RoomState] { resp =>
       val estimates = Json.toJson {
         // If estimates are revealed, we can just return the estimates map.
         // Otherwise we need to convert submitted estimates to hidden estimates, so that the client
@@ -107,7 +107,7 @@ object Events {
   case class ErrorEvent(message: String) extends Event
 
   object ErrorEvent {
-    val writer = Writes[ErrorEvent] { resp =>
+    val writer = OWrites[ErrorEvent] { resp =>
       Json.obj(
         "response" -> "error",
         "message" -> resp.message
