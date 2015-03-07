@@ -50,7 +50,7 @@ object Events {
 
   object RoomCreated {
     val writer = OWrites[RoomCreated] {
-      case RoomCreated(roomId) => EventObject("roomCreated")("id" -> roomId)
+      case RoomCreated(roomId) => EventObject("roomCreated")("roomId" -> roomId)
     }
   }
 
