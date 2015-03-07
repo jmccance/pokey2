@@ -8,9 +8,10 @@ import pokey.user.model.User
 case class Room(id: String,
                 ownerId: String,
                 isRevealed: Boolean = false,
-                users: Set[User] = Set.empty,
+                private val usersById: Map[String, User] = Map.empty,
                 estimates: Map[String, Option[Estimate]] = Map.empty) {
-  def roomInfo: RoomInfo = RoomInfo(id, ownerId, isRevealed)
+  lazy val users = usersById.values
+  lazy val roomInfo: RoomInfo = RoomInfo(id, ownerId, isRevealed)
 
   lazy val publicEstimates: Map[String, Option[PublicEstimate]] =
     if (isRevealed) estimates.mapValues(_.map(_.asRevealed))
@@ -19,23 +20,23 @@ case class Room(id: String,
   def apply(userId: String): (User, Option[Estimate]) = this.get(userId).get
 
   def get(userId: String): Option[(User, Option[Estimate])] = {
-    val oUser = users.find(_.id == userId)
+    val oUser = usersById.get(userId)
     oUser.map(user => (user, estimates(user.id)))
   }
 
   def +(user: User): Room = {
-    val mUsers = users + user
+    val mUsers = usersById + (user.id -> user)
     val mEstimates = estimates + (user.id -> None)
-    this.copy(users = mUsers, estimates = mEstimates)
+    this.copy(usersById = mUsers, estimates = mEstimates)
   }
 
   def -(userId: String): Room = {
-    val mUsers = users.filterNot(_.id == userId)
+    val mUsers = usersById - userId
     val mEstimates = estimates - userId
-    this.copy(users = mUsers, estimates = mEstimates)
+    this.copy(usersById = mUsers, estimates = mEstimates)
   }
 
-  def contains(userId: String): Boolean = users.exists(_.id == userId)
+  def contains(userId: String): Boolean = usersById.contains(userId)
 
   def withEstimate(userId: String, estimate: Estimate): Room Or UnauthorizedErr =
     if (estimates.contains(userId)) {

@@ -45,6 +45,8 @@ class ConnectionHandler(userProxy: UserProxy,
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
+        // TODO Make below methods handle invalid requests more correctly.
+
         case SubmitEstimateRequest(roomId, value, comment) =>
           log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
             connUserId, roomId, value, comment)
@@ -81,7 +83,7 @@ class ConnectionHandler(userProxy: UserProxy,
         import RoomProxyActor._
 
         {
-          // TODO Handle RoomInfo, Set[Users], and estimates
+          case RoomUpdated(roomInfo) => Events.RoomUpdated(roomInfo)
 
           case UserJoined(roomId, user) => Events.UserJoined(roomId, user)
 
