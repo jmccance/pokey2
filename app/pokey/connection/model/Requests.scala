@@ -29,63 +29,67 @@ object Request {
     FrameFormatter.jsonFrame[Request]
 }
 
-object Requests {
-  object RequestType {
-    val setName = "setName"
-    val createRoom = "createRoom"
-    val joinRoom = "joinRoom"
-    val estimate = "estimate"
-    val reveal = "reveal"
-    val clear = "clear"
-  }
+trait RequestCompanion {
+  val jsonId: String
 
+  private[model] def validateType: Reads[JsValue] =
+    (JsPath \ "request").read[String].filter(_ == jsonId) andKeep Reads.of[JsValue]
+}
+
+object Requests {
   case class SetNameRequest(name: String) extends Request
 
-  object SetNameRequest {
+  object SetNameRequest extends RequestCompanion {
+    val jsonId = "setName"
+
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.setName)
-        andKeep (JsPath \ "name").read[String].map(SetNameRequest(_)))
+      validateType andKeep (JsPath \ "name").read[String].map(SetNameRequest(_))
   }
 
-  case object CreateRoomRequest extends Request {
-    val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.createRoom)
-        andKeep Reads.pure(CreateRoomRequest))
+  case object CreateRoomRequest extends Request with RequestCompanion {
+    val jsonId = "createRoom"
+
+    val reader: Reads[Request] = validateType andKeep Reads.pure(CreateRoomRequest)
   }
 
   case class JoinRoomRequest(roomId: String) extends Request
 
-  object JoinRoomRequest {
+  object JoinRoomRequest extends RequestCompanion {
+    val jsonId = "joinRoom"
+
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.joinRoom)
-        andKeep (JsPath \ "roomId").read[String]).map(JoinRoomRequest(_))
+      validateType andKeep (JsPath \ "roomId").read[String].map(JoinRoomRequest(_))
   }
 
   case class SubmitEstimateRequest(roomId: String,
                                    value: Option[String],
                                    comment: Option[String]) extends Request
 
-  object SubmitEstimateRequest {
+  object SubmitEstimateRequest extends RequestCompanion {
+    val jsonId = "submitEstimate"
+
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.estimate)
-        andKeep (JsPath \ "roomId").read[String]
-        and (JsPath \ "value").readNullable[String]
-        and (JsPath \ "comment").readNullable[String])(SubmitEstimateRequest.apply _)
+      validateType andKeep
+        ((JsPath \ "roomId").read[String]
+          and (JsPath \ "value").readNullable[String]
+          and (JsPath \ "comment").readNullable[String])(SubmitEstimateRequest.apply _)
   }
 
   case class RevealRoomRequest(roomId: String) extends Request
 
-  object RevealRoomRequest {
+  object RevealRoomRequest extends RequestCompanion {
+    val jsonId = "revealRoom"
+
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.reveal)
-        andKeep (JsPath \ "roomId").read[String]).map(RevealRoomRequest(_))
+      validateType andKeep (JsPath \ "roomId").read[String].map(RevealRoomRequest(_))
   }
 
   case class ClearRoomRequest(roomId: String) extends Request
 
-  object ClearRoomRequest {
+  object ClearRoomRequest extends RequestCompanion {
+    val jsonId = "clearRoom"
+
     val reader: Reads[Request] =
-      ((JsPath \ "request").read[String].filter(_ == RequestType.clear)
-        andKeep (JsPath \ "roomId").read[String]).map(ClearRoomRequest(_))
+      validateType andKeep (JsPath \ "roomId").read[String].map(ClearRoomRequest(_))
   }
 }
