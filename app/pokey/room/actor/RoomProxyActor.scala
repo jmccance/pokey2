@@ -1,7 +1,7 @@
 package pokey.room.actor
 
 import akka.actor._
-import pokey.room.model.{Estimate, PublicEstimate, Room}
+import pokey.room.model.{Estimate, PublicEstimate, Room, RoomInfo}
 import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
@@ -22,9 +22,13 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
    * When someone subscribes, send them the current room state.
    */
   override def onSubscribe(subscriber: ActorRef): Unit = {
-    subscriber ! room.roomInfo
-    subscriber ! room.users
-    subscriber ! room.publicEstimates
+    // Kind of hacky and noisy, but expedient. Simply send them "updates" for the current state of
+    // the room.
+    subscriber ! RoomUpdated(room.roomInfo)
+    room.users.foreach(user => subscriber ! UserJoined(room.id, user))
+    room.publicEstimates.foreach {
+      case (userId, oEstimate) => EstimateUpdated(room.id, userId, oEstimate)
+    }
   }
 
   def receive: Receive = handleSubscriptions orElse {
@@ -35,16 +39,13 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
         // Subscribe the connection to ourselves so they get updates
         self ! Subscribe(sender())
-
-        // Add a stub user to the room.
-        room += User(userProxy.id, "")
       }
 
-    case user: User =>
-      if (room.contains(user.id)) {
-        room += user
+    case UserProxyActor.UserUpdated(user) =>
+      if (!room.contains(user.id)) {
         self ! Publish(UserJoined(room.id, user))
       }
+      room += user
 
     case LeaveRoom(userProxy) =>
       if (room.contains(userProxy.id)) {
@@ -105,6 +106,8 @@ object RoomProxyActor extends TopicProtocol {
 
   ///////////
   // Events
+
+  case class RoomUpdated(roomInfo: RoomInfo)
 
   case class UserJoined(roomId: String, user: User)
 

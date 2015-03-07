@@ -2,7 +2,7 @@ package pokey.connection.model
 
 import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
-import pokey.room.model.Estimate
+import pokey.room.model.{PublicEstimate, RoomInfo}
 import pokey.user.model.User
 
 sealed trait Event
@@ -10,15 +10,20 @@ sealed trait Event
 object Event {
   import Events._
 
-  implicit val formatter = Format[Event](
+  implicit val formatter = OFormat[Event](
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
     // a reads.
     Reads.pure[Event](???),
-    Writes[Event] {
+    OWrites[Event] {
       case r: UserUpdated => UserUpdated.writer.writes(r)
       case r: RoomCreated => RoomCreated.writer.writes(r)
-      case r: RoomInfo => RoomInfo.writer.writes(r)
-      case r: RoomState => RoomState.writer.writes(r)
+      case r: RoomUpdated => RoomUpdated.writer.writes(r)
+      case r: UserJoined => UserJoined.writer.writes(r)
+      case r: UserLeft => UserLeft.writer.writes(r)
+      case r: EstimateUpdated => EstimateUpdated.writer.writes(r)
+      case r: RoomRevealed => RoomRevealed.writer.writes(r)
+      case r: RoomCleared => RoomCleared.writer.writes(r)
+      case r: RoomClosed => RoomClosed.writer.writes(r)
       case r: ErrorEvent => ErrorEvent.writer.writes(r)
     }
   )
@@ -29,25 +34,23 @@ object Event {
 
 object Events {
 
+  private[this] def EventObject(typeName: String)(fields: (String, Json.JsValueWrapper)*) =
+    Json.obj(("event" -> (typeName: Json.JsValueWrapper)) +: fields: _*)
+
   case class UserUpdated(user: User) extends Event
 
   object UserUpdated {
-    val writer = Writes[UserUpdated] { resp =>
-      Json.obj(
-        "response" -> "userUpdated",
-        "user" -> resp.user
-      )
+    val writer = OWrites[UserUpdated] {
+      case UserUpdated(user) =>
+        EventObject("userUpdate")("response" -> "userUpdated", "user" -> user)
     }
   }
 
-  case class RoomCreated(id: String) extends Event
+  case class RoomCreated(roomId: String) extends Event
 
   object RoomCreated {
-    val writer = Writes[RoomCreated] { resp =>
-      Json.obj(
-        "response" -> "roomCreated",
-        "id" -> resp.id
-      )
+    val writer = OWrites[RoomCreated] {
+      case RoomCreated(roomId) => EventObject("roomCreated")("roomId" -> roomId)
     }
   }
 
@@ -55,63 +58,78 @@ object Events {
    * Metadata for the given room. Used for things that either do not change or do not change often,
    * like the id, owner, estimate schema, etc., room name, etc.
    *
-   * Sent when a connection joins a room or when the room info changes.
-   *
-   * @param id the id of the room
-   * @param ownerId the id of the owner of the room
+   * @param roomInfo the basic info for the room
    */
-  case class RoomInfo(id: String, ownerId: String)
+  case class RoomUpdated(roomInfo: RoomInfo) extends Event
 
-  object RoomInfo {
-    val writer = Writes[RoomInfo] { resp =>
-      Json.obj(
-        "response" -> "roomInfo",
-        "id" -> resp.id,
-        "ownerId" -> resp.ownerId
-      )
+  object RoomUpdated {
+    val writer = OWrites[RoomUpdated] {
+      case RoomUpdated(roomInfo) => EventObject("roomUpdate")("room" -> roomInfo)
     }
   }
 
-  case class RoomState(id: String, isRevealed: Boolean, estimates: Map[User, Option[Estimate]])
+  case class UserJoined(roomId: String, user: User) extends Event
 
-  object RoomState {
-    private[this] case object HiddenEstimate {
-      implicit val writes = Writes[HiddenEstimate.type](_ => Json.obj())
+  object UserJoined {
+    val writer = OWrites[UserJoined] {
+      case UserJoined(roomId, user) => EventObject("userJoined")("roomId" -> roomId, "user" -> user)
     }
+  }
 
-    val writer = Writes[RoomState] { resp =>
-      val estimates = Json.toJson {
-        // If estimates are revealed, we can just return the estimates map.
-        // Otherwise we need to convert submitted estimates to hidden estimates, so that the client
-        // can tell who estimated with knowing what they said.
-        val screenedEstimates =
-          if (resp.isRevealed) resp.estimates.mapValues(Json.toJson(_))
-          else resp.estimates.mapValues(_.map(_ => HiddenEstimate)).mapValues(Json.toJson(_))
+  case class UserLeft(roomId: String, user: User) extends Event
 
-        // TODO This just associates a user id with an estimate. Will need to ensure the FE can
-        // associate the id with a name.
-        screenedEstimates.map {
-          case (user, estimate) => user.id -> estimate
-        }
-      }
+  object UserLeft {
+    val writer = OWrites[UserLeft] {
+      case UserLeft(roomId, user) => EventObject("userLeft")("roomId" -> roomId, "user" -> user)
+    }
+  }
 
-      Json.obj(
-        "response" -> "roomState",
-        "id" -> resp.id,
-        "isRevealed" -> resp.isRevealed,
-        "estimates" -> estimates
-      )
+  case class EstimateUpdated(roomId: String,
+                             userId: String,
+                             estimate: Option[PublicEstimate]) extends Event
+
+  object EstimateUpdated {
+    val writer = OWrites[EstimateUpdated] {
+      case EstimateUpdated(roomId, userId, estimate) =>
+        EventObject("estimateUpdated")(
+          "roomId" -> roomId,
+          "userId" -> userId,
+          "estimate" -> estimate
+        )
+    }
+  }
+
+  case class RoomRevealed(roomId: String,
+                          estimates: Map[String, Option[PublicEstimate]]) extends Event
+
+  object RoomRevealed {
+    val writer = OWrites[RoomRevealed] {
+      case RoomRevealed(roomId, estimates) =>
+        EventObject("roomRevealed")("roomId" -> roomId, "estimates" -> estimates)
+    }
+  }
+
+  case class RoomCleared(roomId: String) extends Event
+
+  object RoomCleared {
+    val writer = OWrites[RoomCleared] {
+      case RoomCleared(roomId) => EventObject("roomCleared")("roomId" -> roomId)
+    }
+  }
+
+  case class RoomClosed(roomId: String) extends Event
+
+  object RoomClosed {
+    val writer = OWrites[RoomClosed] {
+      case RoomClosed(roomId) => EventObject("roomClosed")("roomId" -> roomId)
     }
   }
 
   case class ErrorEvent(message: String) extends Event
 
   object ErrorEvent {
-    val writer = Writes[ErrorEvent] { resp =>
-      Json.obj(
-        "response" -> "error",
-        "message" -> resp.message
-      )
+    val writer = OWrites[ErrorEvent] {
+      case ErrorEvent(message) => EventObject("error")("message" -> message)
     }
   }
 }

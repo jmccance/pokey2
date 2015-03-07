@@ -2,8 +2,8 @@ package pokey.connection.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
-import pokey.connection.model.{Events, InvalidRequest, Request}
-import pokey.room.actor.RoomProxyActor
+import pokey.connection.model.{Event, Events, InvalidRequest, Request}
+import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.model.Estimate
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
@@ -14,7 +14,7 @@ class ConnectionHandler(userProxy: UserProxy,
   import ConnectionHandler._
   import context.dispatcher
 
-  private[this] val userId = userProxy.id
+  private[this] val connUserId = userProxy.id
   private[this] var rooms: Map[String, ActorRef] = Map.empty
 
   userProxy.actor ! UserProxyActor.NewConnection(self)
@@ -25,47 +25,87 @@ class ConnectionHandler(userProxy: UserProxy,
 
       req match {
         case SetNameRequest(name) =>
-          log.info("userId: {}, request: setName, name: {}", userId, name)
+          log.info("userId: {}, request: setName, name: {}", connUserId, name)
           userProxy.actor ! UserProxyActor.SetName(name)
 
         case CreateRoomRequest =>
-          log.info("userId: {}, request: createRoom", userId)
+          log.info("userId: {}, request: createRoom", connUserId)
           roomService
-            .createRoom(userId)
+            .createRoom(connUserId)
             .map(proxy => Events.RoomCreated(proxy.id))
             .pipeTo(client)
 
         case JoinRoomRequest(roomId) =>
-          log.info("userId: {}, request: joinRoom, roomId: {}", userId, roomId)
+          log.info("userId: {}, request: joinRoom, roomId: {}", connUserId, roomId)
           roomService.getRoom(roomId).map {
             case Some(roomProxy) =>
               roomProxy.actor ! RoomProxyActor.JoinRoom(userProxy)
-              self ! RoomJoined(roomId, roomProxy.actor)
+              self ! RoomJoined(roomProxy)
 
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
+        // TODO Make below methods handle invalid requests more correctly.
+
         case SubmitEstimateRequest(roomId, value, comment) =>
           log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
-            userId, roomId, value, comment)
-          rooms(roomId) ! RoomProxyActor.SubmitEstimate(userId, Estimate(value, comment))
+            connUserId, roomId, value, comment)
+          rooms(roomId) ! RoomProxyActor.SubmitEstimate(connUserId, Estimate(value, comment))
 
         case RevealRoomRequest(roomId) =>
-          log.info("userId: {}, request: reveal, roomId: {}", userId, roomId)
-          rooms(roomId) ! RoomProxyActor.Reveal(userId)
+          log.info("userId: {}, request: reveal, roomId: {}", connUserId, roomId)
+          rooms(roomId) ! RoomProxyActor.Reveal(connUserId)
 
         case ClearRoomRequest(roomId) =>
-          log.info("userId: {}, request: clear, roomId: {}", userId, roomId)
-          rooms(roomId) ! RoomProxyActor.Clear(userId)
+          log.info("userId: {}, request: clear, roomId: {}", connUserId, roomId)
+          rooms(roomId) ! RoomProxyActor.Clear(connUserId)
 
         case InvalidRequest(json) =>
-          log.error("userId: {}, request: invalidRequest: {}", userId, json.toString())
+          log.error("userId: {}, request: invalidRequest: {}", connUserId, json.toString())
           client ! Events.ErrorEvent("Invalid request")
       }
 
-    case UserProxyActor.UserUpdated(user) => client ! Events.UserUpdated(user)
+    case RoomJoined(roomProxy) =>
+      rooms += roomProxy.id -> roomProxy.actor
 
-    case RoomJoined(id, proxy) => rooms += (id -> proxy)
+    case message =>
+      type EventMapping = PartialFunction[Any, Event]
+
+      val userEvents: EventMapping = {
+        import UserProxyActor._
+
+        {
+          case UserUpdated(user) => Events.UserUpdated(user)
+        }
+      }
+
+      val roomEvents: EventMapping = {
+        import RoomProxyActor._
+
+        {
+          case RoomUpdated(roomInfo) => Events.RoomUpdated(roomInfo)
+
+          case UserJoined(roomId, user) => Events.UserJoined(roomId, user)
+
+          case UserLeft(roomId, user) => Events.UserLeft(roomId, user)
+
+          case EstimateUpdated(roomId, userId, estimate) =>
+            Events.EstimateUpdated(roomId, userId, estimate)
+
+          case Revealed(roomId, estimates) => Events.RoomRevealed(roomId, estimates)
+
+          case Cleared(roomId) => Events.RoomCleared(roomId)
+
+          case Closed(roomId) =>
+            // The room is closed, so we no longer need to hold onto the proxy
+            rooms -= roomId
+            Events.RoomClosed(roomId)
+        }
+      }
+
+      val event = (userEvents orElse roomEvents).lift(message)
+
+      event.map(client ! _)
   }
 
   /**
@@ -88,5 +128,5 @@ object ConnectionHandler {
     new ConnectionHandler(userProxy, roomService, client)
   }
 
-  private[connection] case class RoomJoined(id: String, proxy: ActorRef)
+  private[actor] case class RoomJoined(roomProxy: RoomProxy)
 }

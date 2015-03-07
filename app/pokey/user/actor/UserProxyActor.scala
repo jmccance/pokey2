@@ -17,7 +17,7 @@ class UserProxyActor(initialUser: User) extends Actor with ActorLogging with Sub
    *
    * @param subscriber the subscribing ActorRef
    */
-  override def onSubscribe(subscriber: ActorRef) = subscriber ! user
+  override def onSubscribe(subscriber: ActorRef) = subscriber ! UserUpdated(user)
 
   def receive = handleSubscriptions orElse {
     case SetName(name) =>

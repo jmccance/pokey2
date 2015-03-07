@@ -1,6 +1,5 @@
 package pokey.room.model
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class Estimate(value: Option[String], comment: Option[String]) {
@@ -10,11 +9,23 @@ case class Estimate(value: Option[String], comment: Option[String]) {
 
 trait PublicEstimate
 
-case class RevealedEstimate(value: Option[String], comment: Option[String]) extends PublicEstimate
-case object HiddenEstimate extends PublicEstimate
-
-object Estimate {
-  implicit val formatter =
-    ((JsPath \ "value").formatNullable[String]
-      and (JsPath \ "comment").formatNullable[String])(Estimate.apply, unlift(Estimate.unapply))
+object PublicEstimate {
+  implicit val writer = Writes[PublicEstimate] {
+    case e: RevealedEstimate => RevealedEstimate.writer.writes(e)
+    case HiddenEstimate => Json.obj()
+  }
 }
+
+case class RevealedEstimate(value: Option[String], comment: Option[String]) extends PublicEstimate
+
+object RevealedEstimate {
+  val writer = OWrites[RevealedEstimate] {
+    case RevealedEstimate(value, comment) =>
+      Json.obj(
+        "value" -> value,
+        "comment" -> comment
+      )
+  }
+}
+
+case object HiddenEstimate extends PublicEstimate
