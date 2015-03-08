@@ -9,6 +9,8 @@ import pokey.user.model.User
 import pokey.user.service.{DefaultUserService, UserService}
 import scaldi.Module
 
+import scala.concurrent.duration._
+
 class ServiceModule extends Module {
   bind [UserService] to injected [DefaultUserService] (
     'userRegistry -> inject [ActorRef] (identified by UserRegistry.identifier)
@@ -16,7 +18,9 @@ class ServiceModule extends Module {
 
   bind[UserProxyActor.PropsFactory] to {
     val config = inject [Configuration]
-    def settings: UserProxyActor.Settings = UserProxyActor.defaultSettings
+    val settings = new UserProxyActor.Settings {
+      override val maxIdleDuration = config.getMilliseconds("pokey.users.max-idle-time").get.millis
+    }
 
     (user: User) => UserProxyActor.props(settings, user)
   }

@@ -1,6 +1,7 @@
 package pokey.user.actor
 
 import akka.actor._
+import org.joda.time.DateTime
 import pokey.user.actor.UserProxyActor.Settings
 import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
@@ -37,8 +38,11 @@ class UserProxyActor(settings: Settings, initialUser: User)
     case NewConnection(conn) =>
       // Attempt to cancel the eviction message. _.cancel() might return false, but that's okay
       // because we'll ignore the message if we have connections anyway.
-      oCancellableEviction.foreach(_.cancel())
-      oCancellableEviction = None
+      oCancellableEviction = oCancellableEviction.flatMap { cancellableEviction =>
+        log.info("eviction_cancelled")
+        cancellableEviction.cancel()
+        None
+      }
 
       // Subscribe the new connection to ourselves so they get updates.
       self ! Subscribe(conn)
@@ -59,7 +63,8 @@ class UserProxyActor(settings: Settings, initialUser: User)
     case Terminated(conn) if connections.contains(conn) =>
       connections = connections - conn
       if (connections.isEmpty) {
-        log.info("user_cleanup_scheduled, user_id: {}", user.id)
+        log.info("user_cleanup_scheduled, user_id: {}, eviction_time: {}",
+          user.id, DateTime.now().plusMillis(settings.maxIdleDuration.toMillis.toInt))
         oCancellableEviction = Option {
           context.system.scheduler.scheduleOnce(settings.maxIdleDuration, self, EvictUser)
         }
