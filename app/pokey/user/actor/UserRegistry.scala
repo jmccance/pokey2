@@ -3,7 +3,7 @@ package pokey.user.actor
 import akka.actor._
 import pokey.user.model.User
 
-class UserRegistry extends Actor with ActorLogging {
+class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor with ActorLogging {
   import UserRegistry._
 
   def withUsers(users: Map[String, UserProxy]): Receive = {
@@ -12,7 +12,7 @@ class UserRegistry extends Actor with ActorLogging {
     case CreateProxyForId(id) if !users.contains(id) =>
       val user = User(id, "Guest")
       val userProxy =
-        UserProxy(user.id, context.actorOf(UserProxyActor.props(user), s"user-proxy-$id"))
+        UserProxy(user.id, context.actorOf(userProxyProps(user), s"user-proxy-$id"))
       context.watch(userProxy.actor)
       become(users + (id -> userProxy))
       log.info("new_user: {}", user)
@@ -48,5 +48,5 @@ object UserRegistry {
 
   case class GetUserProxy(id: String)
 
-  def props = Props(new UserRegistry)
+  def props(userProxyProps: UserProxyActor.PropsFactory) = Props(new UserRegistry(userProxyProps))
 }
