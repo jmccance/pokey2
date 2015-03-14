@@ -27,7 +27,7 @@ A user will only persist for a finite interval after their last connection is cl
 *expires*, their rooms will as well. When this happens, the room *closes* and all associated data
 is released.
 
-### Client/Server View
+### Web API
 
 The client initially acquires a user id by accessing any asset (e.g., `GET /`). The user id is
 stored in the Play session cookie, which is signed by the application to prevent tampering. Once the
@@ -46,8 +46,63 @@ themselves.
 For the details of what each message includes, see pokey.connection.model.Commands and
 pokey.connection.model.Events.
 
-### Backend Architecture
+### Server View
 
+#### Code Organization
+
+The server-side code is organized by feature as much as possible. The top-level packages under
+"pokey" are:
+
+* application
+    * Initialization and configuration of the application, including the Scaldi DI modules and the
+    Play Global object.
+* assets
+    * The serving of static assets. This includes adding the user id to each visitor's Play
+    session.
+* common
+    * Cross-cutting concerns. Mainly errors at the moment.
+* connection
+    * Client WebSocket connections.
+* room
+    * Estimation rooms management.
+* user
+    * User management.
+* util
+    * Things that don't quite fit elsewhere.
+
+Each package is divided into some consistent, self-explanatory subpackages based on functionality:
+
+* actor
+* controller
+* model
+* service
+
+#### Patterns
+
+The "room" and "user" features are organized into an important pattern of *model*, *proxy*,
+*registry*, and *service*.
+
+The *models* consist of conventional Scala objects. As much as possible, these encapsulate the
+entirety of the business logic. For example a Room object encapsulates all the ideas of room
+membership, who's allowed to reveal or clear a room, who can submit an estimate, and so forth. This
+is intended to simplify the other parts of the application by keeping important functional logic in
+obvious, consolidated places.
+
+Since models are immutable but the state of the application changes over time, the canonical
+instance of each model is wrapped in a *proxy* actor. These actors are responsible for coordinating
+changes to the models through message passing. Additionally, both the RoomProxyActor and the
+UserProxyActor make use of the util.Subscribable trait. This allows, for example, the RoomProxyActor
+to subscribe to changes to a User in order to update its internal Room model.
+
+Proxy objects like RoomProxy and UserProxy allow for easily passing around an object that contains
+both the id of an entity and the ActorRef for its proxy actor.
+
+To manage the creation and access of proxies we use another actor, the *registry*.
+
+Finally, in order to simplify testing and avoid duplicated logic around the ask pattern, common
+asks for a given registry are implemented in a *service*. This exposes conventional, Future\[T\]
+-returning service methods that both avoid duplicated code and keep actor code out of the
+controllers.
 
 
 > Topics to cover:
@@ -58,3 +113,7 @@ pokey.connection.model.Events.
     room, you must be in a room to estimate, etc.)
 > * Handling ask pattern usage. Wrap in service components in order to limit amount of boilerplate
     mapTo and timeout logic. Clarifies the expected "return type" of an ask.
+
+### Client View
+
+*TODO*
