@@ -104,16 +104,6 @@ asks for a given registry are implemented in a *service*. This exposes conventio
 -returning service methods that both avoid duplicated code and keep actor code out of the
 controllers.
 
-
-> Topics to cover:
-> * Proxy/Registry/Service pattern
-> * Subscribable trait
-> * The event-sourcing-ish approach we're using.
-> * Rich models that fully encapsulate the functional requirements. (E.g., only owners can reveal a
-    room, you must be in a room to estimate, etc.)
-> * Handling ask pattern usage. Wrap in service components in order to limit amount of boilerplate
-    mapTo and timeout logic. Clarifies the expected "return type" of an ask.
-
 ### Client View
 
 *TODO*
