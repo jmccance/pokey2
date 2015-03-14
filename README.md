@@ -64,6 +64,8 @@ and Events objects in the pokey.connection package.
 
 ### Backend Architecture
 
+
+
 > Topics to cover:
 > * Proxy/Registry/Service pattern
 > * Subscribable trait

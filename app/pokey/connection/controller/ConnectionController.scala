@@ -17,7 +17,7 @@ class ConnectionController(userService: UserService,
 
   private[this] val log = Logger(this.getClass)
 
-  def connect = WebSocket.tryAcceptWithActor[model.Request, Event] { request =>
+  def connect = WebSocket.tryAcceptWithActor[model.Command, Event] { request =>
     log.info("Received WebSocket connection request")
     request.session.get("user_id") match {
       case Some(userId) =>

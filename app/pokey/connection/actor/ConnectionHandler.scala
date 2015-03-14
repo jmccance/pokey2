@@ -2,7 +2,7 @@ package pokey.connection.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
-import pokey.connection.model.{Event, Events, InvalidRequest, Request}
+import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.model.Estimate
 import pokey.room.service.RoomService
@@ -20,23 +20,23 @@ class ConnectionHandler(userProxy: UserProxy,
   userProxy.actor ! UserProxyActor.NewConnection(self)
 
   def receive: Receive = {
-    case req: Request =>
-      import pokey.connection.model.Requests._
+    case req: Command =>
+      import pokey.connection.model.Commands._
 
       req match {
-        case SetNameRequest(name) =>
-          log.info("userId: {}, request: setName, name: {}", connUserId, name)
+        case SetNameCommand(name) =>
+          log.info("userId: {}, command: setName, name: {}", connUserId, name)
           userProxy.actor ! UserProxyActor.SetName(name)
 
-        case CreateRoomRequest =>
-          log.info("userId: {}, request: createRoom", connUserId)
+        case CreateRoomCommand$ =>
+          log.info("userId: {}, command: createRoom", connUserId)
           roomService
             .createRoom(connUserId)
             .map(proxy => Events.RoomCreated(proxy.id))
             .pipeTo(client)
 
-        case JoinRoomRequest(roomId) =>
-          log.info("userId: {}, request: joinRoom, roomId: {}", connUserId, roomId)
+        case JoinRoomCommand(roomId) =>
+          log.info("userId: {}, command: joinRoom, roomId: {}", connUserId, roomId)
           roomService.getRoom(roomId).map {
             case Some(roomProxy) =>
               roomProxy.actor ! RoomProxyActor.JoinRoom(userProxy)
@@ -45,24 +45,24 @@ class ConnectionHandler(userProxy: UserProxy,
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
-        // TODO Make below methods handle invalid requests more correctly.
+        // TODO Make below methods handle invalid commands more correctly.
 
-        case SubmitEstimateRequest(roomId, value, comment) =>
-          log.info("userId: {}, request: estimate, roomId: {}, value: {}, comment: {}",
+        case SubmitEstimateCommand(roomId, value, comment) =>
+          log.info("userId: {}, command: estimate, roomId: {}, value: {}, comment: {}",
             connUserId, roomId, value, comment)
           rooms(roomId) ! RoomProxyActor.SubmitEstimate(connUserId, Estimate(value, comment))
 
-        case RevealRoomRequest(roomId) =>
-          log.info("userId: {}, request: reveal, roomId: {}", connUserId, roomId)
+        case RevealRoomCommand(roomId) =>
+          log.info("userId: {}, command: reveal, roomId: {}", connUserId, roomId)
           rooms(roomId) ! RoomProxyActor.Reveal(connUserId)
 
-        case ClearRoomRequest(roomId) =>
-          log.info("userId: {}, request: clear, roomId: {}", connUserId, roomId)
+        case ClearRoomCommand(roomId) =>
+          log.info("userId: {}, command: clear, roomId: {}", connUserId, roomId)
           rooms(roomId) ! RoomProxyActor.Clear(connUserId)
 
-        case InvalidRequest(json) =>
-          log.error("userId: {}, request: invalidRequest: {}", connUserId, json.toString())
-          client ! Events.ErrorEvent("Invalid request")
+        case InvalidCommand(json) =>
+          log.error("userId: {}, command: invalidCommand: {}", connUserId, json.toString())
+          client ! Events.ErrorEvent("Invalid command")
       }
 
     case RoomJoined(roomProxy) =>
