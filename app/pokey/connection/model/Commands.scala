@@ -32,7 +32,7 @@ object Command {
 trait CommandCompanion {
   val jsonId: String
 
-  private[model] def validateType: Reads[JsValue] =
+  protected def validateType: Reads[JsValue] =
     (JsPath \ "command").read[String].filter(_ == jsonId) andKeep Reads.of[JsValue]
 }
 

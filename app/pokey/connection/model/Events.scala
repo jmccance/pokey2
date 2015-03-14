@@ -34,9 +34,6 @@ object Event {
 
 object Events {
 
-  private[this] def EventObject(typeName: String)(fields: (String, Json.JsValueWrapper)*) =
-    Json.obj(("event" -> (typeName: Json.JsValueWrapper)) +: fields: _*)
-
   case class UserUpdated(user: User) extends Event
 
   object UserUpdated {
@@ -132,4 +129,7 @@ object Events {
       case ErrorEvent(message) => EventObject("error")("message" -> message)
     }
   }
+
+  private[this] def EventObject(typeName: String)(fields: (String, Json.JsValueWrapper)*) =
+    Json.obj(("event" -> (typeName: Json.JsValueWrapper)) +: fields: _*)
 }

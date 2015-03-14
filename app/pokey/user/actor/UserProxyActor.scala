@@ -79,10 +79,6 @@ object UserProxyActor extends TopicProtocol {
     val maxIdleDuration: FiniteDuration
   }
 
-  val defaultSettings = new Settings {
-    val maxIdleDuration = 15.seconds
-  }
-
   def props(settings: Settings, user: User) = Props(new UserProxyActor(settings, user))
 
   case class NewConnection(conn: ActorRef)
@@ -91,5 +87,5 @@ object UserProxyActor extends TopicProtocol {
 
   case class UserUpdated(user: User)
 
-  private[actor] case object EvictUser
+  private case object EvictUser
 }

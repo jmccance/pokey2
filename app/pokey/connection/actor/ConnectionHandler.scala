@@ -128,5 +128,5 @@ object ConnectionHandler {
     new ConnectionHandler(userProxy, roomService, client)
   }
 
-  private[actor] case class RoomJoined(roomProxy: RoomProxy)
+  private case class RoomJoined(roomProxy: RoomProxy)
 }

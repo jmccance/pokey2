@@ -69,7 +69,7 @@ object RoomRegistry {
    * @param querent the original actor that asked for the room to be created
    * @param ownerProxy the user proxy corresponding to the owner id
    */
-  private[room] case class CreateRoomProxy(querent: ActorRef, ownerProxy: UserProxy)
+  private case class CreateRoomProxy(querent: ActorRef, ownerProxy: UserProxy)
 
   case class CreateRoomError(message: String)
 }
