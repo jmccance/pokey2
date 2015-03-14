@@ -24,7 +24,8 @@ meaning that they can only see whether or not a user has estimated. Revealing an
 be done by the room's owner.
 
 A user will only persist for a finite interval after their last connection is closed. If a user
-*expires*, their rooms will as well, meaning that room membership and estimates will not persist.
+*expires*, their rooms will as well. When this happens, the room *closes* and all associated data
+is released.
 
 ### Client/Server View
 
@@ -33,34 +34,17 @@ stored in the Play session cookie, which is signed by the application to prevent
  client has a user id, it can establish a WebSocket connection with the `/connect` endpoint.
 
 Once the connection is granted, the client interacts with the application by sending and receiving
-JSON objects over the WebSocket connection. Requests and server events are defined in the Requests
-and Events objects in the pokey.connection package.
+JSON objects over the WebSocket connection. In the long run the intention is to follow a 
+[CQRS](http://martinfowler.com/bliki/CQRS.html) pattern, though at the moment there are only
+"commands" and no "queries".
 
-#### Requests
+Generally speaking, the server does not send a response specific to a command. Instead any
+appropriate feedback will be sent in the form of event messages. For example a "SetName" command
+will trigger a "UserUpdated" event in response, since all users are subscribed to changes to
+themselves.
 
-* SetName - Update the name that will be displayed to other users.
-* CreateRoom - Creates a new room, owned by the current user, that other users can join and submit
-               estimates. Note that creating a room and joining a room are separate requests.
-* JoinRoom - Joins the specified estimation room. Required in order to send estimates to that room.
-* Estimate - Submit an estimate to the specified room. Client must have joined the room first.
-* Reveal - Reveal all members' estimates in the specified room to all members of the room. User must
-           be the room owner in order to reveal.
-* Clear - Reset all members' estimates in the specified room and hide the estimates. User must be
-          the owner in order to clear.
-
-#### Events
-
-* UserUpdated - Emitted when a user has changed. Clients will receive UserUpdated messages for their
-                own user, as well as any users in any rooms the connection has joined.
-* RoomCreated - Emitted when the connection successfully creates a room via a CreateRoom request.
-* RoomInfo - Emitted both when the connection first joins the room and whenever the room info
-             changes. Room info includes the room id, the room owner's user id, and the roster of
-             connected users (names and ids).
-* RoomState - Emitted both when the connection first joins (after the RoomInfo message is emitted)
-              and whenever the room state changes. Contains the room id, whether the room is
-              revealed, and a map from user ids to their (optional) estimates.
-* ErrorEvent - Sent whenever an error needs to be communicated to the client. Generally when a
-               request is sent that is either invalid or not completable.
+For the details of what each message includes, see pokey.connection.model.Commands and
+pokey.connection.model.Events.
 
 ### Backend Architecture
 

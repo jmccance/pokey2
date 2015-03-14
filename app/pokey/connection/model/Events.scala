@@ -34,53 +34,81 @@ object Event {
 
 object Events {
 
+  /**
+   * The attached user has been updated in some way.
+   *
+   * @param user the updated user
+   */
   case class UserUpdated(user: User) extends Event
 
   object UserUpdated {
     val writer = OWrites[UserUpdated] {
       case UserUpdated(user) =>
-        EventObject("userUpdate")("response" -> "userUpdated", "user" -> user)
-    }
-  }
-
-  case class RoomCreated(roomId: String) extends Event
-
-  object RoomCreated {
-    val writer = OWrites[RoomCreated] {
-      case RoomCreated(roomId) => EventObject("roomCreated")("roomId" -> roomId)
+        EventJsObject("userUpdate")("response" -> "userUpdated", "user" -> user)
     }
   }
 
   /**
-   * Metadata for the given room. Used for things that either do not change or do not change often,
-   * like the id, owner, estimate schema, etc., room name, etc.
+   * The client has successfully created a room.
    *
-   * @param roomInfo the basic info for the room
+   * @param roomId the id of the newly created room
+   */
+  case class RoomCreated(roomId: String) extends Event
+
+  object RoomCreated {
+    val writer = OWrites[RoomCreated] {
+      case RoomCreated(roomId) => EventJsObject("roomCreated")("roomId" -> roomId)
+    }
+  }
+
+  /**
+   * The attached room has been updated.
+   *
+   * @param roomInfo the metadata for the updated room
    */
   case class RoomUpdated(roomInfo: RoomInfo) extends Event
 
   object RoomUpdated {
     val writer = OWrites[RoomUpdated] {
-      case RoomUpdated(roomInfo) => EventObject("roomUpdate")("room" -> roomInfo)
+      case RoomUpdated(roomInfo) => EventJsObject("roomUpdate")("room" -> roomInfo)
     }
   }
 
+  /**
+   * A user has joined the specified room.
+   *
+   * @param roomId the id of the room the user has joined
+   * @param user the user that joined
+   */
   case class UserJoined(roomId: String, user: User) extends Event
 
   object UserJoined {
     val writer = OWrites[UserJoined] {
-      case UserJoined(roomId, user) => EventObject("userJoined")("roomId" -> roomId, "user" -> user)
+      case UserJoined(roomId, user) => EventJsObject("userJoined")("roomId" -> roomId, "user" -> user)
     }
   }
 
+  /**
+   * A user has left the specified room.
+   *
+   * @param roomId the id of the room that the user has left
+   * @param user the user that left
+   */
   case class UserLeft(roomId: String, user: User) extends Event
 
   object UserLeft {
     val writer = OWrites[UserLeft] {
-      case UserLeft(roomId, user) => EventObject("userLeft")("roomId" -> roomId, "user" -> user)
+      case UserLeft(roomId, user) => EventJsObject("userLeft")("roomId" -> roomId, "user" -> user)
     }
   }
 
+  /**
+   * An estimate has been updated.
+   *
+   * @param roomId the room in which the estimate has been updated
+   * @param userId the id of the user who updated their estimate
+   * @param estimate the "public-facing" estimate, or None if they do not have an estimate
+   */
   case class EstimateUpdated(roomId: String,
                              userId: String,
                              estimate: Option[PublicEstimate]) extends Event
@@ -88,7 +116,7 @@ object Events {
   object EstimateUpdated {
     val writer = OWrites[EstimateUpdated] {
       case EstimateUpdated(roomId, userId, estimate) =>
-        EventObject("estimateUpdated")(
+        EventJsObject("estimateUpdated")(
           "roomId" -> roomId,
           "userId" -> userId,
           "estimate" -> estimate
@@ -96,40 +124,69 @@ object Events {
     }
   }
 
+  /**
+   * The specified room as been revealed. Includes the revealed estimates.
+   *
+   * @param roomId the id of the room that has been revealed
+   * @param estimates the revealed estimates for this room
+   */
   case class RoomRevealed(roomId: String,
                           estimates: Map[String, Option[PublicEstimate]]) extends Event
 
   object RoomRevealed {
     val writer = OWrites[RoomRevealed] {
       case RoomRevealed(roomId, estimates) =>
-        EventObject("roomRevealed")("roomId" -> roomId, "estimates" -> estimates)
+        EventJsObject("roomRevealed")("roomId" -> roomId, "estimates" -> estimates)
     }
   }
 
+  /**
+   * The specified room has had its estimates cleared. The client is responsible for zeroing out
+   * all the estimates.
+   *
+   * @param roomId the id of the room that has been cleared
+   */
   case class RoomCleared(roomId: String) extends Event
 
   object RoomCleared {
     val writer = OWrites[RoomCleared] {
-      case RoomCleared(roomId) => EventObject("roomCleared")("roomId" -> roomId)
+      case RoomCleared(roomId) => EventJsObject("roomCleared")("roomId" -> roomId)
     }
   }
 
+  /**
+   * The given room has been closed and will no longer accept new members or estimate updates.
+   *
+   * @param roomId the id of the closed room
+   */
   case class RoomClosed(roomId: String) extends Event
 
   object RoomClosed {
     val writer = OWrites[RoomClosed] {
-      case RoomClosed(roomId) => EventObject("roomClosed")("roomId" -> roomId)
+      case RoomClosed(roomId) => EventJsObject("roomClosed")("roomId" -> roomId)
     }
   }
 
+  /**
+   * An error has occurred.
+   *
+   * @param message a message describing the nature of the error
+   */
   case class ErrorEvent(message: String) extends Event
 
   object ErrorEvent {
     val writer = OWrites[ErrorEvent] {
-      case ErrorEvent(message) => EventObject("error")("message" -> message)
+      case ErrorEvent(message) => EventJsObject("error")("message" -> message)
     }
   }
 
-  private[this] def EventObject(typeName: String)(fields: (String, Json.JsValueWrapper)*) =
+  /**
+   * Helper for creating event JSON objects that conform to a consistent pattern.
+   *
+   * @param typeName the identifying label for this event
+   * @param fields the fields to include in the event JSON
+   * @return a JsObject that includes all the fields and the standardized identifying label field
+   */
+  private[this] def EventJsObject(typeName: String)(fields: (String, Json.JsValueWrapper)*) =
     Json.obj(("event" -> (typeName: Json.JsValueWrapper)) +: fields: _*)
 }
