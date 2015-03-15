@@ -33,7 +33,7 @@ class ConnectionHandler(userProxy: UserProxy,
           log.info("userId: {}, command: createRoom", connUserId)
           roomService
             .createRoom(connUserId)
-            .map(proxy => Events.RoomCreated(proxy.id))
+            .map(proxy => Events.RoomCreatedEvent(proxy.id))
             .recover(ErrorEvent.mapThrowable)
             .pipeTo(client)
 
@@ -92,7 +92,7 @@ class ConnectionHandler(userProxy: UserProxy,
         import UserProxyActor._
 
         {
-          case UserUpdated(user) => Events.UserUpdated(user)
+          case UserUpdated(user) => Events.UserUpdatedEvent(user)
         }
       }
 
@@ -100,23 +100,23 @@ class ConnectionHandler(userProxy: UserProxy,
         import RoomProxyActor._
 
         {
-          case RoomUpdated(roomInfo) => Events.RoomUpdated(roomInfo)
+          case RoomUpdated(roomInfo) => Events.RoomUpdatedEvent(roomInfo)
 
-          case UserJoined(roomId, user) => Events.UserJoined(roomId, user)
+          case UserJoined(roomId, user) => Events.UserJoinedEvent(roomId, user)
 
-          case UserLeft(roomId, user) => Events.UserLeft(roomId, user)
+          case UserLeft(roomId, user) => Events.UserLeftEvent(roomId, user)
 
           case EstimateUpdated(roomId, userId, estimate) =>
-            Events.EstimateUpdated(roomId, userId, estimate)
+            Events.EstimateUpdatedEvent(roomId, userId, estimate)
 
-          case Revealed(roomId, estimates) => Events.RoomRevealed(roomId, estimates)
+          case Revealed(roomId, estimates) => Events.RoomRevealedEvent(roomId, estimates)
 
-          case Cleared(roomId) => Events.RoomCleared(roomId)
+          case Cleared(roomId) => Events.RoomClearedEvent(roomId)
 
           case Closed(roomId) =>
             // The room is closed, so we no longer need to hold onto the proxy
             rooms -= roomId
-            Events.RoomClosed(roomId)
+            Events.RoomClosedEvent(roomId)
         }
       }
 

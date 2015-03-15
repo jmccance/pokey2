@@ -22,8 +22,8 @@ object Command {
       orElse RevealRoomCommand.reader
       orElse ClearRoomCommand.reader
       orElse InvalidCommand.reader,
-    // We never write this, so skipping implementation.
     // $COVERAGE-OFF$
+    // We never write this, so skipping implementation.
     Writes[Command](_ => ???)
     // $COVERAGE-ON$
   )
