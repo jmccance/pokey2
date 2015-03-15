@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "org.scaldi" %% "scaldi" % "0.5.3",
   "org.scaldi" %% "scaldi-akka" % "0.5.3",
   "org.scaldi" %% "scaldi-play" % "0.5.3",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
   "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
 
