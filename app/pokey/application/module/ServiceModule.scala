@@ -5,7 +5,6 @@ import play.api.Configuration
 import pokey.room.actor.RoomRegistry
 import pokey.room.service.{DefaultRoomService, RoomService}
 import pokey.user.actor.{UserProxyActor, UserRegistry}
-import pokey.user.model.User
 import pokey.user.service.{DefaultUserService, UserService}
 import scaldi.Module
 
@@ -22,7 +21,7 @@ class ServiceModule extends Module {
       override val maxIdleDuration = config.getMilliseconds("pokey.users.max-idle-time").get.millis
     }
 
-    (user: User) => UserProxyActor.props(settings, user)
+    UserProxyActor.propsFactory(settings)
   }
 
   bind [ActorRef] identifiedBy required(UserRegistry.identifier) to {

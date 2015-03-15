@@ -2,6 +2,7 @@ package pokey.connection.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
+import play.api.mvc.WebSocket
 import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
@@ -9,8 +10,8 @@ import pokey.room.model.Estimate
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
 
-class ConnectionHandler(userProxy: UserProxy,
-                        roomService: RoomService,
+class ConnectionHandler(roomService: RoomService,
+                        userProxy: UserProxy,
                         client: ActorRef) extends Actor with ActorLogging {
   import ConnectionHandler._
   import context.dispatcher
@@ -137,13 +138,13 @@ class ConnectionHandler(userProxy: UserProxy,
 }
 
 object ConnectionHandler {
-  val propsIdentifier = 'connectionHandlerProps
+  def props(roomService: RoomService,
+            userProxy: UserProxy,
+            client: ActorRef) = Props(new ConnectionHandler(roomService, userProxy, client))
 
-  def props(userProxy: UserProxy,
-            roomService: RoomService,
-            client: ActorRef) = Props {
-    new ConnectionHandler(userProxy, roomService, client)
-  }
+  type PropsFactory = ((UserProxy) => WebSocket.HandlerProps)
+
+  def propsFactory(roomService: RoomService): PropsFactory = user => props(roomService, user, _)
 
   private case class RoomJoined(roomProxy: RoomProxy)
 }

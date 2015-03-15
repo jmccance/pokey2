@@ -7,6 +7,8 @@ import play.api.Play.current
 import scaldi._
 import scaldi.play.ScaldiSupport
 
+// $COVERAGE-OFF$
+// Coverage disabled since I don't see anything particularly testable here.
 object Global extends GlobalSettings with ScaldiSupport {
   override def applicationModule: Injector = (
     new AkkaModule(Akka.system)
@@ -14,3 +16,4 @@ object Global extends GlobalSettings with ScaldiSupport {
       :: new WebModule
   )
 }
+// $COVERAGE-ON$

@@ -73,13 +73,15 @@ class UserProxyActor(settings: Settings, initialUser: User)
 }
 
 object UserProxyActor extends TopicProtocol {
-  type PropsFactory = (User) => Props
+  def props(settings: Settings, user: User) = Props(new UserProxyActor(settings, user))
 
   trait Settings {
     val maxIdleDuration: FiniteDuration
   }
 
-  def props(settings: Settings, user: User) = Props(new UserProxyActor(settings, user))
+  type PropsFactory = (User) => Props
+
+  def propsFactory(settings: Settings): PropsFactory = props(settings, _)
 
   case class NewConnection(conn: ActorRef)
 
