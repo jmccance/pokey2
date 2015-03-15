@@ -30,6 +30,12 @@ case class Room(id: String,
     this.copy(usersById = mUsers, estimates = mEstimates)
   }
 
+  def ++(users: Traversable[User]): Room = {
+    val mUsers = usersById ++ users.map(u => u.id -> u)
+    val mEstimates = estimates ++ users.map(u => u.id -> None)
+    this.copy(usersById = mUsers, estimates = mEstimates)
+  }
+
   def -(userId: String): Room = {
     val mUsers = usersById - userId
     val mEstimates = estimates - userId
