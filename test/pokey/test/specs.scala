@@ -5,7 +5,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import org.scalatest._
 import concurrent.ScalaFutures
 import mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Results
 
 trait BaseSpec
@@ -34,5 +34,6 @@ abstract class AkkaUnitSpec(_system: ActorSystem)
 
 abstract class PlayUnitSpec
   extends PlaySpec
+  with OneAppPerSuite
   with BaseSpec
   with Results

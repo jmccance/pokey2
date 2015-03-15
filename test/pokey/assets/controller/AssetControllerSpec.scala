@@ -1,13 +1,12 @@
 package pokey.assets.controller
 
 import org.mockito.Mockito._
-import org.scalatestplus.play._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import pokey.test.PlayUnitSpec
 import pokey.user.service.UserService
 
-class AssetControllerSpec extends PlayUnitSpec with OneAppPerSuite {
+class AssetControllerSpec extends PlayUnitSpec {
   "An AssetController" when {
     "the user_id is not defined" should {
       "add the user_id to the session" in {

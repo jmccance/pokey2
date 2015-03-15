@@ -6,7 +6,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc._
 import pokey.connection.actor.ConnectionHandler
 import pokey.connection.model
-import pokey.connection.model.Event
+import model.Event
 import pokey.user.service.UserService
 
 import scala.concurrent.Future
