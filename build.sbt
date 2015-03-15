@@ -1,3 +1,5 @@
+import ScoverageSbtPlugin._
+
 name := """pokey2"""
 
 version := "2.0-SNAPSHOT"
@@ -15,6 +17,12 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
 
-ScoverageSbtPlugin.ScoverageKeys.coverageMinimum := 80
+ScoverageKeys.coverageMinimum := 80
 
-ScoverageSbtPlugin.ScoverageKeys.coverageFailOnMinimum := true
+ScoverageKeys.coverageFailOnMinimum := true
+
+ScoverageKeys.coverageExcludedPackages := Seq(
+  "<empty>",
+  ".*\\.controller\\.javascript",
+  ".*\\.controller\\.ref"
+).mkString(";")
