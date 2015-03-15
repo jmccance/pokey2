@@ -16,14 +16,16 @@ object Command {
 
   implicit val formatter = Format[Command](
     SetNameCommand.reader
-      orElse CreateRoomCommand$.reader
+      orElse CreateRoomCommand.reader
       orElse JoinRoomCommand.reader
       orElse SubmitEstimateCommand.reader
       orElse RevealRoomCommand.reader
       orElse ClearRoomCommand.reader
       orElse InvalidCommand.reader,
     // We never write this, so skipping implementation.
+    // $COVERAGE-OFF$
     Writes[Command](_ => ???)
+    // $COVERAGE-ON$
   )
 
   implicit val frameFormatter: FrameFormatter[Command] = FrameFormatter.jsonFrame[Command]
@@ -46,10 +48,10 @@ object Commands {
       validateType andKeep (JsPath \ "name").read[String].map(SetNameCommand(_))
   }
 
-  case object CreateRoomCommand$ extends Command with CommandCompanion {
+  case object CreateRoomCommand extends Command with CommandCompanion {
     val jsonId = "createRoom"
 
-    val reader: Reads[Command] = validateType andKeep Reads.pure(CreateRoomCommand$)
+    val reader: Reads[Command] = validateType andKeep Reads.pure(CreateRoomCommand)
   }
 
   case class JoinRoomCommand(roomId: String) extends Command

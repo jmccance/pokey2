@@ -29,7 +29,7 @@ class ConnectionHandler(userProxy: UserProxy,
           log.info("userId: {}, command: setName, name: {}", connUserId, name)
           userProxy.actor ! UserProxyActor.SetName(name)
 
-        case CreateRoomCommand$ =>
+        case CreateRoomCommand =>
           log.info("userId: {}, command: createRoom", connUserId)
           roomService
             .createRoom(connUserId)
