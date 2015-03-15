@@ -175,6 +175,10 @@ object Events {
   case class ErrorEvent(message: String) extends Event
 
   object ErrorEvent {
+    val mapThrowable: PartialFunction[Throwable, ErrorEvent] = {
+      case e => ErrorEvent(e.getMessage)
+    }
+
     val writer = OWrites[ErrorEvent] {
       case ErrorEvent(message) => EventJsObject("error")("message" -> message)
     }

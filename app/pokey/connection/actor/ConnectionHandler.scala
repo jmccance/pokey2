@@ -2,6 +2,7 @@ package pokey.connection.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.pipe
+import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.model.Estimate
@@ -33,6 +34,7 @@ class ConnectionHandler(userProxy: UserProxy,
           roomService
             .createRoom(connUserId)
             .map(proxy => Events.RoomCreated(proxy.id))
+            .recover(ErrorEvent.mapThrowable)
             .pipeTo(client)
 
         case JoinRoomCommand(roomId) =>
@@ -50,15 +52,30 @@ class ConnectionHandler(userProxy: UserProxy,
         case SubmitEstimateCommand(roomId, value, comment) =>
           log.info("userId: {}, command: estimate, roomId: {}, value: {}, comment: {}",
             connUserId, roomId, value, comment)
-          rooms(roomId) ! RoomProxyActor.SubmitEstimate(connUserId, Estimate(value, comment))
+
+          rooms.get(roomId) match {
+            case Some(roomProxy) =>
+              roomProxy ! RoomProxyActor.SubmitEstimate(connUserId, Estimate(value, comment))
+
+            case None =>
+              client ! ErrorEvent("Cannot reveal room that you have not joined.")
+          }
 
         case RevealRoomCommand(roomId) =>
           log.info("userId: {}, command: reveal, roomId: {}", connUserId, roomId)
-          rooms(roomId) ! RoomProxyActor.Reveal(connUserId)
+          rooms.get(roomId) match {
+            case Some(roomProxy) => roomProxy ! RoomProxyActor.Reveal(connUserId)
+
+            case None => client ! ErrorEvent("Cannot reveal room that you have not joined.")
+          }
 
         case ClearRoomCommand(roomId) =>
           log.info("userId: {}, command: clear, roomId: {}", connUserId, roomId)
-          rooms(roomId) ! RoomProxyActor.Clear(connUserId)
+          rooms.get(roomId) match {
+            case Some(roomProxy) => roomProxy ! RoomProxyActor.Clear(connUserId)
+
+            case None => client ! ErrorEvent("Cannot clear room that you have not joined.")
+          }
 
         case InvalidCommand(json) =>
           log.error("userId: {}, command: invalidCommand: {}", connUserId, json.toString())
