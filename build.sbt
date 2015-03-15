@@ -11,5 +11,10 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "2.2.4",
   "org.scaldi" %% "scaldi" % "0.5.3",
   "org.scaldi" %% "scaldi-akka" % "0.5.3",
-  "org.scaldi" %% "scaldi-play" % "0.5.3"
+  "org.scaldi" %% "scaldi-play" % "0.5.3",
+  "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
+
+ScoverageSbtPlugin.ScoverageKeys.coverageMinimum := 80
+
+ScoverageSbtPlugin.ScoverageKeys.coverageFailOnMinimum := true
