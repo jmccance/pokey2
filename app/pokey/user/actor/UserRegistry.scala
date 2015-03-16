@@ -29,9 +29,6 @@ class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor wi
         case (id, proxy) =>
           log.info("user_pruned: {}", proxy)
           become(users - id)
-      }.orElse {
-        log.warning("unknown_user_terminated: {}", deadActor)
-        None
       }
   }
 
