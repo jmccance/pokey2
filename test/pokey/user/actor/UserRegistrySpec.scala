@@ -61,7 +61,7 @@ class UserRegistrySpec extends AkkaUnitSpec {
         whenReady(foProxy) {
           case Some(proxy) =>
             EventFilter.info(message = s"user_pruned: $proxy") intercept {
-              system.stop(proxy.actor)
+              system.stop(proxy.ref)
             }
         }
       }

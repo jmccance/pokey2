@@ -14,7 +14,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
   override protected val protocol: TopicProtocol = RoomProxyActor
 
-  override def preStart(): Unit = context.watch(ownerProxy.actor)
+  override def preStart(): Unit = context.watch(ownerProxy.ref)
 
   private[this] var room: Room = initialRoom
 
@@ -35,7 +35,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case JoinRoom(userProxy) =>
       if (!room.contains(userProxy.id)) {
         // Subscribe to the user in order to get updates to names.
-        userProxy.actor ! UserProxyActor.Subscribe(self)
+        userProxy.ref ! UserProxyActor.Subscribe(self)
 
         // Subscribe the connection to ourselves so they get updates
         self ! Subscribe(sender())
@@ -50,7 +50,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case LeaveRoom(userProxy) =>
       if (room.contains(userProxy.id)) {
         // Stop getting updates from the user
-        userProxy.actor ! UserProxyActor.Unsubscribe(self)
+        userProxy.ref ! UserProxyActor.Unsubscribe(self)
 
         // Stop sending updates to the connection
         self ! Unsubscribe(sender())
@@ -81,7 +81,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         self ! Publish(Cleared(room.id))
       } recover(sender ! _)
 
-    case Terminated(ownerProxy.actor) =>
+    case Terminated(ownerProxy.`ref`) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       self ! Publish(Closed(room.id))
       context.stop(self)

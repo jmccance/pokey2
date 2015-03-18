@@ -5,7 +5,7 @@ import pokey.room.model.Room
 import pokey.user.actor.UserProxy
 import pokey.user.service.UserService
 
-class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
+class RoomRegistry(private[this] var ids: Stream[String], userService: UserService) extends Actor with ActorLogging {
   import RoomRegistry._
   import context.dispatcher
   
@@ -24,31 +24,29 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
       }
 
     case CreateRoomProxy(querent, ownerProxy) =>
-      val room = Room(nextId(), ownerProxy.id)
+      val id #:: rest = ids
+      ids = rest
+
+      val room = Room(id, ownerProxy.id)
       val roomProxy = RoomProxy(
         room.id,
         context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id}"))
-      context.watch(roomProxy.actor)
+      context.watch(roomProxy.ref)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
       querent ! roomProxy
 
     case Terminated(deadActor) =>
       val deadRoom = rooms.find {
-        case (_, proxy) => proxy.actor == deadActor
+        case (_, proxy) => proxy.ref == deadActor
       }
 
-      deadRoom.map {
+      deadRoom.foreach {
         case (id, proxy) =>
           log.info("room_closed: {}", proxy)
           become(rooms - id)
-      }.orElse {
-        log.warning("unknown_room_closed: {}", deadActor)
-        None
       }
   }
-
-  private[this] def nextId(): String = new java.rmi.server.UID().toString
 
   private[this] def become(rooms: Map[String, RoomProxy]) = context.become(withRooms(rooms))
 }
@@ -56,7 +54,8 @@ class RoomRegistry(userService: UserService) extends Actor with ActorLogging {
 object RoomRegistry {
   val identifier = 'roomRegistry
 
-  def props(userService: UserService) = Props(new RoomRegistry(userService))
+  def props(ids: Stream[String],
+            userService: UserService) = Props(new RoomRegistry(ids, userService))
 
   case class GetRoomProxy(id: String)
 

@@ -22,7 +22,7 @@ class DefaultRoomServiceSpec extends AkkaUnitSpec {
 
         whenReady(fProxy) { proxy =>
           proxy.id shouldBe roomId
-          proxy.actor shouldBe someActorRef
+          proxy.ref shouldBe someActorRef
         }
       }
     }

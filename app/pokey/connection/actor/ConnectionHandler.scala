@@ -19,7 +19,7 @@ class ConnectionHandler(roomService: RoomService,
   private[this] val connUserId = userProxy.id
   private[this] var rooms: Map[String, ActorRef] = Map.empty
 
-  userProxy.actor ! UserProxyActor.NewConnection(self)
+  userProxy.ref ! UserProxyActor.NewConnection(self)
 
   def receive: Receive = {
     case req: Command =>
@@ -28,7 +28,7 @@ class ConnectionHandler(roomService: RoomService,
       req match {
         case SetNameCommand(name) =>
           log.info("userId: {}, command: setName, name: {}", connUserId, name)
-          userProxy.actor ! UserProxyActor.SetName(name)
+          userProxy.ref ! UserProxyActor.SetName(name)
 
         case CreateRoomCommand =>
           log.info("userId: {}, command: createRoom", connUserId)
@@ -42,7 +42,7 @@ class ConnectionHandler(roomService: RoomService,
           log.info("userId: {}, command: joinRoom, roomId: {}", connUserId, roomId)
           roomService.getRoom(roomId).map {
             case Some(roomProxy) =>
-              roomProxy.actor ! RoomProxyActor.JoinRoom(userProxy)
+              roomProxy.ref ! RoomProxyActor.JoinRoom(userProxy)
               self ! RoomJoined(roomProxy)
 
             case None => Events.ErrorEvent(s"No room found with id '$roomId'")
@@ -84,7 +84,7 @@ class ConnectionHandler(roomService: RoomService,
       }
 
     case RoomJoined(roomProxy) =>
-      rooms += roomProxy.id -> roomProxy.actor
+      rooms += roomProxy.id -> roomProxy.ref
 
     case message =>
       type EventMapping = PartialFunction[Any, Event]

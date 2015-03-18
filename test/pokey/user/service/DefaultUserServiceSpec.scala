@@ -26,7 +26,7 @@ class DefaultUserServiceSpec extends AkkaUnitSpec {
 
         whenReady(fProxy) { proxy =>
           proxy.id shouldBe someId
-          proxy.actor shouldBe someActorRef
+          proxy.ref shouldBe someActorRef
         }
       }
     }
@@ -41,7 +41,7 @@ class DefaultUserServiceSpec extends AkkaUnitSpec {
 
         whenReady(foProxy) { oProxy =>
           oProxy.value.id shouldBe someId
-          oProxy.value.actor shouldBe someActorRef
+          oProxy.value.ref shouldBe someActorRef
         }
       }
 
