@@ -45,12 +45,15 @@ trait Subscribable {
       onUnsubscribe(subscriber)
       sender ! Unsubscribed(subscriber)
 
-    case Publish(message) if sender == self => topic.publish(message)
+    case Publish(message) if sender == self =>
+      topic.publish(message)
+      onPublish(message)
   }
 
   // $COVERAGE-OFF$
   // No need to test the stub implementations
   def onSubscribe(subscriber: ActorRef): Unit = ()
+  def onPublish(message: Any): Unit = ()
   def onUnsubscribe(subscriber: ActorRef): Unit = ()
   // $COVERAGE-ON$
 }

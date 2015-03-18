@@ -24,7 +24,7 @@ class SubscribableSpec extends AkkaUnitSpec {
     }
 
     "it publishes a message" should {
-      "send the message to all subscribed actors" in {
+      "send the message to all subscribed actors and invoke the onPublish callback" in {
         val subscribable = newSubscribable()
 
         EventFilter.info(message = SubMessage(self), occurrences = 1) intercept {
@@ -32,8 +32,10 @@ class SubscribableSpec extends AkkaUnitSpec {
         }
         expectMsg(Subscribed(self))
 
-        // Send an auto-forwarded message to the subscribable
-        subscribable ! someMessage
+        EventFilter.info(message = PubMessage(someMessage), occurrences = 1) intercept {
+          // Send an auto-forwarded message to the subscribable
+          subscribable ! someMessage
+        }
 
         expectMsg(someMessage)
       }
@@ -70,11 +72,14 @@ class SubscribableSpec extends AkkaUnitSpec {
 
     override def onSubscribe(subscriber: ActorRef): Unit = log.info(SubMessage(subscriber))
 
+    override def onPublish(message: Any): Unit = log.info(PubMessage(message))
+
     override def onUnsubscribe(subscriber: ActorRef): Unit = log.info(UnSubMessage(subscriber))
   }
 
   def newSubscribable() = system.actorOf(Props(new TestSubscribable))
 
   def SubMessage(subscriber: ActorRef) = s"onSubscribe: $subscriber"
+  def PubMessage(message: Any) = s"onPublish: $message"
   def UnSubMessage(subscriber: ActorRef) = s"onUnsubscribe: $subscriber"
 }

@@ -18,9 +18,6 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
   private[this] var room: Room = initialRoom
 
-  /**
-   * When someone subscribes, send them the current room state.
-   */
   override def onSubscribe(subscriber: ActorRef): Unit = {
     // Kind of hacky and noisy, but expedient. Simply send them "updates" for the current state of
     // the room.
@@ -31,21 +28,28 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     }
   }
 
+  override def onPublish(message: Any) = message match {
+    case msg: Closed => context.stop(self)
+    case _ => /* No action */
+  }
+
   def receive: Receive = handleSubscriptions orElse {
     case JoinRoom(userProxy) =>
-      if (!room.contains(userProxy.id)) {
-        // Subscribe to the user in order to get updates to names.
-        userProxy.ref ! UserProxyActor.Subscribe(self)
+      // Subscribe to the user in order to get updates to names.
+      userProxy.ref ! UserProxyActor.Subscribe(self)
 
-        // Subscribe the connection to ourselves so they get updates
-        self ! Subscribe(sender())
-      }
+      // Subscribe the connection to ourselves so they get updates
+      self ! Subscribe(sender())
 
-    case UserProxyActor.UserUpdated(user) =>
-      if (!room.contains(user.id)) {
+    case update @ UserProxyActor.UserUpdated(user) =>
+      if (room.contains(user.id)) {
+        self ! Publish(update)
+      } else {
+        // We're assuming that we'll never be mistakenly sent an update message for a user who has
+        // not first sent a JoinRoom message.
         self ! Publish(UserJoined(room.id, user))
+        room += user
       }
-      room += user
 
     case LeaveRoom(userProxy) =>
       if (room.contains(userProxy.id)) {
@@ -81,10 +85,10 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         self ! Publish(Cleared(room.id))
       } recover(sender ! _)
 
-    case Terminated(ownerProxy.`ref`) =>
+    case Terminated(ownerProxy.ref) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       self ! Publish(Closed(room.id))
-      context.stop(self)
+      // Publishing a Closed message will terminate the RoomProxyActor.
   }
 }
 
