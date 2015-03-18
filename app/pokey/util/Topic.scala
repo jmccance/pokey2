@@ -34,7 +34,7 @@ trait Subscribable {
 
   private[this] var topic: Topic = Topic()
 
-  def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
+  final def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
     case Subscribe(subscriber) =>
       topic = topic.subscribe(subscriber)
       onSubscribe(subscriber)
@@ -48,6 +48,9 @@ trait Subscribable {
     case Publish(message) if sender == self => topic.publish(message)
   }
 
+  // $COVERAGE-OFF$
+  // No need to test the stub implementations
   def onSubscribe(subscriber: ActorRef): Unit = ()
   def onUnsubscribe(subscriber: ActorRef): Unit = ()
+  // $COVERAGE-ON$
 }
