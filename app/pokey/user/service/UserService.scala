@@ -27,10 +27,10 @@ class DefaultUserService(userRegistry: ActorRef) extends UserService {
   override def nextUserId(): String = new java.rmi.server.UID().toString
 
   override def createUserForId(id: String)
-                               (implicit ec: ExecutionContext): Future[UserProxy] =
+                              (implicit ec: ExecutionContext): Future[UserProxy] =
     (userRegistry ? UserRegistry.CreateProxyForId(id)).mapTo[UserProxy]
 
   override def getUser(id: String)
-                           (implicit ec: ExecutionContext): Future[Option[UserProxy]] =
+                      (implicit ec: ExecutionContext): Future[Option[UserProxy]] =
     (userRegistry ? UserRegistry.GetUserProxy(id)).mapTo[Option[UserProxy]]
 }

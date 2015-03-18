@@ -3,6 +3,7 @@ package pokey.connection.model
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
+import pokey.room.model.Estimate
 
 sealed trait Command
 sealed case class InvalidCommand(json: JsValue) extends Command
@@ -16,14 +17,16 @@ object Command {
 
   implicit val formatter = Format[Command](
     SetNameCommand.reader
-      orElse CreateRoomCommand$.reader
+      orElse CreateRoomCommand.reader
       orElse JoinRoomCommand.reader
       orElse SubmitEstimateCommand.reader
       orElse RevealRoomCommand.reader
       orElse ClearRoomCommand.reader
       orElse InvalidCommand.reader,
+    // $COVERAGE-OFF$
     // We never write this, so skipping implementation.
     Writes[Command](_ => ???)
+    // $COVERAGE-ON$
   )
 
   implicit val frameFormatter: FrameFormatter[Command] = FrameFormatter.jsonFrame[Command]
@@ -46,10 +49,10 @@ object Commands {
       validateType andKeep (JsPath \ "name").read[String].map(SetNameCommand(_))
   }
 
-  case object CreateRoomCommand$ extends Command with CommandCompanion {
+  case object CreateRoomCommand extends Command with CommandCompanion {
     val jsonId = "createRoom"
 
-    val reader: Reads[Command] = validateType andKeep Reads.pure(CreateRoomCommand$)
+    val reader: Reads[Command] = validateType andKeep Reads.pure(CreateRoomCommand)
   }
 
   case class JoinRoomCommand(roomId: String) extends Command
@@ -62,8 +65,7 @@ object Commands {
   }
 
   case class SubmitEstimateCommand(roomId: String,
-                                   value: Option[String],
-                                   comment: Option[String]) extends Command
+                                   estimate: Estimate) extends Command
 
   object SubmitEstimateCommand extends CommandCompanion {
     val jsonId = "submitEstimate"
@@ -71,8 +73,7 @@ object Commands {
     val reader: Reads[Command] =
       validateType andKeep
         ((JsPath \ "roomId").read[String]
-          and (JsPath \ "value").readNullable[String]
-          and (JsPath \ "comment").readNullable[String])(SubmitEstimateCommand.apply _)
+          and (JsPath \ "estimate").read[Estimate])(SubmitEstimateCommand.apply _)
   }
 
   case class RevealRoomCommand(roomId: String) extends Command

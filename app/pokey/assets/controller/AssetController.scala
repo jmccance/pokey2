@@ -11,7 +11,7 @@ class AssetController(userService: UserService) extends Controller {
     val updatedSession = request.session.get("user_id") match {
       case Some(sessionId) => request.session
 
-      case None =>request.session + ("user_id" -> userService.nextUserId())
+      case None => request.session + ("user_id" -> userService.nextUserId())
     }
 
     Assets.at(path, file)(request).map(_.withSession(updatedSession))

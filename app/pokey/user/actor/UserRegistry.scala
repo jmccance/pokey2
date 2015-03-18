@@ -13,7 +13,7 @@ class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor wi
       val user = User(id, "Guest")
       val userProxy =
         UserProxy(user.id, context.actorOf(userProxyProps(user), s"user-proxy-$id"))
-      context.watch(userProxy.actor)
+      context.watch(userProxy.ref)
       become(users + (id -> userProxy))
       log.info("new_user: {}", user)
       sender ! userProxy
@@ -22,16 +22,13 @@ class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor wi
 
     case Terminated(deadActor) =>
       val deadUser = users.find {
-        case (_, proxy) => proxy.actor == deadActor
+        case (_, proxy) => proxy.ref == deadActor
       }
 
-      deadUser.map {
+      deadUser.foreach {
         case (id, proxy) =>
           log.info("user_pruned: {}", proxy)
           become(users - id)
-      }.orElse {
-        log.warning("unknown_user_terminated: {}", deadActor)
-        None
       }
   }
 

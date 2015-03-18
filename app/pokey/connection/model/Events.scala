@@ -11,19 +11,21 @@ object Event {
   import Events._
 
   implicit val formatter = OFormat[Event](
+    // $COVERAGE-OFF$
     // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
     // a reads.
     Reads.pure[Event](???),
+    // $COVERAGE-ON$
     OWrites[Event] {
-      case r: UserUpdated => UserUpdated.writer.writes(r)
-      case r: RoomCreated => RoomCreated.writer.writes(r)
-      case r: RoomUpdated => RoomUpdated.writer.writes(r)
-      case r: UserJoined => UserJoined.writer.writes(r)
-      case r: UserLeft => UserLeft.writer.writes(r)
-      case r: EstimateUpdated => EstimateUpdated.writer.writes(r)
-      case r: RoomRevealed => RoomRevealed.writer.writes(r)
-      case r: RoomCleared => RoomCleared.writer.writes(r)
-      case r: RoomClosed => RoomClosed.writer.writes(r)
+      case r: UserUpdatedEvent => UserUpdatedEvent.writer.writes(r)
+      case r: RoomCreatedEvent => RoomCreatedEvent.writer.writes(r)
+      case r: RoomUpdatedEvent => RoomUpdatedEvent.writer.writes(r)
+      case r: UserJoinedEvent => UserJoinedEvent.writer.writes(r)
+      case r: UserLeftEvent => UserLeftEvent.writer.writes(r)
+      case r: EstimateUpdatedEvent => EstimateUpdatedEvent.writer.writes(r)
+      case r: RoomRevealedEvent => RoomRevealedEvent.writer.writes(r)
+      case r: RoomClearedEvent => RoomClearedEvent.writer.writes(r)
+      case r: RoomClosedEvent => RoomClosedEvent.writer.writes(r)
       case r: ErrorEvent => ErrorEvent.writer.writes(r)
     }
   )
@@ -39,12 +41,12 @@ object Events {
    *
    * @param user the updated user
    */
-  case class UserUpdated(user: User) extends Event
+  case class UserUpdatedEvent(user: User) extends Event
 
-  object UserUpdated {
-    val writer = OWrites[UserUpdated] {
-      case UserUpdated(user) =>
-        EventJsObject("userUpdate")("response" -> "userUpdated", "user" -> user)
+  object UserUpdatedEvent {
+    val writer = OWrites[UserUpdatedEvent] {
+      case UserUpdatedEvent(user) =>
+        EventJsObject("userUpdated")("user" -> user)
     }
   }
 
@@ -53,11 +55,11 @@ object Events {
    *
    * @param roomId the id of the newly created room
    */
-  case class RoomCreated(roomId: String) extends Event
+  case class RoomCreatedEvent(roomId: String) extends Event
 
-  object RoomCreated {
-    val writer = OWrites[RoomCreated] {
-      case RoomCreated(roomId) => EventJsObject("roomCreated")("roomId" -> roomId)
+  object RoomCreatedEvent {
+    val writer = OWrites[RoomCreatedEvent] {
+      case RoomCreatedEvent(roomId) => EventJsObject("roomCreated")("roomId" -> roomId)
     }
   }
 
@@ -66,11 +68,11 @@ object Events {
    *
    * @param roomInfo the metadata for the updated room
    */
-  case class RoomUpdated(roomInfo: RoomInfo) extends Event
+  case class RoomUpdatedEvent(roomInfo: RoomInfo) extends Event
 
-  object RoomUpdated {
-    val writer = OWrites[RoomUpdated] {
-      case RoomUpdated(roomInfo) => EventJsObject("roomUpdate")("room" -> roomInfo)
+  object RoomUpdatedEvent {
+    val writer = OWrites[RoomUpdatedEvent] {
+      case RoomUpdatedEvent(roomInfo) => EventJsObject("roomUpdated")("room" -> roomInfo)
     }
   }
 
@@ -80,11 +82,11 @@ object Events {
    * @param roomId the id of the room the user has joined
    * @param user the user that joined
    */
-  case class UserJoined(roomId: String, user: User) extends Event
+  case class UserJoinedEvent(roomId: String, user: User) extends Event
 
-  object UserJoined {
-    val writer = OWrites[UserJoined] {
-      case UserJoined(roomId, user) => EventJsObject("userJoined")("roomId" -> roomId, "user" -> user)
+  object UserJoinedEvent {
+    val writer = OWrites[UserJoinedEvent] {
+      case UserJoinedEvent(roomId, user) => EventJsObject("userJoined")("roomId" -> roomId, "user" -> user)
     }
   }
 
@@ -94,11 +96,11 @@ object Events {
    * @param roomId the id of the room that the user has left
    * @param user the user that left
    */
-  case class UserLeft(roomId: String, user: User) extends Event
+  case class UserLeftEvent(roomId: String, user: User) extends Event
 
-  object UserLeft {
-    val writer = OWrites[UserLeft] {
-      case UserLeft(roomId, user) => EventJsObject("userLeft")("roomId" -> roomId, "user" -> user)
+  object UserLeftEvent {
+    val writer = OWrites[UserLeftEvent] {
+      case UserLeftEvent(roomId, user) => EventJsObject("userLeft")("roomId" -> roomId, "user" -> user)
     }
   }
 
@@ -109,13 +111,13 @@ object Events {
    * @param userId the id of the user who updated their estimate
    * @param estimate the "public-facing" estimate, or None if they do not have an estimate
    */
-  case class EstimateUpdated(roomId: String,
-                             userId: String,
-                             estimate: Option[PublicEstimate]) extends Event
+  case class EstimateUpdatedEvent(roomId: String,
+                                  userId: String,
+                                  estimate: Option[PublicEstimate]) extends Event
 
-  object EstimateUpdated {
-    val writer = OWrites[EstimateUpdated] {
-      case EstimateUpdated(roomId, userId, estimate) =>
+  object EstimateUpdatedEvent {
+    val writer = OWrites[EstimateUpdatedEvent] {
+      case EstimateUpdatedEvent(roomId, userId, estimate) =>
         EventJsObject("estimateUpdated")(
           "roomId" -> roomId,
           "userId" -> userId,
@@ -130,12 +132,12 @@ object Events {
    * @param roomId the id of the room that has been revealed
    * @param estimates the revealed estimates for this room
    */
-  case class RoomRevealed(roomId: String,
-                          estimates: Map[String, Option[PublicEstimate]]) extends Event
+  case class RoomRevealedEvent(roomId: String,
+                               estimates: Map[String, Option[PublicEstimate]]) extends Event
 
-  object RoomRevealed {
-    val writer = OWrites[RoomRevealed] {
-      case RoomRevealed(roomId, estimates) =>
+  object RoomRevealedEvent {
+    val writer = OWrites[RoomRevealedEvent] {
+      case RoomRevealedEvent(roomId, estimates) =>
         EventJsObject("roomRevealed")("roomId" -> roomId, "estimates" -> estimates)
     }
   }
@@ -146,11 +148,11 @@ object Events {
    *
    * @param roomId the id of the room that has been cleared
    */
-  case class RoomCleared(roomId: String) extends Event
+  case class RoomClearedEvent(roomId: String) extends Event
 
-  object RoomCleared {
-    val writer = OWrites[RoomCleared] {
-      case RoomCleared(roomId) => EventJsObject("roomCleared")("roomId" -> roomId)
+  object RoomClearedEvent {
+    val writer = OWrites[RoomClearedEvent] {
+      case RoomClearedEvent(roomId) => EventJsObject("roomCleared")("roomId" -> roomId)
     }
   }
 
@@ -159,11 +161,11 @@ object Events {
    *
    * @param roomId the id of the closed room
    */
-  case class RoomClosed(roomId: String) extends Event
+  case class RoomClosedEvent(roomId: String) extends Event
 
-  object RoomClosed {
-    val writer = OWrites[RoomClosed] {
-      case RoomClosed(roomId) => EventJsObject("roomClosed")("roomId" -> roomId)
+  object RoomClosedEvent {
+    val writer = OWrites[RoomClosedEvent] {
+      case RoomClosedEvent(roomId) => EventJsObject("roomClosed")("roomId" -> roomId)
     }
   }
 

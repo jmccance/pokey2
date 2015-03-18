@@ -14,7 +14,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
   override protected val protocol: TopicProtocol = RoomProxyActor
 
-  override def preStart(): Unit = context.watch(ownerProxy.actor)
+  override def preStart(): Unit = context.watch(ownerProxy.ref)
 
   private[this] var room: Room = initialRoom
 
@@ -35,7 +35,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case JoinRoom(userProxy) =>
       if (!room.contains(userProxy.id)) {
         // Subscribe to the user in order to get updates to names.
-        userProxy.actor ! UserProxyActor.Subscribe(self)
+        userProxy.ref ! UserProxyActor.Subscribe(self)
 
         // Subscribe the connection to ourselves so they get updates
         self ! Subscribe(sender())
@@ -50,7 +50,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case LeaveRoom(userProxy) =>
       if (room.contains(userProxy.id)) {
         // Stop getting updates from the user
-        userProxy.actor ! UserProxyActor.Unsubscribe(self)
+        userProxy.ref ! UserProxyActor.Unsubscribe(self)
 
         // Stop sending updates to the connection
         self ! Unsubscribe(sender())
@@ -69,19 +69,19 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         self ! Publish(EstimateUpdated(room.id, userId, room.publicEstimates(userId)))
       } recover(sender ! _)
 
-    case Reveal(userId: String) =>
+    case RevealFor(userId: String) =>
       room.revealedBy(userId).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(Revealed(room.id, room.publicEstimates))
       } recover(sender ! _)
 
-    case Clear(userId: String) =>
+    case ClearFor(userId: String) =>
       room.clearedBy(userId).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(Cleared(room.id))
       } recover(sender ! _)
 
-    case Terminated(ownerProxy.actor) =>
+    case Terminated(ownerProxy.`ref`) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       self ! Publish(Closed(room.id))
       context.stop(self)
@@ -100,9 +100,9 @@ object RoomProxyActor extends TopicProtocol {
 
   case class SubmitEstimate(userId: String, estimate: Estimate)
 
-  case class Reveal(userId: String)
+  case class RevealFor(userId: String)
 
-  case class Clear(userId: String)
+  case class ClearFor(userId: String)
 
   ///////////
   // Events
