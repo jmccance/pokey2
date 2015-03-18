@@ -6,7 +6,6 @@ import play.api.mvc.WebSocket
 import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
-import pokey.room.model.Estimate
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
 
@@ -45,37 +44,37 @@ class ConnectionHandler(roomService: RoomService,
               roomProxy.ref ! RoomProxyActor.JoinRoom(userProxy)
               self ! RoomJoined(roomProxy)
 
-            case None => Events.ErrorEvent(s"No room found with id '$roomId'")
+            case None => client ! Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
         // TODO Make below methods handle invalid commands more correctly.
 
-        case SubmitEstimateCommand(roomId, value, comment) =>
-          log.info("userId: {}, command: estimate, roomId: {}, value: {}, comment: {}",
-            connUserId, roomId, value, comment)
+        case SubmitEstimateCommand(roomId, estimate) =>
+          log.info("userId: {}, command: estimate, roomId: {}, estimate: {}",
+            connUserId, roomId, estimate)
 
           rooms.get(roomId) match {
             case Some(roomProxy) =>
-              roomProxy ! RoomProxyActor.SubmitEstimate(connUserId, Estimate(value, comment))
+              roomProxy ! RoomProxyActor.SubmitEstimate(connUserId, estimate)
 
             case None =>
-              client ! ErrorEvent("Cannot reveal room that you have not joined.")
+              client ! ErrorEvent(s"Room $roomId is not associated with this connection")
           }
 
         case RevealRoomCommand(roomId) =>
           log.info("userId: {}, command: reveal, roomId: {}", connUserId, roomId)
           rooms.get(roomId) match {
-            case Some(roomProxy) => roomProxy ! RoomProxyActor.Reveal(connUserId)
+            case Some(roomProxy) => roomProxy ! RoomProxyActor.RevealFor(connUserId)
 
-            case None => client ! ErrorEvent("Cannot reveal room that you have not joined.")
+            case None => client ! ErrorEvent(s"Room $roomId is not associated with this connection")
           }
 
         case ClearRoomCommand(roomId) =>
           log.info("userId: {}, command: clear, roomId: {}", connUserId, roomId)
           rooms.get(roomId) match {
-            case Some(roomProxy) => roomProxy ! RoomProxyActor.Clear(connUserId)
+            case Some(roomProxy) => roomProxy ! RoomProxyActor.ClearFor(connUserId)
 
-            case None => client ! ErrorEvent("Cannot clear room that you have not joined.")
+            case None => client ! ErrorEvent(s"Room $roomId is not associated with this connection")
           }
 
         case InvalidCommand(json) =>
@@ -123,7 +122,7 @@ class ConnectionHandler(roomService: RoomService,
 
       val event = (userEvents orElse roomEvents).lift(message)
 
-      event.map(client ! _)
+      event.foreach(client ! _)
   }
 
   /**

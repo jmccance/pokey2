@@ -2,6 +2,7 @@ package pokey.connection.model
 
 import play.api.libs.json.Json
 import pokey.connection.model.Commands._
+import pokey.room.model.Estimate
 import pokey.test.UnitSpec
 
 class CommandSpecs extends UnitSpec {
@@ -47,57 +48,21 @@ class CommandSpecs extends UnitSpec {
   }
 
   "A SubmitEstimateCommand" should {
-    "deserialize from JSON correctly when value and comment are present" in {
+    "deserialize correctly from JSON" in {
       val json =
         """
           |{
           |  "command": "submitEstimate",
           |  "roomId": "1234",
-          |  "value": "XXS",
-          |  "comment": "Easy-peasy"
+          |  "estimate": {
+          |    "value": "XXS",
+          |    "comment": "Easy-peasy"
+          |  }
           |}
         """.stripMargin
 
       parseCommand(json).value shouldBe
-        SubmitEstimateCommand("1234", Some("XXS"), Some("Easy-peasy"))
-    }
-
-    "deserialize from JSON correctly when only the value is present" in {
-      val json =
-        """
-          |{
-          |  "command": "submitEstimate",
-          |  "roomId": "1234",
-          |  "value": "XXS"
-          |}
-        """.stripMargin
-
-      parseCommand(json).value shouldBe SubmitEstimateCommand("1234", Some("XXS"), None)
-    }
-
-    "deserialize from JSON correctly when only the comment is present" in {
-      val json =
-        """
-          |{
-          |  "command": "submitEstimate",
-          |  "roomId": "1234",
-          |  "comment": "Not my job."
-          |}
-        """.stripMargin
-
-      parseCommand(json).value shouldBe SubmitEstimateCommand("1234", None, Some("Not my job."))
-    }
-
-    "deserialize from JSON correctly when neither of the estimate fields are present" in {
-      val json =
-        """
-          |{
-          |  "command": "submitEstimate",
-          |  "roomId": "1234"
-          |}
-        """.stripMargin
-
-      parseCommand(json).value shouldBe SubmitEstimateCommand("1234", None, None)
+        SubmitEstimateCommand("1234", Estimate(Some("XXS"), Some("Easy-peasy")))
     }
   }
 

@@ -1,10 +1,17 @@
 package pokey.room.model
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class Estimate(value: Option[String], comment: Option[String]) {
   lazy val asRevealed = RevealedEstimate(value, comment)
   val asHidden = HiddenEstimate
+}
+
+object Estimate {
+  implicit val reader =
+    ((JsPath \ "value").readNullable[String]
+      and (JsPath \ "comment").readNullable[String])(Estimate.apply _)
 }
 
 trait PublicEstimate

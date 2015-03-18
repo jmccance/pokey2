@@ -69,13 +69,13 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         self ! Publish(EstimateUpdated(room.id, userId, room.publicEstimates(userId)))
       } recover(sender ! _)
 
-    case Reveal(userId: String) =>
+    case RevealFor(userId: String) =>
       room.revealedBy(userId).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(Revealed(room.id, room.publicEstimates))
       } recover(sender ! _)
 
-    case Clear(userId: String) =>
+    case ClearFor(userId: String) =>
       room.clearedBy(userId).map { updatedRoom =>
         room = updatedRoom
         self ! Publish(Cleared(room.id))
@@ -100,9 +100,9 @@ object RoomProxyActor extends TopicProtocol {
 
   case class SubmitEstimate(userId: String, estimate: Estimate)
 
-  case class Reveal(userId: String)
+  case class RevealFor(userId: String)
 
-  case class Clear(userId: String)
+  case class ClearFor(userId: String)
 
   ///////////
   // Events

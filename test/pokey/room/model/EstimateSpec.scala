@@ -29,12 +29,60 @@ class EstimateSpec extends UnitSpec {
         }
       }
     }
+
+    "being deserialized from JSON" should {
+
+      "deserialize from JSON correctly when both value and comment are present" in {
+        val json =
+          """
+            |{
+            |  "value": "XXS",
+            |  "comment": "Already done"
+            |}
+          """.stripMargin
+
+        parseEstimate(json).value shouldBe Estimate(Some("XXS"), Some("Already done"))
+      }
+
+      "deserialize from JSON correctly when only the value is present" in {
+        val json =
+          """
+            |{
+            |  "value": "XXS"
+            |}
+          """.stripMargin
+
+        parseEstimate(json).value shouldBe Estimate(Some("XXS"), None)
+      }
+
+      "deserialize from JSON correctly when only the comment is present" in {
+        val json =
+          """
+            |{
+            |  "comment": "Not my job."
+            |}
+          """.stripMargin
+
+        parseEstimate(json).value shouldBe Estimate(None, Some("Not my job."))
+      }
+
+      "deserialize from JSON correctly when neither of the estimate fields are present" in {
+        val json =
+          """
+            |{
+            |}
+          """.stripMargin
+
+        parseEstimate(json).value shouldBe Estimate(None, None)
+      }
+    }
+
+    def parseEstimate(json: String) = Json.parse(json).asOpt[Estimate]
   }
 
   "A HiddenEstimate" when {
     "serialized to JSON" should {
       "be an empty JSON object" in {
-        val estimate: PublicEstimate = HiddenEstimate
         Json.toJson(HiddenEstimate) shouldBe Json.obj()
       }
     }
