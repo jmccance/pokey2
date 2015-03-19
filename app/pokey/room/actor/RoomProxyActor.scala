@@ -14,7 +14,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
   override protected val protocol: TopicProtocol = RoomProxyActor
 
-  override def preStart(): Unit = context.watch(ownerProxy.ref)
+  context.watch(ownerProxy.ref)
 
   private[this] var room: Room = initialRoom
 
@@ -43,12 +43,14 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
 
     case update @ UserProxyActor.UserUpdated(user) =>
       if (room.contains(user.id)) {
+        log.info("room: {}, user_updated, user: {}", room.id, user)
         self ! Publish(update)
       } else {
         // We're assuming that we'll never be mistakenly sent an update message for a user who has
         // not first sent a JoinRoom message.
         self ! Publish(UserJoined(room.id, user))
         room += user
+        log.info("room: {}, user_joined, user: {}", room.id, user)
       }
 
     case LeaveRoom(userProxy) =>
@@ -62,6 +64,8 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         // Remove the user from the room.
         val (user, _) = room(userProxy.id)
         room -= userProxy.id
+
+        log.info("room: {}, user_left, user: {}", room.id, user)
 
         // Update members of the change
         self ! Publish(UserLeft(room.id, user))
@@ -89,6 +93,9 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       self ! Publish(Closed(room.id))
       // Publishing a Closed message will terminate the RoomProxyActor.
+
+    case _: UserProxyActor.Subscribed | _: UserProxyActor.Unsubscribed =>
+      /* Expected, but not actionable */
   }
 }
 
@@ -97,31 +104,37 @@ object RoomProxyActor extends TopicProtocol {
 
   /////////////
   // Commands
+  
+  sealed trait Command
 
-  case class JoinRoom(userProxy: UserProxy)
+  case class JoinRoom(userProxy: UserProxy) extends Command
 
-  case class LeaveRoom(userProxy: UserProxy)
+  case class LeaveRoom(userProxy: UserProxy) extends Command
 
-  case class SubmitEstimate(userId: String, estimate: Estimate)
+  case class SubmitEstimate(userId: String, estimate: Estimate) extends Command
 
-  case class RevealFor(userId: String)
+  case class RevealFor(userId: String) extends Command
 
-  case class ClearFor(userId: String)
+  case class ClearFor(userId: String) extends Command
 
   ///////////
   // Events
 
-  case class RoomUpdated(roomInfo: RoomInfo)
+  sealed trait Event
 
-  case class UserJoined(roomId: String, user: User)
+  case class RoomUpdated(roomInfo: RoomInfo) extends Event
 
-  case class UserLeft(roomId: String, user: User)
+  case class UserJoined(roomId: String, user: User) extends Event
 
-  case class EstimateUpdated(roomId: String, userId: String, estimate: Option[PublicEstimate])
+  case class UserLeft(roomId: String, user: User) extends Event
 
-  case class Revealed(roomId: String, estimates: Map[String, Option[PublicEstimate]])
+  case class EstimateUpdated(roomId: String,
+                             userId: String,
+                             estimate: Option[PublicEstimate]) extends Event
 
-  case class Cleared(roomId: String)
+  case class Revealed(roomId: String, estimates: Map[String, Option[PublicEstimate]]) extends Event
 
-  case class Closed(roomId: String)
+  case class Cleared(roomId: String) extends Event
+
+  case class Closed(roomId: String) extends Event
 }
