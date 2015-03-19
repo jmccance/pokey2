@@ -8,7 +8,7 @@ import pokey.test.AkkaUnitSpec
 import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
 
-class RoomProxySpec extends AkkaUnitSpec {
+class RoomProxyActorSpec extends AkkaUnitSpec {
   val owner = User("U-1", "Esme")
   val someUser = User("U-2", "Magrat")
   val anotherUser = User("U-3", "Nanny")
