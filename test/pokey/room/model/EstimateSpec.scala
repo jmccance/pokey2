@@ -91,11 +91,11 @@ class EstimateSpec extends UnitSpec {
   "A RevealedEstimate" when {
     "serialized to JSON" should {
       "be an empty JSON object" in {
-        val revealedEstimates: Seq[PublicEstimate] = estimates.map(_.asRevealed)
+        val revealedEstimates: Seq[RevealedEstimate] = estimates.map(_.asRevealed)
         val revealedEstimatesJson = revealedEstimates.map(Json.toJson(_))
 
         forAll (revealedEstimatesJson.zip(revealedEstimates)) {
-          case (json, estimate: RevealedEstimate) =>
+          case (json, estimate) =>
             val expectedValue = estimate.value.map(JsString).getOrElse(JsNull)
             val expectedComment = estimate.comment.map(JsString).getOrElse(JsNull)
             (json \ "value") shouldBe expectedValue
