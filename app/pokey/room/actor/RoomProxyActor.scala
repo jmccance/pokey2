@@ -53,23 +53,21 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         log.info("room: {}, user_joined, user: {}", room.id, user)
       }
 
-    case LeaveRoom(userProxy) =>
-      if (room.contains(userProxy.id)) {
-        // Stop getting updates from the user
-        userProxy.ref ! UserProxyActor.Unsubscribe(self)
+    case LeaveRoom(userProxy) if room.contains(userProxy.id) =>
+      // Stop getting updates from the user
+      userProxy.ref ! UserProxyActor.Unsubscribe(self)
 
-        // Stop sending updates to the connection
-        self ! Unsubscribe(sender())
+      // Stop sending updates to the connection
+      self ! Unsubscribe(sender())
 
-        // Remove the user from the room.
-        val (user, _) = room(userProxy.id)
-        room -= userProxy.id
+      // Remove the user from the room.
+      val (user, _) = room(userProxy.id)
+      room -= userProxy.id
 
-        log.info("room: {}, user_left, user: {}", room.id, user)
+      log.info("room: {}, user_left, user: {}", room.id, user)
 
-        // Update members of the change
-        self ! Publish(UserLeft(room.id, user))
-      }
+      // Update members of the change
+      self ! Publish(UserLeft(room.id, user))
 
     case SubmitEstimate(userId, estimate) =>
       room.withEstimate(userId, estimate).map { updatedRoom =>
@@ -92,10 +90,10 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case Terminated(ownerProxy.ref) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
       self ! Publish(Closed(room.id))
-      // Publishing a Closed message will terminate the RoomProxyActor.
+    // Publishing a Closed message will terminate the RoomProxyActor.
 
     case _: UserProxyActor.Subscribed | _: UserProxyActor.Unsubscribed =>
-      /* Expected, but not actionable */
+    /* Expected, but not actionable */
   }
 }
 
@@ -104,7 +102,7 @@ object RoomProxyActor extends TopicProtocol {
 
   /////////////
   // Commands
-  
+
   sealed trait Command
 
   case class JoinRoom(userProxy: UserProxy) extends Command
