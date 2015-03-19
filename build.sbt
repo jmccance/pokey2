@@ -18,6 +18,11 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
 
+////////////////////////
+// Test Configuration
+
+javaOptions in Test += "-Dconfig.resource=test.conf"
+
 ScoverageKeys.coverageMinimum := 90
 
 ScoverageKeys.coverageFailOnMinimum := true
