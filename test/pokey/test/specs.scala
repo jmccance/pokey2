@@ -1,7 +1,7 @@
 package pokey.test
 
 import akka.actor.ActorSystem
-import akka.testkit.{ImplicitSender, TestKit}
+import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import org.scalatest._
 import concurrent.ScalaFutures
 import mock.MockitoSugar
@@ -25,6 +25,18 @@ abstract class AkkaUnitSpec(_system: ActorSystem)
   with BeforeAndAfterAll {
 
   def this() = this(ActorSystem())
+
+  implicit class RichTestProbe(probe: TestProbe) {
+    def expectMsgEventually[T](o: T): T = {
+      val firstMatch = probe.fishForMessage() {
+        case msg if msg == o => true
+        case _ => false
+      }
+
+      // firstMatch == o, so firstMatch is a T, right?
+      firstMatch.asInstanceOf[T]
+    }
+  }
 
   override def afterAll() = {
     super.afterAll()

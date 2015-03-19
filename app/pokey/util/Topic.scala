@@ -14,7 +14,7 @@ trait TopicProtocol {
   case class Publish(message: Any)
 }
 
-class Topic private(subscribers: Set[ActorRef]) {
+class Topic private(val subscribers: Set[ActorRef]) {
   def subscribe(subscriber: ActorRef): Topic = new Topic(subscribers + subscriber)
 
   def unsubscribe(subscriber: ActorRef): Topic = new Topic(subscribers - subscriber)
@@ -27,27 +27,36 @@ object Topic {
 }
 
 trait Subscribable {
-  this: Actor =>
+  this: Actor with ActorLogging =>
 
   protected val protocol: TopicProtocol
   import protocol._
 
   private[this] var topic: Topic = Topic()
 
-  def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
+  final def handleSubscriptions(implicit ctx: ActorContext): Actor.Receive = {
     case Subscribe(subscriber) =>
       topic = topic.subscribe(subscriber)
       onSubscribe(subscriber)
       sender ! Subscribed(subscriber)
+      log.debug("subscribed: {}", subscriber)
 
     case Unsubscribe(subscriber) =>
       topic = topic.unsubscribe(subscriber)
       onUnsubscribe(subscriber)
       sender ! Unsubscribed(subscriber)
+      log.debug("unsubscribed: {}", subscriber)
 
-    case Publish(message) if sender == self => topic.publish(message)
+    case Publish(message) if sender == self =>
+      topic.publish(message)
+      onPublish(message)
+      log.debug("published: {}, to: {}", message, topic.subscribers)
   }
 
+  // $COVERAGE-OFF$
+  // No need to test the stub implementations
   def onSubscribe(subscriber: ActorRef): Unit = ()
+  def onPublish(message: Any): Unit = ()
   def onUnsubscribe(subscriber: ActorRef): Unit = ()
+  // $COVERAGE-ON$
 }

@@ -76,6 +76,8 @@ class RoomRegistrySpec extends AkkaUnitSpec {
             }
             registry ! GetRoomProxy(roomId)
             expectMsg(None)
+
+          case other => assert(false, s"Expected Some[RoomProxy]; got: $other")
         }
       }
     }
