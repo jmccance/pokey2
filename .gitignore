@@ -14,3 +14,4 @@ tmp
 /RUNNING_PID
 /.settings
 public/dist
+node_modules
