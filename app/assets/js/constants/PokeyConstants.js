@@ -1,4 +1,4 @@
-export const EventType = {
+export const ApiEventType = {
   UserUpdated: 'userUpdated',
   RoomCreated: 'roomCreated',
   RoomUpdated: 'roomUpdated',

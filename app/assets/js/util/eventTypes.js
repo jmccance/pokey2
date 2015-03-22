@@ -1,0 +1,10 @@
+export const UserUpdated = 'userUpdated';
+export const RoomCreated = 'roomCreated';
+export const RoomUpdated = 'roomUpdated';
+export const UserJoined = 'userJoined';
+export const UserLeft = 'userLeft';
+export const EstimateUpdated = 'estimateUpdated';
+export const RoomRevealed = 'roomRevealed';
+export const RoomCleared = 'roomCleared';
+export const RoomClosed = 'roomClosed';
+export const Error = 'error';

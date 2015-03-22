@@ -20,7 +20,7 @@ var target = {
 var bundler;
 function getBundler() {
   if (!bundler) {
-    bundler = browserify('./js/app.js', {everything: true});
+    bundler = browserify('./js/app.js', { debug: true });
   }
   return bundler;
 }

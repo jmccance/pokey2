@@ -1,5 +1,6 @@
-import PokeyApp from './components/PokeyApp';
 import React from 'react';
+
+import PokeyApp from './components/PokeyApp';
 
 window.React = React;
 
