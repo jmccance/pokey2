@@ -1,7 +1,16 @@
+import NavBar from './common/NavBar';
 import React from 'react';
+import WelcomeBox from './lobby/WelcomeBox';
 
 export default class extends React.Component {
   render() {
-    return <h1>Holy shit, it worked.</h1>;
+    return (
+      <div>
+        <NavBar />
+        <div className="container">
+          <WelcomeBox />
+        </div>
+      </div>
+    );
   }
 }

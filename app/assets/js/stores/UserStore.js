@@ -1,11 +1,11 @@
-import {EventEmitter} from 'events';
+import EventEmitter from 'events';
 
-var _users = {};
+export default class UserStore extends EventEmitter {
+  constructor() {
+    this._users = new Map();
+  }
 
-class UserStore extends EventEmitter {
   emitChange() {
     this.emit(CHANGE_EVENT);
   }
 }
-
-export default new UserStore();
