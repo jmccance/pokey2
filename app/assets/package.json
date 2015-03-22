@@ -1,0 +1,13 @@
+{
+  "name": "pokey-client",
+  "version": "2.0.0-SNAPSHOT",
+  "description": "Web client for the Pokey planning poker app",
+  "repository": "http://github.com/jmccance/pokey2.git",
+  "devDependencies": {
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "gulp-babel": "^4.0.0",
+    "gulp-bower": "0.0.10",
+    "gulp-clean": "^0.3.1"
+  }
+}

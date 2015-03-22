@@ -13,3 +13,4 @@ tmp
 /.project
 /RUNNING_PID
 /.settings
+public/dist
