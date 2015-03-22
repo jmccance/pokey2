@@ -3,6 +3,8 @@
   "version": "2.0.0-SNAPSHOT",
 
   "dependencies": {
-    "bootstrap": "3.3.4"
+    "bootstrap": "3.3.4",
+    "flux": "2.0.2",
+    "react": "~0.13.1"
   }
 }
