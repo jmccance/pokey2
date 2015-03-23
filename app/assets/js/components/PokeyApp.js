@@ -3,7 +3,8 @@ import React from 'react';
 
 import {ContextStore, ContextType} from '../stores/context';
 import NavBar from './common/NavBar';
-import WelcomeBox from './lobby/WelcomeBox';
+import LobbyView from './lobby/LobbyView';
+import RoomView from './room/RoomView';
 
 export default class extends React.Component {
   constructor(props) {
@@ -18,17 +19,15 @@ export default class extends React.Component {
   render() {
     let view;
     if (this.state.context == ContextType.lobby) {
-      view = <WelcomeBox />
+      view = <LobbyView />
     } else if (this.state.context == ContextType.room ){
-      view = <h1>This would be Room {this.state.roomId}.</h1>
+      view = <RoomView isOwner={true} />
     }
 
     return (
       <div>
         <NavBar />
-        <div className="container">
-          {view}
-        </div>
+        {view}
       </div>
     );
   }
