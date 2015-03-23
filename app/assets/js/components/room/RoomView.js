@@ -10,11 +10,11 @@ export default class extends React.Component {
     return (
       <div className='container'>
         <div className='row'>
-          <div className='col-md-9'>
+          <div className='col-md-10'>
             <EstimateForm />
           </div>
 
-          <div className='col-md-3'>
+          <div className='col-md-2'>
             {this.props.isOwner ? <RoomOwnerControls /> : '&nbsp;'}
           </div>
         </div>
