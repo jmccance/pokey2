@@ -7,6 +7,12 @@ import RoomOwnerControls from './RoomOwnerControls';
 
 export default class extends React.Component {
   render() {
+    const estimates = [
+      {userId: '1', name: 'Esme'},
+      {userId: '2', name: 'Nanny'},
+      {userId: '3', name: 'Magrat'}
+    ];
+
     return (
       <div className='container'>
         <div className='row'>
@@ -23,7 +29,7 @@ export default class extends React.Component {
 
         <div className="row">
           <div className='col-md-5'>
-            <EstimateList />
+            <EstimateList estimates={estimates} />
           </div>
 
           <div className="col-md-7">
