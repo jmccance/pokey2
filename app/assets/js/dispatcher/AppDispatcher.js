@@ -1,3 +1,3 @@
 import Dispatcher from 'flux';
 
-export class AppDispatcher extends Dispatcher { }
+export default new class extends Dispatcher { }

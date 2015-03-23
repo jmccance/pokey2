@@ -1,7 +1,12 @@
 import director from 'director';
 import EventEmitter from 'events';
 
-class _ContextStore extends EventEmitter {
+export const ContextType = {
+  lobby: 'lobby',
+  room: 'room'
+};
+
+export default new class extends EventEmitter {
   constructor() {
     const routes = {
       '/': () => {
@@ -47,10 +52,3 @@ class _ContextStore extends EventEmitter {
     return context;
   }
 }
-
-export const ContextType = {
-  lobby: 'lobby',
-  room: 'room'
-};
-
-export const ContextStore = new _ContextStore();
