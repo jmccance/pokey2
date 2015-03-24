@@ -1,5 +1,7 @@
 import React from 'react';
 
+import UpdateUserDialog from './UpdateUserDialog';
+
 export default class extends React.Component {
   render() {
     return (
@@ -13,10 +15,13 @@ export default class extends React.Component {
           </div>
           <div className='collapse navbar-collapse'>
             <ul className='nav navbar-nav navbar-right'>
-              <li><a>Change Name</a></li>
+              <li><a data-toggle='modal'
+                     data-target='#update-user-modal'>Change Name</a></li>
             </ul>
           </div>
         </div>
+
+        <UpdateUserDialog />
       </div>
     );
   }
