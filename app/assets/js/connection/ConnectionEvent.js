@@ -1,12 +1,12 @@
 export default {
-  UserUpdated: 'userUpdated',
-  RoomCreated: 'roomCreated',
-  RoomUpdated: 'roomUpdated',
-  UserJoined: 'userJoined',
-  UserLeft: 'userLeft',
-  EstimateUpdated: 'estimateUpdated',
-  RoomRevealed: 'roomRevealed',
-  RoomCleared: 'roomCleared',
-  RoomClosed: 'roomClosed',
-  Error: 'error'
+  UserUpdated: 'connection.userUpdated',
+  RoomCreated: 'connection.roomCreated',
+  RoomUpdated: 'connection.roomUpdated',
+  UserJoined: 'connection.userJoined',
+  UserLeft: 'connection.userLeft',
+  EstimateUpdated: 'connection.estimateUpdated',
+  RoomRevealed: 'connection.roomRevealed',
+  RoomCleared: 'connection.roomCleared',
+  RoomClosed: 'connection.roomClosed',
+  Error: 'connection.error'
 }

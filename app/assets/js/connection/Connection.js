@@ -1,4 +1,7 @@
 import EventEmitter from 'events';
+
+import ContextAction from '../context/contextActions';
+import User from '../users/user';
 import {ServerAction} from './connectionActions';
 
 function getUrl() {
@@ -17,8 +20,14 @@ export default class extends EventEmitter {
   constructor() {
     this.conn = new WebSocket(getUrl());
 
-    this.conn.onmessage = function (event) {
+    this.conn.onmessage = (message) => {
+      const event = JSON.parse(message.data);
+
       switch (event.event) {
+        case 'connectionInfo':
+          ContextAction.setCurrentUser(new User(event.userId))
+          break;
+
         case 'userUpdated':
           ServerAction.userUpdated(event.user);
           break;

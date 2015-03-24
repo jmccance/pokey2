@@ -17,6 +17,7 @@ object Event {
     Reads.pure[Event](???),
     // $COVERAGE-ON$
     OWrites[Event] {
+      case r: ConnectionInfo => ConnectionInfo.writer.writes(r)
       case r: UserUpdatedEvent => UserUpdatedEvent.writer.writes(r)
       case r: RoomCreatedEvent => RoomCreatedEvent.writer.writes(r)
       case r: RoomUpdatedEvent => RoomUpdatedEvent.writer.writes(r)
@@ -35,6 +36,15 @@ object Event {
 }
 
 object Events {
+
+  case class ConnectionInfo(userId: String) extends Event
+
+  object ConnectionInfo {
+    val writer = OWrites[ConnectionInfo] {
+      case ConnectionInfo(user) =>
+        EventJsObject("connectionInfo")("userId" -> user)
+    }
+  }
 
   /**
    * The attached user has been updated in some way.

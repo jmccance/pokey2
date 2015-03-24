@@ -4,14 +4,14 @@
 // router instead of directly coupling it to the ContextStore. Instead have Actions here for changing and getting the
 // context, with the certain context changes triggering or being triggered by route changes.
 
-import AppDispatcher from '../dispatcher/AppDispatcher';
+import AppDispatcher from '../dispatcher/appDispatcher';
 
-import ContextEvent from './contextEvent';
+import ContextEvent from './contextEvents';
 
-const View {
+const View = {
   Lobby: 'Lobby',
   Room: 'Room'
-}
+};
 
 var _context = {
   view: View.Lobby,
@@ -20,9 +20,9 @@ var _context = {
 
 export default new class {
   setCurrentUser(user) {
-    _context.user = user;
     AppDispatcher.dispatch({
-      type: ContextEvent
+      type: ContextEvent.UserChanged,
+      user: user
     });
   }
 

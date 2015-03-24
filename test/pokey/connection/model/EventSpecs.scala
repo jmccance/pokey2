@@ -14,6 +14,16 @@ class EventSpecs extends UnitSpec {
   private[this] val someRoom = RoomInfo("5678", "1234", isRevealed = false)
   private[this] val someEstimate = Some(RevealedEstimate(Some("XXS"), None))
 
+  "A ConnectionInfoEvent event" should {
+    "serialize to JSON correctly" in {
+      val event = ConnectionInfo(someUser.id)
+      writeEvent(event) shouldBe Json.obj(
+        "event" -> "newConnection",
+        "userId" -> someUser.id
+      )
+    }
+  }
+
   "A UserUpdatedEvent event" should {
     "serialize to JSON correctly" in {
       val event = UserUpdatedEvent(someUser)

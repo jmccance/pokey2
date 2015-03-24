@@ -19,6 +19,7 @@ class ConnectionHandler(roomService: RoomService,
   private[this] var rooms: Map[String, ActorRef] = Map.empty
 
   userProxy.ref ! UserProxyActor.NewConnection(self)
+  client ! Events.ConnectionInfo(connUserId)
 
   def receive: Receive = {
     case req: Command =>

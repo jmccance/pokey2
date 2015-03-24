@@ -49,6 +49,6 @@ gulp.task('compile', function () {
 
 gulp.task('default', ['clean', 'compile']);
 
-gulp.task('watch', function() {
+gulp.task('watch', ['default'], function() {
   gulp.watch(src.scripts, ['default']);
 });
