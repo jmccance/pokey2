@@ -28,7 +28,7 @@ export default new class extends EventEmitter {
   }
 
   emitChange() {
-    this.emit("route_updated");
+    this.emit('route_updated');
   }
 
   get() {

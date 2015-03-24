@@ -7,7 +7,7 @@ export default class extends React.Component {
         <td>{this.props.name}</td>
         <td>
           <span>
-            <span className="glyphicon glyphicon-ok text-success"></span>
+            <span className='glyphicon glyphicon-ok text-success'></span>
           </span>
         </td>
         <td>

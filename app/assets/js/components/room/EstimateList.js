@@ -15,7 +15,7 @@ export default class extends React.Component {
 
     return (
       <div>
-        <table className="table table-striped">
+        <table className='table table-striped'>
           <tr>
             <th>User</th>
             <th>Estimate</th>

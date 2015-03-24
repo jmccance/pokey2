@@ -25,14 +25,14 @@ export default class extends React.Component {
           </div>
         </div>
 
-        <div className="row">&nbsp;</div>
+        <div className='row'>&nbsp;</div>
 
-        <div className="row">
+        <div className='row'>
           <div className='col-md-5'>
             <EstimateList estimates={estimates} />
           </div>
 
-          <div className="col-md-7">
+          <div className='col-md-7'>
              <EstimateHistogram />
           </div>
         </div>
