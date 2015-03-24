@@ -6,7 +6,36 @@
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
 
+import ContextEvent from './contextEvent';
+
+const View {
+  Lobby: 'Lobby',
+  Room: 'Room'
+}
+
+var _context = {
+  view: View.Lobby,
+  user: null
+};
+
 export default new class {
   setCurrentUser(user) {
+    _context.user = user;
+    AppDispatcher.dispatch({
+      type: ContextEvent
+    });
+  }
+
+  changeView(view) {
+    // TODO Set route using the router.
+    // When the router changes the route, it will send an event to trigger us to change the view.
+  }
+
+  viewChanged(newView) {
+    _context.view(view);
+    AppDispatcher.dispatch({
+      type: ContextEvent.ViewChanged,
+      view: _context.view
+    });
   }
 }

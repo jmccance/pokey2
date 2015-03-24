@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
-import * as EventType from './EventType';
-import {ServerAction} from './ConnectionActions';
+import {ServerAction} from './connectionActions';
 
 function getUrl() {
   const loc = window.location;
@@ -20,43 +19,43 @@ export default class extends EventEmitter {
 
     this.conn.onmessage = function (event) {
       switch (event.event) {
-        case EventType.UserUpdated:
+        case 'userUpdated':
           ServerAction.userUpdated(event.user);
           break;
 
-        case EventType.RoomCreated:
+        case 'roomCreated':
           ServerAction.roomCreated(event.roomId);
           break;
 
-        case EventType.RoomUpdatedEvent:
+        case 'roomUpdated':
           ServerAction.roomUpdated(event.roomId, event.room);
           break;
 
-        case EventType.UserJoinedEvent:
+        case 'userJoined':
           ServerAction.userJoined(event.roomId, event.user);
           break;
 
-        case EventType.UserLeftEvent:
+        case 'userLeft':
           ServerAction.userLeft(event.roomId, event.user);
           break;
 
-        case EventType.EstimateUpdatedEvent:
+        case 'estimateUpdated':
           ServerAction.estimateUpdated(event.roomId, event.userId, event.estimate);
           break;
 
-        case EventType.RoomRevealedEvent:
+        case 'roomRevealed':
           ServerAction.roomRevealed(event.roomId, event.estimates);
           break;
 
-        case EventType.RoomClearedEvent:
+        case 'roomCleared':
           ServerAction.roomCleared(event.roomId);
           break;
 
-        case EventType.RoomClosedEvent:
+        case 'roomClosed':
           ServerAction.roomClosed(event.roomId)
           break;
 
-        case EventType.ErrorEvent:
+        case 'error':
           ServerAction.error(event.message);
           break;
       }
