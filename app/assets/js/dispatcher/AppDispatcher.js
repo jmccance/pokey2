@@ -1,3 +1,3 @@
-import Dispatcher from 'flux';
+import {Dispatcher} from 'flux';
 
-export default new class extends Dispatcher { }
+export default new Dispatcher()
