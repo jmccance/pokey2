@@ -58,8 +58,7 @@ export default new class extends EventEmitter {
    * Notify listeners that the store has changed.
    */
   _emitChange() {
-    console.log(ContextEvent.ContextChanged, _context);
-    let result = this.emit(ContextEvent.ContextChanged);
-    console.log('Listeners responded', result);
+    console.log('ContextStore', ContextEvent.ContextChanged, _context);
+    this.emit(ContextEvent.ContextChanged);
   }
 }

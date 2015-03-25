@@ -3,7 +3,7 @@ import React from 'react';
 export default class extends React.Component {
 
   render() {
-    return(
+    return (
       <div className='modal fade' id='update-user-modal'>
         <div className='modal-dialog'>
           <div className='modal-content'>

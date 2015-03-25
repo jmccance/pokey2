@@ -32,10 +32,10 @@ export default class extends React.Component {
 
   render() {
     let view;
-    if (this.state.view == View.Lobby) {
-      view = <LobbyView />
-    } else if (this.state.view == View.Room) {
-      view = <RoomView isOwner={true} />
+    if (this.state.view === View.Lobby) {
+      view = <LobbyView />;
+    } else if (this.state.view === View.Room) {
+      view = <RoomView isOwner={true} />;
     }
 
     return (

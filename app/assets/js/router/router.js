@@ -13,7 +13,7 @@ const routes = {
   }
 };
 
-const Router = director.Router(routes);
-Router.init();
+const router = new director.Router(routes);
+router.init();
 
-export default Router;
+export default router;

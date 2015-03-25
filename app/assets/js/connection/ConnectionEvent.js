@@ -1,4 +1,5 @@
 export default {
+  NewConnection: 'connection.newConnection',
   UserUpdated: 'connection.userUpdated',
   RoomCreated: 'connection.roomCreated',
   RoomUpdated: 'connection.roomUpdated',

@@ -1,7 +1,8 @@
 var babelify = require('babelify');
 var browserify = require('browserify');
-var gulp = require('gulp');
 var del = require('del');
+var gulp = require('gulp');
+var eslint = require('gulp-eslint');
 var reactify = require('reactify');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
@@ -43,11 +44,18 @@ gulp.task('clean', function(cb) {
   cb);
 });
 
+gulp.task('lint', function () {
+  return gulp.src(src.scripts)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
 gulp.task('compile', function () {
   return bundle();
 });
 
-gulp.task('default', ['clean', 'compile']);
+gulp.task('default', ['clean', 'lint', 'compile']);
 
 gulp.task('watch', ['default'], function() {
   gulp.watch(src.scripts, ['default']);

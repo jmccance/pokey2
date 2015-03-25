@@ -4,10 +4,10 @@ import ContextAction from '../context/contextActions';
 import User from '../users/user';
 import {ServerAction} from './connectionActions';
 
-function getUrl() {
+function _getUrl() {
   const loc = window.location;
   let protocol;
-  if (loc.protocol === 'https:')  {
+  if (loc.protocol === 'https:') {
     protocol = 'wss:';
   } else {
     protocol = 'ws:';
@@ -18,14 +18,14 @@ function getUrl() {
 
 export default class extends EventEmitter {
   constructor() {
-    this.conn = new WebSocket(getUrl());
+    this.conn = new WebSocket(_getUrl());
 
     this.conn.onmessage = (message) => {
       const event = JSON.parse(message.data);
 
       switch (event.event) {
         case 'connectionInfo':
-          ContextAction.setCurrentUser(new User(event.userId))
+          ContextAction.setCurrentUser(new User(event.userId));
           break;
 
         case 'userUpdated':
@@ -61,7 +61,7 @@ export default class extends EventEmitter {
           break;
 
         case 'roomClosed':
-          ServerAction.roomClosed(event.roomId)
+          ServerAction.roomClosed(event.roomId);
           break;
 
         case 'error':
