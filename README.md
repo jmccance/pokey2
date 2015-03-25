@@ -106,4 +106,14 @@ controllers.
 
 ### Client View
 
-*TODO*
+#### TODOC
+
+* Flux/React implementation.
+* Naming conventions. React components are CamelCased, other files are lowerCamelCased.
+* The primary stores and their roles.
+    * ContextStore
+    * RoomStore
+    * EstimateStore
+* Action integrations
+    * Connection - Interacts with the WebSocket API, generating ConnectionEvents.
+    * Router - Manages hash-routing, triggering events to the Dispatcher when the route changes.
