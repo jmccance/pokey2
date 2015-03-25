@@ -1,11 +1,15 @@
 var babelify = require('babelify');
 var browserify = require('browserify');
 var del = require('del');
-var gulp = require('gulp');
 var eslint = require('gulp-eslint');
+var gulp = require('gulp');
+var path = require('path');
 var reactify = require('reactify');
+var remapify = require('remapify');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
+
+var cwd = path.resolve('.');
 
 var src = {
   scripts: 'js/**/*.js'
@@ -31,7 +35,7 @@ function bundle() {
     .transform(babelify)
     .transform(reactify)
     .bundle()
-    .on('error', function(err) { console.log('Error: ' + err.message); })
+//    .on('error', function(err) { console.log('Error: ' + err.message); })
     .pipe(source('app.js'))
     .pipe(gulp.dest(target.scripts));
 }

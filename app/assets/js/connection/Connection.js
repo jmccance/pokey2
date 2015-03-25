@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 
 import ContextAction from '../context/contextActions';
 import User from '../users/user';
-import {ServerAction} from './connectionActions';
+import ServerAction from './serverActions';
 
 function _getUrl() {
   const loc = window.location;

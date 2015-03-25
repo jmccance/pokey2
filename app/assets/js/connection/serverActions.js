@@ -1,9 +1,7 @@
-import AppDispatcher from '../dispatcher/appDispatcher';
-
-import Connection from './connection';
+import AppDispatcher from '../dispatcher/AppDispatcher';
 import ConnectionEvent from './connectionEvent';
 
-export const ServerAction = new class {
+export default new class {
   userUpdated(user) {
     AppDispatcher.dispatch({
       type: ConnectionEvent.UserUpdated,
@@ -68,16 +66,6 @@ export const ServerAction = new class {
     AppDispatcher.dispatch({
       type: ConnectionEvent.Error,
       message: message
-    });
-  }
-};
-
-export const ClientAction = new class {
-  openConnection() {
-    let conn = new Connection();
-    AppDispatcher.dispatch({
-      type: ConnectionEvent.NewConnection,
-      connection: conn
     });
   }
 };

@@ -5,6 +5,7 @@
   "repository": "http://github.com/jmccance/pokey2.git",
   "dependencies": {
     "bootstrap": "3.3.4",
+    "director": "^1.2.8",
     "flux": "2.0.1",
     "highcharts": "0.0.8",
     "jquery": "^2.1.3",
