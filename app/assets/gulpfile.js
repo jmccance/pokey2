@@ -3,9 +3,6 @@ var browserify = require('browserify');
 var del = require('del');
 var eslint = require('gulp-eslint');
 var gulp = require('gulp');
-var path = require('path');
-var reactify = require('reactify');
-var remapify = require('remapify');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
 
@@ -33,9 +30,8 @@ function getBundler() {
 function bundle() {
   return getBundler()
     .transform(babelify)
-    .transform(reactify)
     .bundle()
-//    .on('error', function(err) { console.log('Error: ' + err.message); })
+    .on('error', function(err) { console.log('Error: ' + err.message); })
     .pipe(source('app.js'))
     .pipe(gulp.dest(target.scripts));
 }
