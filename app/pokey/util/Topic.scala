@@ -14,7 +14,7 @@ trait TopicProtocol {
   case class Publish(message: Any)
 }
 
-class Topic private(val subscribers: Set[ActorRef]) {
+class Topic private (val subscribers: Set[ActorRef]) {
   def subscribe(subscriber: ActorRef): Topic = new Topic(subscribers + subscriber)
 
   def unsubscribe(subscriber: ActorRef): Topic = new Topic(subscribers - subscriber)

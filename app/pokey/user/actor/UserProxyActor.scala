@@ -4,14 +4,14 @@ import akka.actor._
 import org.joda.time.DateTime
 import pokey.user.actor.UserProxyActor.Settings
 import pokey.user.model.User
-import pokey.util.{Subscribable, TopicProtocol}
+import pokey.util.{ Subscribable, TopicProtocol }
 
 import concurrent.duration._
 
 class UserProxyActor(settings: Settings, initialUser: User)
-  extends Actor
-  with ActorLogging
-  with Subscribable {
+    extends Actor
+    with ActorLogging
+    with Subscribable {
 
   import UserProxyActor._
   import context.dispatcher

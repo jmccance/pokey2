@@ -8,7 +8,7 @@ import pokey.user.service.UserService
 class RoomRegistry(private[this] var ids: Stream[String], userService: UserService) extends Actor with ActorLogging {
   import RoomRegistry._
   import context.dispatcher
-  
+
   def receive = withRooms(Map.empty)
 
   private[this] def withRooms(rooms: Map[String, RoomProxy]): Receive = {

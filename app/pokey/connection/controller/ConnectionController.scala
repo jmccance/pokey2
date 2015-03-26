@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class ConnectionController(userService: UserService,
                            connectionHandlerProps: ConnectionHandler.PropsFactory)
-  extends Controller {
+    extends Controller {
 
   private[this] val log = Logger(this.getClass)
 

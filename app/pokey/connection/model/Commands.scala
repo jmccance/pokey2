@@ -26,7 +26,7 @@ object Command {
     // $COVERAGE-OFF$
     // We never write this, so skipping implementation.
     Writes[Command](_ => ???)
-    // $COVERAGE-ON$
+  // $COVERAGE-ON$
   )
 
   implicit val frameFormatter: FrameFormatter[Command] = FrameFormatter.jsonFrame[Command]

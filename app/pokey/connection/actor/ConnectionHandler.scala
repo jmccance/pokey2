@@ -1,13 +1,13 @@
 package pokey.connection.actor
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
 import akka.pattern.pipe
 import play.api.mvc.WebSocket
 import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model._
-import pokey.room.actor.{RoomProxy, RoomProxyActor}
+import pokey.room.actor.{ RoomProxy, RoomProxyActor }
 import pokey.room.service.RoomService
-import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.actor.{ UserProxy, UserProxyActor }
 
 class ConnectionHandler(roomService: RoomService,
                         userProxy: UserProxy,

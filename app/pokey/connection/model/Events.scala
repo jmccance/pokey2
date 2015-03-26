@@ -2,7 +2,7 @@ package pokey.connection.model
 
 import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
-import pokey.room.model.{PublicEstimate, RoomInfo}
+import pokey.room.model.{ PublicEstimate, RoomInfo }
 import pokey.user.model.User
 
 sealed trait Event
