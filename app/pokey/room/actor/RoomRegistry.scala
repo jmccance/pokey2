@@ -16,7 +16,7 @@ class RoomRegistry(private[this] var ids: Stream[String], userService: UserServi
 
     case CreateRoomFor(ownerId) =>
       val querent = sender()
-      userService.getUser(ownerId).map {
+      userService.getUser(ownerId).foreach {
         case Some(userProxy) => self ! CreateRoomProxy(querent, userProxy)
 
         case None =>

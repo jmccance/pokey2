@@ -1,6 +1,7 @@
 package pokey.room.actor
 
 import akka.actor._
+import org.scalactic.{Bad, Good}
 import pokey.room.model.{Estimate, PublicEstimate, Room, RoomInfo}
 import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
@@ -70,22 +71,31 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
       self ! Publish(UserLeft(room.id, user))
 
     case SubmitEstimate(userId, estimate) =>
-      room.withEstimate(userId, estimate).map { updatedRoom =>
-        room = updatedRoom
-        self ! Publish(EstimateUpdated(room.id, userId, room.publicEstimates(userId)))
-      } recover(sender ! _)
+      room.withEstimate(userId, estimate) match {
+        case Good(updatedRoom) =>
+          room = updatedRoom
+          self ! Publish(EstimateUpdated(room.id, userId, room.publicEstimates(userId)))
+
+        case Bad(error) => sender ! error
+      }
 
     case RevealFor(userId: String) =>
-      room.revealedBy(userId).map { updatedRoom =>
-        room = updatedRoom
-        self ! Publish(Revealed(room.id, room.publicEstimates))
-      } recover(sender ! _)
+      room.revealedBy(userId) match {
+        case Good(updatedRoom) =>
+          room = updatedRoom
+          self ! Publish(Revealed(room.id, room.publicEstimates))
+
+        case Bad(error) => sender ! error
+      }
 
     case ClearFor(userId: String) =>
-      room.clearedBy(userId).map { updatedRoom =>
-        room = updatedRoom
-        self ! Publish(Cleared(room.id))
-      } recover(sender ! _)
+      room.clearedBy(userId) match {
+        case Good(updatedRoom) =>
+          room = updatedRoom
+          self ! Publish(Cleared(room.id))
+
+        case Bad(error) => sender ! error
+      }
 
     case Terminated(ownerProxy.ref) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)

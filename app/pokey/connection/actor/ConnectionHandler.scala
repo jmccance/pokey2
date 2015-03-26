@@ -37,10 +37,11 @@ class ConnectionHandler(roomService: RoomService,
             .map(proxy => Events.RoomCreatedEvent(proxy.id))
             .recover(ErrorEvent.mapThrowable)
             .pipeTo(client)
+          ()
 
         case JoinRoomCommand(roomId) =>
           log.info("userId: {}, command: joinRoom, roomId: {}", connUserId, roomId)
-          roomService.getRoom(roomId).map {
+          roomService.getRoom(roomId).foreach {
             case Some(roomProxy) =>
               roomProxy.ref ! RoomProxyActor.JoinRoom(userProxy)
               self ! RoomJoined(roomProxy)
