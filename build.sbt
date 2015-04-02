@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
 
-scalacOptions ++= Seq(
+scalacOptions in (Compile, compile) ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8",       // yes, this is 2 args
   "-feature",
