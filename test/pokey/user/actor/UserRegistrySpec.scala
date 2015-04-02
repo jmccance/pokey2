@@ -4,16 +4,16 @@ import akka.pattern.ask
 import akka.testkit.EventFilter
 import akka.util.Timeout
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.UserRegistry.{CreateProxyForId, GetUserProxy}
+import pokey.user.actor.UserRegistry.{ CreateProxyForId, GetUserProxy }
 
 import concurrent.duration._
 
 class UserRegistrySpec extends AkkaUnitSpec {
   val existingUserId = "1234"
   val newUserId = "5678"
-  
+
   "A UserRegistry" when {
-    
+
     "receiving a CreateProxyForId message for a new id" should {
       "create a new UserProxy and reply with it" in {
         val registry = init()
@@ -21,7 +21,7 @@ class UserRegistrySpec extends AkkaUnitSpec {
         expectMsgType[UserProxy]
       }
     }
-    
+
     "receiving a CreateProxyForId message for an existing id" should {
       "reply with the existing UserProxy" in {
         val registry = init()
@@ -29,20 +29,20 @@ class UserRegistrySpec extends AkkaUnitSpec {
         expectMsgType[UserProxy]
       }
     }
-    
+
     "receiving a GetUserProxy message for an existing id" should {
       "reply with the UserProxy" in {
         val registry = init()
         registry ! GetUserProxy(existingUserId)
         expectMsgPF() {
           case msg =>
-            msg shouldBe a [Some[_]]
+            msg shouldBe a[Some[_]]
             val Some(UserProxy(id, _)) = msg
             id shouldBe existingUserId
         }
       }
     }
-    
+
     "receiving a GetUserProxy message for a non-existing id" should {
       "reply with None" in {
         val registry = init()
@@ -66,7 +66,7 @@ class UserRegistrySpec extends AkkaUnitSpec {
         }
       }
     }
-    
+
     def init() = {
       val settings = new UserProxyActor.Settings {
         override val maxIdleDuration: FiniteDuration = 10.minutes

@@ -1,12 +1,12 @@
 package pokey.connection.model
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{ JsObject, Json }
 import pokey.connection.model.Events._
-import pokey.room.model.{RevealedEstimate, RoomInfo}
+import pokey.room.model.{ RevealedEstimate, RoomInfo }
 import pokey.test.UnitSpec
 import pokey.user.model.User
 
-import util.{Success, Try}
+import util.{ Success, Try }
 
 class EventSpecs extends UnitSpec {
 
@@ -134,7 +134,7 @@ class EventSpecs extends UnitSpec {
         throw new RuntimeException("Oops")
       }.recover(ErrorEvent.mapThrowable)
 
-      event shouldBe an [Success[_]]
+      event shouldBe an[Success[_]]
       event.get.asInstanceOf[ErrorEvent].message shouldBe "Oops"
     }
 

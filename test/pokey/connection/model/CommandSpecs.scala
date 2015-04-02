@@ -103,7 +103,7 @@ class CommandSpecs extends UnitSpec {
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe an [InvalidCommand]
+      parseCommand(json).value shouldBe an[InvalidCommand]
     }
   }
 

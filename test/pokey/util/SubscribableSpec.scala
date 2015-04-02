@@ -1,6 +1,6 @@
 package pokey.util
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
 import akka.testkit.EventFilter
 import pokey.test.AkkaUnitSpec
 

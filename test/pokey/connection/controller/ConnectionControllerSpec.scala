@@ -1,6 +1,6 @@
 package pokey.connection.controller
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ Actor, ActorRef, Props }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -8,7 +8,6 @@ import pokey.connection.actor.ConnectionHandler
 import pokey.test.PlayUnitSpec
 import pokey.user.actor.UserProxy
 import pokey.user.service.UserService
-
 
 class ConnectionControllerSpec extends PlayUnitSpec {
   "A ConnectionController" when {
@@ -29,7 +28,7 @@ class ConnectionControllerSpec extends PlayUnitSpec {
       val propsFactory: ConnectionHandler.PropsFactory =
         (userProxy: UserProxy) =>
           (actor: ActorRef) =>
-            Props(new Actor { def receive = Actor.emptyBehavior})
+            Props(new Actor { def receive = Actor.emptyBehavior })
       new ConnectionController(mockService, propsFactory)
     }
   }

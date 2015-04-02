@@ -1,17 +1,17 @@
 package pokey.room.actor
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ ActorRef, Props }
 import akka.pattern.ask
 import akka.testkit.EventFilter
 import akka.util.Timeout
-import pokey.room.actor.RoomRegistry.{CreateRoomError, CreateRoomFor, GetRoomProxy}
+import pokey.room.actor.RoomRegistry.{ CreateRoomError, CreateRoomFor, GetRoomProxy }
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxy
-import pokey.user.service.{StubUserService, UserService}
+import pokey.user.service.{ StubUserService, UserService }
 import pokey.util.using
 
 import concurrent.duration._
-import concurrent.{ExecutionContext, Future}
+import concurrent.{ ExecutionContext, Future }
 
 class RoomRegistrySpec extends AkkaUnitSpec {
 
@@ -47,7 +47,7 @@ class RoomRegistrySpec extends AkkaUnitSpec {
         registry ! CreateRoomFor(userId)
 
         expectMsgPF() {
-          case msg => msg shouldBe a [RoomProxy]
+          case msg => msg shouldBe a[RoomProxy]
         }
       }
 
@@ -56,7 +56,7 @@ class RoomRegistrySpec extends AkkaUnitSpec {
         registry ! CreateRoomFor(invalidUserId)
 
         expectMsgPF() {
-          case msg => msg shouldBe a [CreateRoomError]
+          case msg => msg shouldBe a[CreateRoomError]
         }
       }
 
@@ -66,7 +66,7 @@ class RoomRegistrySpec extends AkkaUnitSpec {
       "remove that room from the map" in {
         implicit val timeout = Timeout(3.seconds)
         val registry = newRoomRegistry()
-        
+
         val foRoomProxy = (registry ? GetRoomProxy(roomId)).mapTo[Option[RoomProxy]]
 
         whenReady(foRoomProxy) {
@@ -83,15 +83,14 @@ class RoomRegistrySpec extends AkkaUnitSpec {
     }
 
     class TestRoomRegistry(userService: UserService)
-      extends RoomRegistry(Stream.from(0).map(_.toString), userService) {
+        extends RoomRegistry(Stream.from(0).map(_.toString), userService) {
     }
 
     class TestUserService(users: (String, ActorRef)*)
-      extends StubUserService {
+        extends StubUserService {
       private[this] val _users = Map(userId -> system.deadLetters) ++ users
 
-      override def getUser(id: String)
-                          (implicit ec: ExecutionContext): Future[Option[UserProxy]] =
+      override def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]] =
         Future.successful(_users.get(id).map(ref => UserProxy(id, ref)))
     }
 

@@ -4,9 +4,9 @@ import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import pokey.common.error.UnauthorizedErr
 import pokey.room.actor.RoomProxyActor._
-import pokey.room.model.{Estimate, Room}
+import pokey.room.model.{ Estimate, Room }
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.actor.{ UserProxy, UserProxyActor }
 import pokey.user.model.User
 
 class RoomProxyActorSpec extends AkkaUnitSpec {
@@ -21,18 +21,18 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     "it receives a JoinRoom message from a connection" should {
       "subscribe to the supplied UserProxy, subscribe the connection to itself, and publish a " +
         "UserJoined Message" in withContext {
-        case Context(rpa, ownerProbe, conn, _) =>
-          val userProbe = TestProbe()
-          val userProxy = UserProxy(someUser.id, userProbe.ref)
+          case Context(rpa, ownerProbe, conn, _) =>
+            val userProbe = TestProbe()
+            val userProxy = UserProxy(someUser.id, userProbe.ref)
 
-          rpa ! JoinRoom(userProxy)
+            rpa ! JoinRoom(userProxy)
 
-          userProbe.expectMsg(UserProxyActor.Subscribe(rpa))
-          userProbe.send(rpa, UserProxyActor.UserUpdated(someUser))
+            userProbe.expectMsg(UserProxyActor.Subscribe(rpa))
+            userProbe.send(rpa, UserProxyActor.UserUpdated(someUser))
 
-          expectMsgType[RoomUpdated]
-          expectMsg(UserJoined(roomId, someUser))
-      }
+            expectMsgType[RoomUpdated]
+            expectMsg(UserJoined(roomId, someUser))
+        }
     }
 
     "it receives a UserUpdated message for a member of the room" should {
@@ -174,19 +174,20 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
       RoomProxyActor.props(room, UserProxy(owner.id, ownerProbe.ref)),
       s"room-proxy-actor-${now.toMillis}")
 
-    val userMap: Map[String, UserContext] = users.zipWithIndex.map { case (user, index) =>
-      val connP = TestProbe()
-      val proxyP = TestProbe()
-      val proxy = UserProxy(user.id, proxyP.ref)
+    val userMap: Map[String, UserContext] = users.zipWithIndex.map {
+      case (user, index) =>
+        val connP = TestProbe()
+        val proxyP = TestProbe()
+        val proxy = UserProxy(user.id, proxyP.ref)
 
-      connP.ignoreMsg { case _ => true }
+        connP.ignoreMsg { case _ => true }
 
-      connP.send(rpa, JoinRoom(proxy))
-      proxyP.expectMsg(UserProxyActor.Subscribe(rpa))
-      proxyP.send(rpa, UserProxyActor.Subscribed(rpa))
-      proxyP.send(rpa, UserProxyActor.UserUpdated(user))
+        connP.send(rpa, JoinRoom(proxy))
+        proxyP.expectMsg(UserProxyActor.Subscribe(rpa))
+        proxyP.send(rpa, UserProxyActor.Subscribed(rpa))
+        proxyP.send(rpa, UserProxyActor.UserUpdated(user))
 
-      (user.id, UserContext(connP, user, proxyP))
+        (user.id, UserContext(connP, user, proxyP))
     }.toMap
 
     userMap.values.foreach(_.connP.ignoreNoMsg())

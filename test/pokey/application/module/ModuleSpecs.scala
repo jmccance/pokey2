@@ -12,14 +12,14 @@ import pokey.user.service.UserService
 import scaldi.Injectable._
 import scaldi.Module
 
-import concurrent.{ExecutionContext, Future}
+import concurrent.{ ExecutionContext, Future }
 
 class ModuleSpecs extends AkkaUnitSpec {
   "An AkkaModule" should {
     "provide a binding for the ActorSystem passed to the module" in {
       implicit val module = new AkkaModule(system)
 
-      inject [ActorSystem] shouldBe system
+      inject[ActorSystem] shouldBe system
     }
   }
 
@@ -28,12 +28,12 @@ class ModuleSpecs extends AkkaUnitSpec {
 
     "provide a binding for AssetController" in {
       implicit val m = module
-      inject [AssetController]
+      inject[AssetController]
     }
 
     "provide a binding for ConnectionController" in {
       implicit val m = module
-      inject [ConnectionController]
+      inject[ConnectionController]
     }
   }
 
@@ -42,17 +42,17 @@ class ModuleSpecs extends AkkaUnitSpec {
 
     "provide a binding for UserService" in {
       implicit val m = module
-      inject [UserService]
+      inject[UserService]
     }
 
     "provide a binding for RoomService" in {
       implicit val m = module
-      inject [RoomService]
+      inject[RoomService]
     }
   }
 
   private[this] def mockServiceModule = new Module {
-    bind [UserService] to new UserService {
+    bind[UserService] to new UserService {
       override def nextUserId(): String = ???
 
       override def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]] = ???
@@ -60,7 +60,7 @@ class ModuleSpecs extends AkkaUnitSpec {
       override def createUserForId(id: String)(implicit ec: ExecutionContext): Future[UserProxy] = ???
     }
 
-    bind [RoomService] to new RoomService {
+    bind[RoomService] to new RoomService {
       override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] = ???
 
       override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] = ???
@@ -68,8 +68,8 @@ class ModuleSpecs extends AkkaUnitSpec {
   }
 
   private[this] def mockDependencies = new Module {
-    bind [ActorSystem] to system
-    bind [Configuration] to Configuration.from(Map(
+    bind[ActorSystem] to system
+    bind[Configuration] to Configuration.from(Map(
       "pokey.users.max-idle-time" -> "10s"
     ))
   }

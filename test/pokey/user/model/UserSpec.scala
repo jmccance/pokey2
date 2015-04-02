@@ -1,6 +1,6 @@
 package pokey.user.model
 
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{ JsString, Json }
 import pokey.test.UnitSpec
 
 class UserSpec extends UnitSpec {

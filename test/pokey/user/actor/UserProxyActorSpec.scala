@@ -11,7 +11,6 @@ import concurrent.duration._
 class UserProxyActorSpec extends AkkaUnitSpec {
   val user = User("U-1", "Felmet")
 
-
   "A UserProxyActor" when {
     "it receives a SetName message" should {
       "publish the new user state" in withProxyActor() { upa =>
@@ -42,7 +41,7 @@ class UserProxyActorSpec extends AkkaUnitSpec {
     }
   }
 
-  def withProxyActor(_maxIdleDuration: FiniteDuration = 1.day) (testcode: ActorRef => Unit) = {
+  def withProxyActor(_maxIdleDuration: FiniteDuration = 1.day)(testcode: ActorRef => Unit) = {
     val settings = new UserProxyActor.Settings {
       override val maxIdleDuration: FiniteDuration = _maxIdleDuration
     }

@@ -1,6 +1,6 @@
 package pokey.room.model
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{ JsObject, Json }
 import pokey.common.error.UnauthorizedErr
 import pokey.test.UnitSpec
 import pokey.user.model.User
@@ -52,7 +52,7 @@ class RoomSpec extends UnitSpec {
         val updatedRoom = someRoom - user.id
 
         updatedRoom.users should not contain user
-        updatedRoom.estimates should not contain key (user.id)
+        updatedRoom.estimates should not contain key(user.id)
       }
     }
 
@@ -67,7 +67,7 @@ class RoomSpec extends UnitSpec {
         val user = newUser
         val result = someRoom.withEstimate(user.id, someEstimate)
         result shouldBe 'bad
-        result.swap.get shouldBe an [UnauthorizedErr]
+        result.swap.get shouldBe an[UnauthorizedErr]
       }
     }
 
@@ -81,7 +81,7 @@ class RoomSpec extends UnitSpec {
       "return an UnauthorizedErr if the user is not the owner of the room" in {
         val result = someRoom.revealedBy(notOwner.id)
         result shouldBe 'bad
-        result.swap.get shouldBe an [UnauthorizedErr]
+        result.swap.get shouldBe an[UnauthorizedErr]
       }
     }
 
@@ -94,8 +94,8 @@ class RoomSpec extends UnitSpec {
     "it is revealed" should {
       "return revealed public estimates" in {
         val revealedRoom = someRoom.revealedBy(someRoom.ownerId).get
-        forAll (revealedRoom.publicEstimates.values) {
-          case Some(estimate) => estimate shouldBe a [RevealedEstimate]
+        forAll(revealedRoom.publicEstimates.values) {
+          case Some(estimate) => estimate shouldBe a[RevealedEstimate]
           case None => /* None is fine. */
         }
       }
@@ -111,7 +111,7 @@ class RoomSpec extends UnitSpec {
       "return an UnauthorizedErr if the user is not the owner of the room" in {
         val result = someRoom.clearedBy(notOwner.id)
         result shouldBe 'bad
-        result.swap.get shouldBe an [UnauthorizedErr]
+        result.swap.get shouldBe an[UnauthorizedErr]
       }
     }
 
