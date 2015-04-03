@@ -38,10 +38,6 @@ scalariformSettings
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(AlignParameters, true)
 
-//scalariformCompile = taskKey[Unit]("scalariformCompile")
-//scalariformCompile := scalariformFormat.in(Compile).toTask("").value
-//(compile in Compile) <<= (compile in Compile) dependsOn scalariformCompile
-
 ////////////////////////
 // Test Configuration
 
