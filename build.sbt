@@ -1,7 +1,7 @@
 import ScoverageSbtPlugin._
 import scalariform.formatter.preferences._
 
-name := """pokey2"""
+name := """pokey"""
 
 version := "2.0-SNAPSHOT"
 
