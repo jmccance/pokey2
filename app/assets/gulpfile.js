@@ -3,6 +3,7 @@ var browserify = require('browserify');
 var del = require('del');
 var eslint = require('gulp-eslint');
 var gulp = require('gulp');
+var path = require('path');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
 
