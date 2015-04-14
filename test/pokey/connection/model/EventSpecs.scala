@@ -18,7 +18,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = ConnectionInfo(someUser.id)
       writeEvent(event) shouldBe Json.obj(
-        "event" -> "newConnection",
+        "event" -> "connectionInfo",
         "userId" -> someUser.id
       )
     }
