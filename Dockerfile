@@ -2,7 +2,7 @@
 # Pokey Dockerfile #
 ####################
 
-FROM dockerfile/java
+FROM dockerfile/java:oracle-java8
 MAINTAINER Joel McCance
 
 ### BEGIN INSTALL ###
