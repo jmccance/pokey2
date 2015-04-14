@@ -12,6 +12,7 @@ import pokey.room.service.{ RoomService, StubRoomService }
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.{ UserProxy, UserProxyActor }
 import pokey.user.model.User
+import pokey.util.using
 
 import concurrent.{ ExecutionContext, Future }
 
@@ -227,17 +228,17 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
     }
 
     def init(roomService: RoomService = new TestRoomService,
-             userRef: ActorRef = TestProbe().ref) = system.actorOf {
-      ConnectionHandler.props(roomService, UserProxy(userId, userRef), self)
-    }
+             userRef: ActorRef = TestProbe().ref) =
+      using(system.actorOf(ConnectionHandler.props(roomService, UserProxy(userId, userRef), self))) { handler =>
+        expectMsgType[ConnectionInfo]
+      }
 
     def initWithProbe(roomService: RoomService = new TestRoomService,
-                      userProbe: TestProbe = TestProbe()) = {
-      val handler =
-        system.actorOf(ConnectionHandler.props(roomService, UserProxy(userId, userProbe.ref), self))
-      userProbe.expectMsg(UserProxyActor.NewConnection(handler))
-      handler
-    }
+                      userProbe: TestProbe = TestProbe()) =
+      using(system.actorOf(ConnectionHandler.props(roomService, UserProxy(userId, userProbe.ref), self))) { handler =>
+        userProbe.expectMsg(UserProxyActor.NewConnection(handler))
+        expectMsgType[ConnectionInfo]
+      }
 
     class TestRoomService(_rooms: (String, ActorRef)*) extends StubRoomService {
       private[this] val rooms = Map(_rooms: _*)
