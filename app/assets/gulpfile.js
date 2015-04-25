@@ -68,7 +68,3 @@ gulp.task('lib', function () {
 });
 
 gulp.task('default', ['clean', 'lint', 'compile', 'lib']);
-
-gulp.task('watch', ['default'], function() {
-  gulp.watch(src.scripts, ['default']);
-});
