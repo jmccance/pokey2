@@ -3,38 +3,43 @@ var browserify = require('browserify');
 var del = require('del');
 var eslint = require('gulp-eslint');
 var gulp = require('gulp');
+var gutil = require('gutil');
 var path = require('path');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
+var watchify = require('watchify');
 
 var cwd = path.resolve('.');
 
 var src = {
-  scripts: 'js/**/*.js'
-}
+  scripts: 'js/**/*.js',
+  libs: [
+    'bootstrap',
+    'director',
+    'flux',
+    'jquery',
+    'react'
+  ]
+};
 
 // Write output to the Play public directory.
-var target = '../../public/dist'
 var target = {
-  scripts: target + '/js',
-  lib: target + '/lib'
-}
+  root: '../../public/dist',
+  scripts: 'js',
+  lib: 'lib'
+};
 
-var bundler;
-function getBundler() {
-  if (!bundler) {
-    bundler = browserify('./js/app.js', { debug: true });
-  }
-  return bundler;
-}
+var bundler = watchify(browserify('./js/app.js', { debug: true }));
+bundler.on('update', bundle);
+bundler.on('log', gutil.log);
 
 function bundle() {
-  return getBundler()
+  return bundler
     .transform(babelify)
     .bundle()
-    .on('error', function(err) { console.log('Error: ' + err.message); })
+    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
     .pipe(source('app.js'))
-    .pipe(gulp.dest(target.scripts));
+    .pipe(gulp.dest(target.scripts, { cwd: target.root }));
 }
 
 gulp.task('clean', function(cb) {
@@ -56,7 +61,13 @@ gulp.task('compile', function () {
   return bundle();
 });
 
-gulp.task('default', ['clean', 'lint', 'compile']);
+gulp.task('lib', function () {
+  return gulp
+    .src(src.libs, { cwd: 'node_modules' })
+    .pipe(gulp.dest(target.lib), { cwd: target.root });
+});
+
+gulp.task('default', ['clean', 'lint', 'compile', 'lib']);
 
 gulp.task('watch', ['default'], function() {
   gulp.watch(src.scripts, ['default']);
