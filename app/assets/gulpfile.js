@@ -18,7 +18,8 @@ var src = {
     'director',
     'flux',
     'jquery',
-    'react'
+    'react',
+    'react-bootstrap'
   ]
 };
 
@@ -34,6 +35,7 @@ bundler.on('update', bundle);
 bundler.on('log', gutil.log);
 
 function bundle() {
+  gutil.log('Running bundler...');
   return bundler
     .transform(babelify)
     .bundle()
