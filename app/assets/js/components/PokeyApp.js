@@ -1,12 +1,8 @@
 import director from 'director';
 import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
-import ModalTrigger from 'react-bootstrap/lib/ModalTrigger';
-import Navbar from 'react-bootstrap/lib/Navbar';
-import Nav from 'react-bootstrap/lib/Nav';
-import NavItem from 'react-bootstrap/lib/NavItem';
 
-import EditProfileModal from './common/EditProfileModal';
+import MainNav from './MainNav'
 import ContextStore, {View} from '../context/contextStore';
 import ContextEvent from '../context/contextEvents';
 import LobbyView from './lobby/LobbyView';
@@ -45,18 +41,10 @@ export default class extends React.Component {
 
     return (
       <div>
-        <Navbar brand='Pokey' className='staticTop'>
-          <Nav right>
-            <ModalTrigger modal={<EditProfileModal />}>
-              <NavItem>
-                Edit Profile
-              </NavItem>
-            </ModalTrigger>
-          </Nav>
-        </Navbar>
-
+        <MainNav />
         {view}
       </div>
     );
   }
 }
+
