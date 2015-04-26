@@ -4,6 +4,7 @@ var del = require('del');
 var eslint = require('gulp-eslint');
 var gulp = require('gulp');
 var gutil = require('gutil');
+var _ = require('lodash');
 var path = require('path');
 var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
@@ -28,7 +29,9 @@ var target = {
   lib: 'lib'
 };
 
-var bundler = watchify(browserify('./js/app.js', { debug: true }));
+var bundlerOpts = _.assign({}, watchify.args, { debug: true });
+
+var bundler = watchify(browserify('./js/app.js', bundlerOpts));
 bundler.on('update', bundle);
 bundler.on('log', gutil.log);
 
