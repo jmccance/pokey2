@@ -4,14 +4,11 @@ import EstimateListItem from './EstimateListItem';
 
 export default class extends React.Component {
   render() {
-    let estimateListItems = [];
-    for (let estimate of this.props.estimates) {
-      estimateListItems.push(
-        <EstimateListItem
-          key={estimate.userId}
-          name={estimate.name} />
-      );
-    }
+    const estimateListItems = this.props.estimates.map(estimate =>
+      <EstimateListItem
+        key={estimate.userId}
+        name={estimate.name} />
+    );
 
     return (
       <div>
