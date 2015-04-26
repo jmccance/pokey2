@@ -9,8 +9,6 @@ var rename = require('gulp-regex-rename');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 
-var cwd = path.resolve('.');
-
 var src = {
   scripts: 'js/**/*.js',
   libs: [
@@ -44,6 +42,8 @@ function bundle() {
     .pipe(gulp.dest(target.scripts, { cwd: target.root }));
 }
 
+// Tasks ////////////////////////////////////////////////////////////
+
 gulp.task('clean', function(cb) {
   del([
    target + '/*'
@@ -59,9 +59,7 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('compile', function () {
-  return bundle();
-});
+gulp.task('compile', bundle);
 
 gulp.task('lib', function () {
   return gulp
