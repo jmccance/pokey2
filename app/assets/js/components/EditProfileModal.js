@@ -21,7 +21,7 @@ export default class extends React.Component {
               name='user'
               data-role='form'
               className='form-horizontal'
-              onSubmit={(e) => this.onSubmit(e)}>
+              onSubmit={e => this.onSubmit(e)}>
           <div className='modal-body'>
             <div className='form-group'>
               <label className='control-label col-sm-2' htmlFor='name'>
