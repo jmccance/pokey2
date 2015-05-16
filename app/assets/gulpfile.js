@@ -13,12 +13,12 @@ var watchify = require('watchify');
 var src = {
   scripts: 'js/**/*.js',
   libs: [
-    'bootstrap',
-    'director',
-    'flux',
-    'jquery',
-    'react',
-    'react-bootstrap'
+    'node_modules/bootstrap/**/*',
+    'node_modules/director/**/*',
+    'node_modules/flux/**/*',
+    'node_modules/jquery/**/*',
+    'node_modules/react/**/*',
+    'node_modules/react-bootstrap/**/*'
   ]
 };
 
@@ -66,8 +66,8 @@ gulp.task('compile', bundle);
 
 gulp.task('lib', function () {
   return gulp
-    .src(src.libs, { cwd: 'node_modules' })
-    .pipe(gulp.dest(target.lib), { cwd: target.root });
+    .src(src.libs, { base: 'node_modules' })
+    .pipe(gulp.dest(target.lib, { cwd: target.root }));
 });
 
 gulp.task('default', ['clean', 'lint', 'compile', 'lib']);
