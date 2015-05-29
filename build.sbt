@@ -14,9 +14,10 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "2.2.4",
   "org.scaldi" %% "scaldi" % "0.5.3",
   "org.scaldi" %% "scaldi-akka" % "0.5.3",
-  "org.scaldi" %% "scaldi-play" % "0.5.3",
+  "org.scaldi" %% "scaldi-play" % "0.5.6-RC1",
+  "org.mockito" % "mockito-core" % "1.9.5" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
-  "org.scalatestplus" %% "play" % "1.2.0" % "test"
+  "org.scalatestplus" %% "play" % "1.4.0-M3" % "test"
 )
 
 scalacOptions in (Compile, compile) ++= Seq(

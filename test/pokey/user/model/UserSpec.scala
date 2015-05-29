@@ -1,6 +1,6 @@
 package pokey.user.model
 
-import play.api.libs.json.{ JsString, Json }
+import play.api.libs.json._
 import pokey.test.UnitSpec
 
 class UserSpec extends UnitSpec {
@@ -11,8 +11,8 @@ class UserSpec extends UnitSpec {
         val user = User("1234", "Antoine")
         val json = Json.toJson(user)
 
-        (json \ "id") shouldBe JsString(user.id)
-        (json \ "name") shouldBe JsString(user.name)
+        (json \ "id") shouldBe JsDefined(JsString(user.id))
+        (json \ "name") shouldBe JsDefined(JsString(user.name))
       }
     }
   }

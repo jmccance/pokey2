@@ -1,6 +1,6 @@
 package pokey.room.model
 
-import play.api.libs.json.{ JsNull, JsString, Json }
+import play.api.libs.json._
 import pokey.test.UnitSpec
 
 class EstimateSpec extends UnitSpec {
@@ -90,7 +90,7 @@ class EstimateSpec extends UnitSpec {
 
   "A RevealedEstimate" when {
     "serialized to JSON" should {
-      "be an empty JSON object" in {
+      "represent the revealed estimate" in {
         val revealedEstimates: Seq[RevealedEstimate] = estimates.map(_.asRevealed)
         val revealedEstimatesJson = revealedEstimates.map(Json.toJson(_))
 
@@ -98,8 +98,8 @@ class EstimateSpec extends UnitSpec {
           case (json, estimate) =>
             val expectedValue = estimate.value.map(JsString).getOrElse(JsNull)
             val expectedComment = estimate.comment.map(JsString).getOrElse(JsNull)
-            (json \ "value") shouldBe expectedValue
-            (json \ "comment") shouldBe expectedComment
+            (json \ "value") shouldBe JsDefined(expectedValue)
+            (json \ "comment") shouldBe JsDefined(expectedComment)
         }
       }
     }
