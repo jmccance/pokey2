@@ -1,4 +1,5 @@
-import ScoverageSbtPlugin._
+import scoverage.ScoverageSbtPlugin._
+
 import scalariform.formatter.preferences._
 
 name := """pokey"""
@@ -38,6 +39,11 @@ scalariformSettings
 
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(AlignParameters, true)
+
+////////////////////////
+// Play Configuration
+
+routesGenerator := InjectedRoutesGenerator
 
 ////////////////////////
 // Test Configuration
