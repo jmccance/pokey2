@@ -8,6 +8,7 @@ import pokey.connection.actor.ConnectionHandler
 import pokey.test.PlayUnitSpec
 import pokey.user.actor.UserProxy
 import pokey.user.service.UserService
+import scaldi.play.ScaldiApplicationBuilder._
 
 class ConnectionControllerSpec extends PlayUnitSpec {
   "A ConnectionController" when {
@@ -16,7 +17,7 @@ class ConnectionControllerSpec extends PlayUnitSpec {
     }
 
     "the client connects without a valid user id" should {
-      "return an Unauthorized error" in {
+      "return an Unauthorized error" in withScaldiApp() {
         val controller = newController()
         val result = controller.connect.f(FakeRequest()).map(_.left.get)
         status(result) mustBe UNAUTHORIZED

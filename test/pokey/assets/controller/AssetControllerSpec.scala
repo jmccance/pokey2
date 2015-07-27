@@ -5,12 +5,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import pokey.test.PlayUnitSpec
 import pokey.user.service.UserService
+import scaldi.play.ScaldiApplicationBuilder._
 
 class AssetControllerSpec extends PlayUnitSpec {
   "An AssetController" when {
     "the user_id is not defined" should {
-      "add the user_id to the session" in {
-        val (controller, userService) = init()
+      "add the user_id to the session" in withScaldiApp() {
+        val (controller, _) = init()
 
         val result = controller.assets("/", "")(FakeRequest())
         session(result).get("user_id") must not be empty
@@ -18,7 +19,7 @@ class AssetControllerSpec extends PlayUnitSpec {
     }
 
     "the user_id is defined" should {
-      "not the replace the existing user_id" in {
+      "not the replace the existing user_id" in withScaldiApp() {
         val (controller, _) = init()
         val userId = "1234"
 

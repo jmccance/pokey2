@@ -15,13 +15,6 @@ import scaldi.Module
 import concurrent.{ ExecutionContext, Future }
 
 class ModuleSpecs extends AkkaUnitSpec {
-  "An AkkaModule" should {
-    "provide a binding for the ActorSystem passed to the module" in {
-      implicit val module = new AkkaModule(system)
-
-      inject[ActorSystem] shouldBe system
-    }
-  }
 
   "A WebModule" should {
     val module = new WebModule :: mockServiceModule

@@ -46,6 +46,5 @@ abstract class AkkaUnitSpec(_system: ActorSystem)
 
 abstract class PlayUnitSpec
   extends PlaySpec
-  with OneAppPerSuite
   with BaseSpec
   with Results
