@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+scripts/update
+echo
+
+echo "==> Building client-side assets..."
+{
+  cd app/assets
+  gulp watch | sed -e 's/^/[gulp] /'
+} &
+GULP_ID=$$
+trap "{ kill $GULP_ID; }" EXIT
+echo "==> Continuous build started."
+
+echo
+echo "==> Running server..."
+{
+  ./activator run
+}
+  

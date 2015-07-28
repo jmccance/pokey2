@@ -31,18 +31,19 @@ var target = {
 
 var bundlerOpts = _.assign({}, watchify.args, { debug: true });
 
-var bundler = watchify(browserify('./js/app.js', bundlerOpts));
-bundler.on('update', bundle);
+var bundler = browserify('./js/app.js', bundlerOpts);
 bundler.on('log', gutil.log);
 
-function bundle() {
-  gutil.log('Running bundler...');
-  return bundler
-    .transform(babelify)
-    .bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source('app.js'))
-    .pipe(gulp.dest(target.scripts, { cwd: target.root }));
+function bundleWith(bundler) {
+  return function () {
+    gutil.log('Running bundler...');
+    return bundler
+      .transform(babelify)
+      .bundle()
+      .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+      .pipe(source('app.js'))
+      .pipe(gulp.dest(target.scripts, { cwd: target.root }));
+  }
 }
 
 // Tasks ////////////////////////////////////////////////////////////
@@ -62,7 +63,14 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('compile', bundle);
+gulp.task('compile', bundleWith(bundler));
+
+gulp.task('watch-compile', function () {
+  var watchingBundler = watchify(bundler);
+  var bundleF = bundleWith(watchingBundler);
+  watchingBundler.on('update', bundleF);
+  return bundleF();
+});
 
 gulp.task('lib', function () {
   return gulp
@@ -71,3 +79,5 @@ gulp.task('lib', function () {
 });
 
 gulp.task('default', ['clean', 'lint', 'compile', 'lib']);
+
+gulp.task('watch', ['clean', 'lint', 'watch-compile', 'lib']);

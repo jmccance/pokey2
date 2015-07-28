@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# scripts/update:
+#   Resolve all dependencies that the application requires to run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Updating backend assets..."
+{
+  ./activator update
+}
+echo "==> Done!"
+
+echo ""
+echo "==> Updating client-side assets..."
+{
+  cd app/assets
+  npm install
+}
+echo "==> Done!"
