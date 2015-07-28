@@ -11,12 +11,10 @@ import RoomView from './room/RoomView';
 export default class extends React.Component {
   constructor(props) {
     super(props);
-    this.state = ContextStore.get();
+    this.state = this._getState();
 
     this._onChange = () => {
-      let ctx = ContextStore.get();
-      console.log('context_changed', ctx);
-      this.setState(ctx);
+      this.setState(this._getState());
     };
   }
 
@@ -46,5 +44,10 @@ export default class extends React.Component {
       </div>
     );
   }
-}
 
+  _getState() {
+    let ctx = ContextStore.get();
+    console.log('context_changed', ctx);
+    return ctx;
+  }
+}
