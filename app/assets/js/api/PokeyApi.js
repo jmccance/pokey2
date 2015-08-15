@@ -1,3 +1,5 @@
+import EventEmitter from 'events';
+
 function _getUrl() {
   const loc = window.location;
   let protocol;
@@ -15,7 +17,7 @@ const PokeyApi = {
     this.conn = new WebSocket(_getUrl());
 
     // TODO Set up server-side event responses.
-  }
+  },
 
   setName(name) {
     const msg = {
@@ -24,7 +26,7 @@ const PokeyApi = {
     };
 
     this.conn.send(JSON.stringify(msg));
-  }
+  },
 
   createRoom() {
     const msg = {
@@ -32,7 +34,7 @@ const PokeyApi = {
     };
 
     this.conn.send(JSON.stringify(msg));
-  }
+  },
 
   joinRoom(roomId) {
     const msg = {
@@ -41,7 +43,7 @@ const PokeyApi = {
     };
 
     this.conn.send(JSON.stringify(msg));
-  }
+  },
 
   submitEstimate(roomId, estimate) {
     const msg = {
@@ -51,7 +53,7 @@ const PokeyApi = {
     };
 
     this.conn.send(JSON.stringify(msg));
-  }
+  },
 
   revealRoom(roomId) {
     const msg = {
@@ -60,7 +62,7 @@ const PokeyApi = {
     };
 
     this.conn.send(JSON.stringify(msg));
-  }
+  },
 
   clearRoom(roomId) {
     const msg = {
