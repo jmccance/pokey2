@@ -10,7 +10,7 @@ const EVENTS = {
   ERROR: 'ERROR'
 };
 
-var _currentUser = null;
+var _user = null;
 var _currentRoom = null;
 
 class PokeyStore extends EventEmitter {
@@ -56,20 +56,29 @@ class PokeyStore extends EventEmitter {
       }
     });
 
-    PokeyApi.on(PokeyApiEvents.ConnectionInfo, () => {});
-    PokeyApi.on(PokeyApiEvents.UserUpdated, () => {});
-    PokeyApi.on(PokeyApiEvents.RoomCreated, () => {});
-    PokeyApi.on(PokeyApiEvents.RoomUpdated, () => {});
-    PokeyApi.on(PokeyApiEvents.UserJoined, () => {});
-    PokeyApi.on(PokeyApiEvents.UserLeft, () => {});
-    PokeyApi.on(PokeyApiEvents.EstimateUpdated, () => {});
-    PokeyApi.on(PokeyApiEvents.RoomRevealed, () => {});
-    PokeyApi.on(PokeyApiEvents.RoomCleared, () => {});
-    PokeyApi.on(PokeyApiEvents.RoomClosed, () => {});
-    PokeyApi.on(PokeyApiEvents.Error, () => {});
+    PokeyApi
+      .on(PokeyApiEvents.ConnectionInfo, () => {})
+      .on(PokeyApiEvents.UserUpdated, (user) => {
+        console.log("user_updated", user);
+        _user = user;
+        this.emitChange();
+      })
+      .on(PokeyApiEvents.RoomCreated, () => {})
+      .on(PokeyApiEvents.RoomUpdated, () => {})
+      .on(PokeyApiEvents.UserJoined, () => {})
+      .on(PokeyApiEvents.UserLeft, () => {})
+      .on(PokeyApiEvents.EstimateUpdated, () => {})
+      .on(PokeyApiEvents.RoomRevealed, () => {})
+      .on(PokeyApiEvents.RoomCleared, () => {})
+      .on(PokeyApiEvents.RoomClosed, () => {})
+      .on(PokeyApiEvents.Error, () => {});
 
     PokeyApi.openConnection();
 
+  }
+
+  emitChange() {
+    this.emit(EVENTS.CHANGE);
   }
 
   addChangeListener(callback) {
@@ -80,8 +89,8 @@ class PokeyStore extends EventEmitter {
     this.removeListener(EVENTS.CHANGE, callback);
   }
 
-  getCurrentUser() {
-    return _currentUser;
+  getUser() {
+    return _user;
   }
 
   getCurrentRoom() {

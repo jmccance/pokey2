@@ -9,7 +9,7 @@ export default class extends React.Component {
     event.preventDefault();
     var name = React.findDOMNode(this.refs.name).value.trim();
     PokeyActionCreator.nameSet(name);
-    this.props.onRequestHide();
+    this.props.close();
   }
 
   render() {
@@ -20,7 +20,10 @@ export default class extends React.Component {
               data-role='form'
               className='form-horizontal'
               onSubmit={e => this.onSubmit(e)}>
-          <div className='modal-body'>
+          <Modal.Header closeButton>
+            <Modal.Title>Set Name</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <div className='form-group'>
               <label className='control-label col-sm-2' htmlFor='name'>
                 Name
@@ -35,11 +38,11 @@ export default class extends React.Component {
                        type='text'/>
               </div>
             </div>
-          </div>
+          </Modal.Body>
 
-          <div className='modal-footer'>
-            <Button bsStyle='primary' type='submit' >Register</Button>
-          </div>
+          <Modal.Footer>
+            <Button bsStyle='primary' type='submit'>Register</Button>
+          </Modal.Footer>
         </form>
       </Modal>
     );

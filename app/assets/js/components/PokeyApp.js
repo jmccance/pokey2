@@ -9,7 +9,7 @@ import MainNav from './MainNav'
 import PokeyStore from '../stores/PokeyStore';
 import RoomView from './room/RoomView';
 
-export default class extends React.Component {
+class PokeyApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = this._getState();
@@ -20,14 +20,11 @@ export default class extends React.Component {
   }
 
   componentDidMount() {
-    ContextStore.on(
-      ContextEvent.ContextChanged,
-      this._onChange
-    );
+    PokeyStore.addChangeListener(this._onChange);
   }
 
   componentWillUnmount() {
-    ContextStore.removeListener(this._onChange);
+    PokeyStore.removeChangeListener(this._onChange);
   }
 
   render() {
@@ -40,15 +37,18 @@ export default class extends React.Component {
 
     return (
       <div>
-        <MainNav />
+        <MainNav user={this.state.user} />
         {view}
       </div>
     );
   }
 
   _getState() {
-    let ctx = ContextStore.get();
-    console.log('context_changed', ctx);
-    return ctx;
+    return {
+      user: PokeyStore.getUser(),
+      view: View.Lobby
+    };
   }
 }
+
+export default PokeyApp;
