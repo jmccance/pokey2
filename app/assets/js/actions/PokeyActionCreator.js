@@ -1,10 +1,17 @@
-import PokeyAppDispatcher from '../dispatcher/PokeyAppDispatcher';
-import PokeyConstants from '../constants/PokeyConstants';
+import AppDispatcher from '../dispatcher/appDispatcher';
+import PokeyActions from './PokeyActions';
 
 const PokeyActionCreator = {
-  applicationStarted() {
-    PokeyAppDispatcher.dispatch({
-      type: PokeyConstants.ActionTypes.APP_STARTED
+  appStarted() {
+    AppDispatcher.dispatch({
+      type: PokeyActions.AppStarted
+    });
+  },
+
+  nameSet(name) {
+    AppDispatcher.dispatch({
+      type: PokeyActions.NameSet,
+      name
     });
   }
 };

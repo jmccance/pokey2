@@ -2,15 +2,13 @@ import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
 
-import ClientActions from '../connection/clientActions';
+import PokeyActionCreator from '../actions/PokeyActionCreator';
 
 export default class extends React.Component {
   onSubmit(event) {
     event.preventDefault();
     var name = React.findDOMNode(this.refs.name).value.trim();
-    ClientActions.updateProfile({
-      name: name
-    });
+    PokeyActionCreator.nameSet(name);
     this.props.onRequestHide();
   }
 

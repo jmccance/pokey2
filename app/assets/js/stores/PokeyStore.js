@@ -32,7 +32,7 @@ class PokeyStore extends EventEmitter {
 
         case PokeyActions.NameSet:
           console.log('name_set', action.name);
-          PokeyApi.setName(name);
+          PokeyApi.setName(action.name);
           break;
 
         case PokeyActions.RoomCleared:
@@ -67,6 +67,9 @@ class PokeyStore extends EventEmitter {
     PokeyApi.on(PokeyApiEvents.RoomCleared, () => {});
     PokeyApi.on(PokeyApiEvents.RoomClosed, () => {});
     PokeyApi.on(PokeyApiEvents.Error, () => {});
+
+    PokeyApi.openConnection();
+
   }
 
   addChangeListener(callback) {
@@ -77,8 +80,13 @@ class PokeyStore extends EventEmitter {
     this.removeListener(EVENTS.CHANGE, callback);
   }
 
-  getCurrentUser() { }
-  getCurrentRoom() { }
-};
+  getCurrentUser() {
+    return _currentUser;
+  }
+
+  getCurrentRoom() {
+    return _currentRoom;
+  }
+}
 
 export default new PokeyStore();
