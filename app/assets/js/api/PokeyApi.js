@@ -14,7 +14,7 @@ function _getUrl() {
   return `${protocol}//${loc.host}/connect`;
 }
 
-const PokeyApi = new class extends EventEmitter {
+class PokeyApi extends EventEmitter {
   openConnection() {
     this.conn = new WebSocket(_getUrl());
 
@@ -122,6 +122,6 @@ const PokeyApi = new class extends EventEmitter {
 
     this.conn.send(JSON.stringify(msg));
   }
-};
+}
 
-export default PokeyApi;
+export default new PokeyApi();
