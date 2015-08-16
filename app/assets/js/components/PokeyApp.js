@@ -2,10 +2,11 @@ import director from 'director';
 import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 
-import MainNav from './MainNav'
 import ContextStore, {View} from '../context/contextStore';
 import ContextEvent from '../context/contextEvents';
 import LobbyView from './lobby/LobbyView';
+import MainNav from './MainNav'
+import PokeyStore from '../stores/PokeyStore';
 import RoomView from './room/RoomView';
 
 export default class extends React.Component {
