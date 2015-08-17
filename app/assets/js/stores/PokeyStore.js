@@ -4,14 +4,26 @@ import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
+import PokeyRouter from '../router/PokeyRouter';
+import RouterEvents from '../router/routerEvents';
 
-const EVENTS = {
-  CHANGE: 'CHANGE',
-  ERROR: 'ERROR'
+const InternalEvents = {
+  Change: 'CHANGE',
+  Error: 'ERROR'
+};
+
+/**
+ * Context type identifiers. Indicates which view of the application is currently active.
+ */
+// TODO These constants should live somewhere more sensible.
+export const View = {
+  Lobby: 'lobby',
+  Room: 'room'
 };
 
 var _user = null;
 var _currentRoom = null;
+var _view = null;
 
 class PokeyStore extends EventEmitter {
   constructor() {
@@ -51,6 +63,16 @@ class PokeyStore extends EventEmitter {
           PokeyApi.revealRoom(action.roomId);
           break;
 
+        case RouterEvents.EnteredLobby:
+          _view = View.Lobby;
+          this._emitChange();
+          break;
+
+        case RouterEvents.EnteredRoom:
+          _view = View.Room;
+          PokeyApi.joinRoom(action.roomId);
+          break;
+
         default:
           // do nothing
       }
@@ -63,7 +85,10 @@ class PokeyStore extends EventEmitter {
         _user = user;
         this.emitChange();
       })
-      .on(PokeyApiEvents.RoomCreated, () => {})
+      .on(PokeyApiEvents.RoomCreated, () => {
+        // TODO Emit change to trigger navigation to the room.
+        this.emitChange();
+      })
       .on(PokeyApiEvents.RoomUpdated, () => {})
       .on(PokeyApiEvents.UserJoined, () => {})
       .on(PokeyApiEvents.UserLeft, () => {})
@@ -78,15 +103,15 @@ class PokeyStore extends EventEmitter {
   }
 
   emitChange() {
-    this.emit(EVENTS.CHANGE);
+    this.emit(InternalEvents.Change);
   }
 
   addChangeListener(callback) {
-    this.addListener(EVENTS.CHANGE, callback);
+    this.addListener(InternalEvents.Change, callback);
   }
 
   removeChangeListener(callback) {
-    this.removeListener(EVENTS.CHANGE, callback);
+    this.removeListener(InternalEvents.Change, callback);
   }
 
   getUser() {
@@ -95,6 +120,10 @@ class PokeyStore extends EventEmitter {
 
   getCurrentRoom() {
     return _currentRoom;
+  }
+
+  getView() {
+    return _view;
   }
 }
 

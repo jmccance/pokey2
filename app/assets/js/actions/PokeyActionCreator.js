@@ -13,6 +13,12 @@ const PokeyActionCreator = {
       type: PokeyActions.NameSet,
       name
     });
+  },
+
+  roomCreated() {
+    AppDispatcher.dispatch({
+      type: PokeyActions.RoomCreated
+    });
   }
 };
 

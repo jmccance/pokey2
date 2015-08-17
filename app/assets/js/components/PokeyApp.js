@@ -1,12 +1,10 @@
-import director from 'director';
 import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 
-import ContextStore, {View} from '../context/contextStore';
-import ContextEvent from '../context/contextEvents';
+import PokeyStore from '../stores/PokeyStore';
+import { View } from '../stores/PokeyStore';
 import LobbyView from './lobby/LobbyView';
 import MainNav from './MainNav'
-import PokeyStore from '../stores/PokeyStore';
 import RoomView from './room/RoomView';
 
 class PokeyApp extends React.Component {
@@ -29,10 +27,18 @@ class PokeyApp extends React.Component {
 
   render() {
     let view;
-    if (this.state.view === View.Lobby) {
-      view = <LobbyView />;
-    } else if (this.state.view === View.Room) {
-      view = <RoomView isOwner={true} />;
+    switch (this.state.view) {
+      case View.Lobby:
+        view = <LobbyView />;
+        break;
+
+      case View.Room:
+        // TODO Validate whether or not we're the owner
+        view = <RoomView isOwner={true} />;
+        break;
+
+      default:
+       // TODO Display a 404 page or redirect to Lobby.
     }
 
     return (

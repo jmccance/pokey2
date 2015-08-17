@@ -2,7 +2,7 @@ import director from 'director';
 
 import RouterAction from './routerActions'
 
-const routes = {
+const PokeyRouter = new director.Router({
   '/': () => {
     console.log('router: /');
     RouterAction.enteredLobby();
@@ -11,6 +11,6 @@ const routes = {
     console.log(`router: /room/${roomId}`);
     RouterAction.enteredRoom(roomId);
   }
-};
+});
 
-export default new director.Router(routes);
+export default PokeyRouter;
