@@ -31,14 +31,13 @@ var target = {
 
 var bundlerOpts = _.assign({}, watchify.args, { debug: true });
 
-var bundler = browserify('./js/app.js', bundlerOpts);
+var bundler = browserify('./js/app.js', bundlerOpts).transform(babelify);
 bundler.on('log', gutil.log);
 
 function bundleWith(bundler) {
   return function () {
     gutil.log('Running bundler...');
     return bundler
-      .transform(babelify)
       .bundle()
       .on('error', gutil.log.bind(gutil, 'Browserify Error'))
       .pipe(source('app.js'))
