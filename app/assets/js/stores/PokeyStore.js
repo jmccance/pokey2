@@ -38,24 +38,30 @@ class PokeyStore extends EventEmitter {
           break;
 
         case PokeyActions.RoomCleared:
+          console.log('room_cleared', action.roomId);
           PokeyApi.clearRoom(action.roomId);
           break;
 
         case PokeyActions.RoomCreated:
+          console.log('room_created');
           PokeyApi.createRoom();
           break;
 
         case PokeyActions.RoomJoined:
+          console.log('room_joined', action.roomId);
           PokeyApi.joinRoom(action.roomId);
           break;
 
         case PokeyActions.RoomRevealed:
+          console.log('room_revealed', action.roomId);
           PokeyApi.revealRoom(action.roomId);
           break;
 
         case PokeyActions.ViewChanged:
+          console.log('view_changed', action.view);
           _view = action.view;
           this.emitChange();
+          break;
 
         default:
           // do nothing

@@ -41,7 +41,7 @@ class PokeyApp extends React.Component {
 
       default:
        // TODO Display a 404 page or redirect to Lobby.
-        view = <div className='container'><h1>404 :(</h1></div>
+        view = (<div className='container'><h1>404 :(</h1></div>);
     }
 
     return (
