@@ -19,6 +19,13 @@ const PokeyActionCreator = {
     AppDispatcher.dispatch({
       type: PokeyActions.RoomCreated
     });
+  },
+
+  viewChanged(view) {
+    AppDispatcher.dispatch({
+      type: PokeyActions.ViewChanged,
+      view
+    });
   }
 };
 

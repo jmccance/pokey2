@@ -4,26 +4,16 @@ import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
-import PokeyRouter from '../router/PokeyRouter';
-import RouterEvents from '../router/routerEvents';
+import Views from '../router/Views';
 
 const InternalEvents = {
   Change: 'CHANGE',
   Error: 'ERROR'
 };
 
-/**
- * Context type identifiers. Indicates which view of the application is currently active.
- */
-// TODO These constants should live somewhere more sensible.
-export const View = {
-  Lobby: 'lobby',
-  Room: 'room'
-};
-
 var _user = null;
 var _currentRoom = null;
-var _view = null;
+var _view = { view: Views.Lobby };
 
 class PokeyStore extends EventEmitter {
   constructor() {
@@ -63,15 +53,9 @@ class PokeyStore extends EventEmitter {
           PokeyApi.revealRoom(action.roomId);
           break;
 
-        case RouterEvents.EnteredLobby:
-          _view = View.Lobby;
-          this._emitChange();
-          break;
-
-        case RouterEvents.EnteredRoom:
-          _view = View.Room;
-          PokeyApi.joinRoom(action.roomId);
-          break;
+        case PokeyActions.ViewChanged:
+          _view = action.view;
+          this.emitChange();
 
         default:
           // do nothing

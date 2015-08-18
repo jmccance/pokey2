@@ -5,7 +5,8 @@ const PokeyActions = {
   RoomCleared: 'ROOM_CLEARED',
   RoomCreated: 'ROOM_CREATED',
   RoomJoined: 'ROOM_JOINED',
-  RoomRevealed: 'ROOM_REVEALED'
+  RoomRevealed: 'ROOM_REVEALED',
+  ViewChanged: 'VIEW_CHANGED'
 };
 
 export default PokeyActions;
