@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "org.scaldi" %% "scaldi-akka" % "0.5.6",
   "org.scaldi" %% "scaldi-play" % "0.5.8",
   "org.mockito" % "mockito-core" % "1.9.5" % "test",
+  "org.pegdown" % "pegdown" % "1.5.0" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
   "org.scalatestplus" %% "play" % "1.4.0-M3" % "test"
 )
@@ -50,6 +51,8 @@ routesGenerator := InjectedRoutesGenerator
 
 javaOptions in Test += "-Dconfig.resource=test.conf"
 
+testOptions in Test += Tests.Argument("-h", "target/test-reports-html")
+
 ScoverageKeys.coverageMinimum := 90
 
 ScoverageKeys.coverageFailOnMinimum := true
@@ -59,3 +62,4 @@ ScoverageKeys.coverageExcludedPackages := Seq(
   ".*\\.controller\\.javascript",
   ".*\\.controller\\.ref"
 ).mkString(";")
+
