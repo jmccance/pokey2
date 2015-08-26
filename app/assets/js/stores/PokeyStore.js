@@ -13,7 +13,7 @@ const InternalEvents = {
 
 var _user = null;
 var _currentRoom = null;
-var _view = { view: Views.Lobby };
+var _view = Views.Lobby;
 
 class PokeyStore extends EventEmitter {
   constructor() {
