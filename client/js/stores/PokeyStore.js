@@ -83,7 +83,7 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.UserJoined, (roomId, user) => {
         console.log('user_joined', roomId, user);
         // FIXME Don't change view unless _currentRoom.id != roomId
-        if (user.id == _currentUser.id) {
+        if (user.id === _currentUser.id) {
           _view = Views.room(roomId);
           this.emitChange();
         }

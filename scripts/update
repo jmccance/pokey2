@@ -16,7 +16,7 @@ echo "==> Done!"
 echo ""
 echo "==> Updating client-side assets..."
 {
-  cd app/assets
+  cd client
   npm install
 }
 echo "==> Done!"
