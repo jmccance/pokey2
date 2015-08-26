@@ -32,7 +32,7 @@ class PokeyApp extends React.Component {
     let view;
 
     if (viewState instanceof Lobby) {
-      view = <LobbyView />
+      view = <LobbyView />;
     } else if (viewState instanceof Room) {
       // TODO Validate whether or not we're the owner
       view = <RoomView isOwner={true} />;

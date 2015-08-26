@@ -6,7 +6,7 @@ export class Lobby {
 
 export class Room {
   constructor(roomId) {
-    this._roomId = roomId
+    this._roomId = roomId;
   }
 
   get route() {
@@ -19,9 +19,9 @@ export class Room {
 }
 
 const Views = {
-  Lobby: new Lobby(),
+  lobby: new Lobby(),
 
-  Room: (roomId) => new Room(roomId)
+  room: (roomId) => new Room(roomId)
 };
 
 export default Views;

@@ -7,12 +7,12 @@ import Views from './Views';
 const PokeyRouter = new director.Router({
   '/': () => {
     console.log('router: /');
-    PokeyActionCreator.viewChanged(Views.Lobby);
+    PokeyActionCreator.viewChanged(Views.lobby);
   },
 
   '/room/:roomId': (roomId) => {
     console.log(`router: /room/${roomId}`);
-    PokeyActionCreator.viewChanged(Views.Room(roomId));
+    PokeyActionCreator.viewChanged(Views.room(roomId));
   }
 });
 
