@@ -2,8 +2,8 @@ import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 
 import PokeyStore from '../stores/PokeyStore';
+import Views, { Lobby, Room } from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
-import Views, { Lobby, Room } from '../router/Views';
 import LobbyView from './lobby/LobbyView';
 import MainNav from './MainNav'
 import RoomView from './room/RoomView';

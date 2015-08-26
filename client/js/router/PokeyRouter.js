@@ -2,7 +2,7 @@ import director from 'director';
 
 import PokeyActionCreator from '../actions/PokeyActionCreator';
 import PokeyStore from '../stores/PokeyStore';
-import Views from './Views';
+import Views from '../models/Views';
 
 const PokeyRouter = new director.Router({
   '/': () => {

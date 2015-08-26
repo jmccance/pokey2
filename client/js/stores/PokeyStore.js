@@ -4,7 +4,7 @@ import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
-import Views from '../router/Views';
+import Views from '../models/Views';
 
 const InternalEvents = {
   Change: 'CHANGE',
@@ -13,7 +13,7 @@ const InternalEvents = {
 
 var _currentUser = null;
 var _currentRoom = null;
-var _view = Views.Lobby;
+var _view = Views.lobby;
 
 class PokeyStore extends EventEmitter {
   constructor() {
