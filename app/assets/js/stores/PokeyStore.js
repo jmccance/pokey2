@@ -11,7 +11,7 @@ const InternalEvents = {
   Error: 'ERROR'
 };
 
-var _user = null;
+var _currentUser = null;
 var _currentRoom = null;
 var _view = Views.Lobby;
 
@@ -72,15 +72,22 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.ConnectionInfo, () => {})
       .on(PokeyApiEvents.UserUpdated, (user) => {
         console.log("user_updated", user);
-        _user = user;
+        _currentUser = user;
         this.emitChange();
       })
-      .on(PokeyApiEvents.RoomCreated, () => {
-        // TODO Emit change to trigger navigation to the room.
-        this.emitChange();
+      .on(PokeyApiEvents.RoomCreated, (roomId) => {
+        console.log('room_created', roomId);
+        PokeyApi.joinRoom(roomId);
       })
       .on(PokeyApiEvents.RoomUpdated, () => {})
-      .on(PokeyApiEvents.UserJoined, () => {})
+      .on(PokeyApiEvents.UserJoined, (roomId, user) => {
+        console.log('user_joined', roomId, user);
+        // FIXME Don't change view unless _currentRoom.id != roomId
+        if (user.id == _currentUser.id) {
+          _view = Views.room(roomId);
+          this.emitChange();
+        }
+      })
       .on(PokeyApiEvents.UserLeft, () => {})
       .on(PokeyApiEvents.EstimateUpdated, () => {})
       .on(PokeyApiEvents.RoomRevealed, () => {})
@@ -105,7 +112,7 @@ class PokeyStore extends EventEmitter {
   }
 
   getUser() {
-    return _user;
+    return _currentUser;
   }
 
   getCurrentRoom() {
