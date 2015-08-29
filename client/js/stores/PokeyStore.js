@@ -5,6 +5,7 @@ import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
 import Views from '../models/Views';
+import PokeyRouter from '../router/PokeyRouter';
 
 const InternalEvents = {
   Change: 'CHANGE',
@@ -13,20 +14,17 @@ const InternalEvents = {
 
 var _currentUser = null;
 var _currentRoom = null;
-var _view = Views.lobby;
+var _view = null;
 
 class PokeyStore extends EventEmitter {
   constructor() {
     super();
 
-    // TODO Wire into dispatcher and into API
+    // Constructor should perform wiring *only*. Active initialization (that makes stuff happen)
+    // should be in init() below.
+
     AppDispatcher.register((action) => {
       switch (action.type) {
-        case PokeyActions.AppStarted:
-          console.log('app_started');
-          // TODO Dispatch a change event
-          break;
-
         case PokeyActions.EstimateSubmitted:
           console.log('estimate_submitted', action.roomId, action.estimate);
           PokeyApi.submitEstimate(action.roomId, action.estimate);
@@ -94,9 +92,20 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.RoomCleared, () => {})
       .on(PokeyApiEvents.RoomClosed, () => {})
       .on(PokeyApiEvents.Error, () => {});
+  }
+
+  init() {
+    this.addChangeListener(() => {
+      const currentRoute = PokeyRouter.getRoute();
+      const newView = this.getView();
+
+      if (newView !== null && newView.route !== currentRoute) {
+        PokeyRouter.setRoute(newView.route);
+      }
+    });
 
     PokeyApi.openConnection();
-
+    PokeyRouter.init(Views.lobby.route);
   }
 
   emitChange() {

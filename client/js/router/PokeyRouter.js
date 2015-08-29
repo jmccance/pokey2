@@ -1,8 +1,8 @@
 import director from 'director';
 
 import PokeyActionCreator from '../actions/PokeyActionCreator';
-import PokeyStore from '../stores/PokeyStore';
 import Views from '../models/Views';
+import PokeyStore from '../stores/PokeyStore';
 
 const PokeyRouter = new director.Router({
   '/': () => {
@@ -15,16 +15,5 @@ const PokeyRouter = new director.Router({
     PokeyActionCreator.viewChanged(Views.room(roomId));
   }
 });
-
-PokeyStore.addChangeListener(() => {
-  const currentRoute = PokeyRouter.getRoute();
-  const newRoute = PokeyStore.getView().route;
-
-  if (newRoute !== currentRoute) {
-    PokeyRouter.setRoute(newRoute);
-  }
-});
-
-PokeyRouter.init('/');
 
 export default PokeyRouter;
