@@ -6,6 +6,9 @@ import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
 import Views from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
+import Debug from '../util/Debug';
+
+const debug = Debug('PokeyStore');
 
 const InternalEvents = {
   Change: 'CHANGE',
@@ -26,37 +29,37 @@ class PokeyStore extends EventEmitter {
     AppDispatcher.register((action) => {
       switch (action.type) {
         case PokeyActions.EstimateSubmitted:
-          console.log('estimate_submitted', action.roomId, action.estimate);
+          debug('estimate_submitted %s, %o', action.roomId, action.estimate);
           PokeyApi.submitEstimate(action.roomId, action.estimate);
           break;
 
         case PokeyActions.NameSet:
-          console.log('name_set', action.name);
+          debug('name_set %s', action.name);
           PokeyApi.setName(action.name);
           break;
 
         case PokeyActions.RoomCleared:
-          console.log('room_cleared', action.roomId);
+          debug('room_cleared %s', action.roomId);
           PokeyApi.clearRoom(action.roomId);
           break;
 
         case PokeyActions.RoomCreated:
-          console.log('room_created');
+          debug('room_created');
           PokeyApi.createRoom();
           break;
 
         case PokeyActions.RoomJoined:
-          console.log('room_joined', action.roomId);
+          debug('room_joined %s', action.roomId);
           PokeyApi.joinRoom(action.roomId);
           break;
 
         case PokeyActions.RoomRevealed:
-          console.log('room_revealed', action.roomId);
+          debug('room_revealed %s', action.roomId);
           PokeyApi.revealRoom(action.roomId);
           break;
 
         case PokeyActions.ViewChanged:
-          console.log('view_changed', action.view);
+          debug('view_changed %o', action.view);
           _view = action.view;
           this.emitChange();
           break;
@@ -69,17 +72,17 @@ class PokeyStore extends EventEmitter {
     PokeyApi
       .on(PokeyApiEvents.ConnectionInfo, () => {})
       .on(PokeyApiEvents.UserUpdated, (user) => {
-        console.log("user_updated", user);
+        debug('user_updated %o', user);
         _currentUser = user;
         this.emitChange();
       })
       .on(PokeyApiEvents.RoomCreated, (roomId) => {
-        console.log('room_created', roomId);
+        debug('room_created %s', roomId);
         PokeyApi.joinRoom(roomId);
       })
       .on(PokeyApiEvents.RoomUpdated, () => {})
       .on(PokeyApiEvents.UserJoined, (roomId, user) => {
-        console.log('user_joined', roomId, user);
+        debug('user_joined %s, %o', roomId, user);
         // FIXME Don't change view unless _currentRoom.id != roomId
         if (user.id === _currentUser.id) {
           _view = Views.room(roomId);

@@ -1,6 +1,9 @@
 import EventEmitter from 'events';
 
+import Debug from '../util/Debug';
 import PokeyApiEvents from './PokeyApiEvents';
+
+const debug = Debug('PokeyApi');
 
 function _getUrl() {
   const loc = window.location;
@@ -16,10 +19,18 @@ function _getUrl() {
 
 class PokeyApi extends EventEmitter {
   openConnection() {
-    this.conn = new WebSocket(_getUrl());
+    const url = _getUrl();
+    debug('open_socket %s', url);
+    this.conn = new WebSocket(url);
+
+    this._sendMessage = function _sendMessage(msg) {
+      debug('send_message %o', msg);
+      this.conn.send(JSON.stringify(msg));
+    }
 
     this.conn.onmessage = (message) => {
       const event = JSON.parse(message.data);
+      debug('message_received %o', event);
 
       switch (event.event) {
         case 'connectionInfo':
@@ -70,57 +81,45 @@ class PokeyApi extends EventEmitter {
   }
 
   setName(name) {
-    const msg = {
+    this._sendMessage({
       command: 'setName',
       name: name
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 
   createRoom() {
-    const msg = {
+    this._sendMessage({
       command: 'createRoom'
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 
   joinRoom(roomId) {
-    const msg = {
+    this._sendMessage({
       command: 'joinRoom',
       roomId: roomId
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 
   submitEstimate(roomId, estimate) {
-    const msg = {
+    this._sendMessage({
       command: 'submitEstimate',
       roomId: roomId,
       estimate: estimate
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 
   clearRoom(roomId) {
-    const msg = {
+    this._sendMessage({
       command: 'clearRoom',
       roomId: roomId
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 
   revealRoom(roomId) {
-    const msg = {
+    this._sendMessage({
       command: 'revealRoom',
       roomId: roomId
-    };
-
-    this.conn.send(JSON.stringify(msg));
+    });
   }
 }
 

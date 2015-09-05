@@ -3,15 +3,18 @@ import director from 'director';
 import PokeyActionCreator from '../actions/PokeyActionCreator';
 import Views from '../models/Views';
 import PokeyStore from '../stores/PokeyStore';
+import Debug from '../util/Debug';
+
+const debug = Debug('PokeyRouter');
 
 const PokeyRouter = new director.Router({
   '/': () => {
-    console.log('router: /');
+    debug('route_changed /');
     PokeyActionCreator.viewChanged(Views.lobby);
   },
 
   '/room/:roomId': (roomId) => {
-    console.log(`router: /room/${roomId}`);
+    debug('route_changed %s', `/room/${roomId}`);
     PokeyActionCreator.viewChanged(Views.room(roomId));
   }
 });

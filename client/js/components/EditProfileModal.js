@@ -15,7 +15,7 @@ export default class extends React.Component {
   render() {
     return (
       <Modal {...this.props} title='Update Profile'>
-        <form novalidate
+        <form noValidate
               name='user'
               data-role='form'
               className='form-horizontal'
@@ -33,7 +33,7 @@ export default class extends React.Component {
                 <input ref='name'
                        required
                        pattern='.*\w.*'
-                       maxlength='32'
+                       maxLength='32'
                        className='form-control'
                        type='text'/>
               </div>

@@ -15,6 +15,7 @@
   },
 
   "rules": {
+    "new-cap": false,
     "new-parens": false,
     "no-underscore-dangle": false,
     "quotes": "single"
