@@ -21,7 +21,13 @@ class PokeyApi extends EventEmitter {
   openConnection() {
     const url = _getUrl();
     debug('open_socket %s', url);
+    this._messages = [];
     this.conn = new WebSocket(url);
+    this.conn.onopen = () => {
+      const messages = this._messages;
+      this._messages = [];
+      messages.forEach((msg) => this._sendMessage(msg));
+    };
 
     this.conn.onmessage = (message) => {
       const event = JSON.parse(message.data);
@@ -118,8 +124,13 @@ class PokeyApi extends EventEmitter {
   }
 
   _sendMessage(msg) {
-    debug('send_message %o', msg);
-    this.conn.send(JSON.stringify(msg));
+    if (this.conn.readyState === WebSocket.OPEN) {
+      debug('send_message %o', msg);
+      this.conn.send(JSON.stringify(msg));
+    } else {
+      debug('queue_message readyState=%d', this.conn.readyState);
+      this._messages.push(msg);
+    }
   }
 }
 

@@ -111,7 +111,7 @@ class PokeyStore extends EventEmitter {
         if (roomId === _currentRoom.id) {
           debug('user_joined %s, %o', roomId, user);
           _currentRoom = _currentRoom.update('users', (users) => {
-            users.set(user.id, new User(user));
+            return users.set(user.id, new User(user));
           });
         }
       })
@@ -119,7 +119,7 @@ class PokeyStore extends EventEmitter {
         if (roomId === _currentRoom.id) {
           debug('user_left %s, %o', roomId, user);
           _currentRoom = _currentRoom.update('users', (users) => {
-            users.remove(user.id);
+            return users.remove(user.id);
           });
         }
       })
@@ -132,8 +132,9 @@ class PokeyStore extends EventEmitter {
 
   init() {
     this.addChangeListener(() => {
-      const currentRoute = PokeyRouter.getRoute();
+      const currentRoute = PokeyRouter.getPath();
       const newView = this.getView();
+      debug('update_route old=%s, new=%s', currentRoute, newView.route);
 
       if (newView !== null && newView.route !== currentRoute) {
         PokeyRouter.setRoute(newView.route);
