@@ -1,27 +1,29 @@
-export class Lobby {
-  get route() {
-    return '/';
-  }
-}
+export const View = {
+  Lobby: class Lobby {
+    get route() {
+      return '/';
+    }
+  },
 
-export class Room {
-  constructor(roomId) {
-    this._roomId = roomId;
-  }
+  Room: class Room {
+    constructor(roomId) {
+      this._roomId = roomId;
+    }
 
-  get route() {
-    return `/room/${this._roomId}`;
-  }
+    get route() {
+      return `/room/${this._roomId}`;
+    }
 
-  get roomId() {
-    return this._roomId;
+    get roomId() {
+      return this._roomId;
+    }
   }
 }
 
 const Views = {
-  lobby: new Lobby(),
+  lobby: new View.Lobby(),
 
-  room: (roomId) => new Room(roomId)
+  room: (roomId) => new View.Room(roomId)
 };
 
 export default Views;

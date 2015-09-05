@@ -2,7 +2,7 @@ import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 
 import PokeyStore from '../stores/PokeyStore';
-import Views, { Lobby, Room } from '../models/Views';
+import Views, { View } from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
 import LobbyView from './lobby/LobbyView';
 import MainNav from './MainNav'
@@ -31,9 +31,9 @@ class PokeyApp extends React.Component {
     const viewState = this.state.view;
     let view;
 
-    if (viewState instanceof Lobby) {
+    if (viewState instanceof View.Lobby) {
       view = <LobbyView />;
-    } else if (viewState instanceof Room) {
+    } else if (viewState instanceof View.Room) {
       // TODO Validate whether or not we're the owner
       view = <RoomView isOwner={true} />;
     } else {

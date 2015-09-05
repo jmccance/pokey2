@@ -1,10 +1,13 @@
 import EventEmitter from 'events';
+import _, { Map } from 'immutable';
 
 import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
-import Views from '../models/Views';
+import Room from '../models/Room';
+import User from '../models/User';
+import Views, { View } from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
 import Debug from '../util/Debug';
 
@@ -50,7 +53,9 @@ class PokeyStore extends EventEmitter {
 
         case PokeyActions.RoomJoined:
           debug('room_joined %s', action.roomId);
-          PokeyApi.joinRoom(action.roomId);
+          _currentRoom = new Room({ id: action.roomId });
+          _view = Views.room(action.roomId);
+          this.emitChange();
           break;
 
         case PokeyActions.RoomRevealed:
@@ -61,6 +66,12 @@ class PokeyStore extends EventEmitter {
         case PokeyActions.ViewChanged:
           debug('view_changed %o', action.view);
           _view = action.view;
+
+          if (_view instanceof View.Room) {
+            _currentRoom = new Room({ id: _view.roomId });
+            PokeyApi.joinRoom(_view.roomId);
+          }
+
           this.emitChange();
           break;
 
@@ -70,26 +81,48 @@ class PokeyStore extends EventEmitter {
     });
 
     PokeyApi
-      .on(PokeyApiEvents.ConnectionInfo, () => {})
+      .on(PokeyApiEvents.ConnectionInfo, (userId) => {
+        debug('connection_info %s', userId);
+        _currentUser = new User({ id: userId });
+        this.emitChange();
+      })
       .on(PokeyApiEvents.UserUpdated, (user) => {
         debug('user_updated %o', user);
-        _currentUser = user;
+        if (user.id == _currentUser.id) {
+          _currentUser = new User(user);
+        }
         this.emitChange();
       })
       .on(PokeyApiEvents.RoomCreated, (roomId) => {
         debug('room_created %s', roomId);
-        PokeyApi.joinRoom(roomId);
+        _currentRoom = new Room({ id: roomId });
+        _view = Views.room(roomId);
+        this.emitChange();
       })
-      .on(PokeyApiEvents.RoomUpdated, () => {})
-      .on(PokeyApiEvents.UserJoined, (roomId, user) => {
-        debug('user_joined %s, %o', roomId, user);
-        // FIXME Don't change view unless _currentRoom.id != roomId
-        if (user.id === _currentUser.id) {
-          _view = Views.room(roomId);
+      .on(PokeyApiEvents.RoomUpdated, (room) => {
+        if (room.id === _currentRoom.id) {
+          debug('room_updated %o', room);
+          _currentRoom = new Room(room);
+          _view = Views.room(_currentRoom.id);
           this.emitChange();
         }
       })
-      .on(PokeyApiEvents.UserLeft, () => {})
+      .on(PokeyApiEvents.UserJoined, (roomId, user) => {
+        if (roomId === _currentRoom.id) {
+          debug('user_joined %s, %o', roomId, user);
+          _currentRoom = _currentRoom.update('users', (users) => {
+            users.set(user.id, new User(user));
+          });
+        }
+      })
+      .on(PokeyApiEvents.UserLeft, (roomId, user) => {
+        if (roomId === _currentRoom.id) {
+          debug('user_left %s, %o', roomId, user);
+          _currentRoom = _currentRoom.update('users', (users) => {
+            users.remove(user.id);
+          });
+        }
+      })
       .on(PokeyApiEvents.EstimateUpdated, () => {})
       .on(PokeyApiEvents.RoomRevealed, () => {})
       .on(PokeyApiEvents.RoomCleared, () => {})
@@ -106,6 +139,8 @@ class PokeyStore extends EventEmitter {
         PokeyRouter.setRoute(newView.route);
       }
     });
+
+    window.router = PokeyRouter;
 
     PokeyApi.openConnection();
     PokeyRouter.init(Views.lobby.route);

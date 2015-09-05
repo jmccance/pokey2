@@ -23,11 +23,6 @@ class PokeyApi extends EventEmitter {
     debug('open_socket %s', url);
     this.conn = new WebSocket(url);
 
-    this._sendMessage = function _sendMessage(msg) {
-      debug('send_message %o', msg);
-      this.conn.send(JSON.stringify(msg));
-    }
-
     this.conn.onmessage = (message) => {
       const event = JSON.parse(message.data);
       debug('message_received %o', event);
@@ -120,6 +115,11 @@ class PokeyApi extends EventEmitter {
       command: 'revealRoom',
       roomId: roomId
     });
+  }
+
+  _sendMessage(msg) {
+    debug('send_message %o', msg);
+    this.conn.send(JSON.stringify(msg));
   }
 }
 
