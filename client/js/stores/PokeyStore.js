@@ -88,9 +88,15 @@ class PokeyStore extends EventEmitter {
       })
       .on(PokeyApiEvents.UserUpdated, (user) => {
         debug('user_updated %o', user);
-        if (user.id == _currentUser.id) {
+
+        if (user.id === _currentUser.id) {
           _currentUser = new User(user);
         }
+
+        if (_currentRoom && _currentRoom.users.has(user.id)) {
+          _currentRoom = _currentRoom.update('users', users => users.set(user.id, user));
+        }
+
         this.emitChange();
       })
       .on(PokeyApiEvents.RoomCreated, (roomId) => {
@@ -110,24 +116,56 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.UserJoined, (roomId, user) => {
         if (roomId === _currentRoom.id) {
           debug('user_joined %s, %o', roomId, user);
-          _currentRoom = _currentRoom.update('users', (users) => {
-            return users.set(user.id, new User(user));
-          });
+          _currentRoom = _currentRoom.update('users', users => users.set(user.id, new User(user)));
+          this.emitChange();
         }
       })
       .on(PokeyApiEvents.UserLeft, (roomId, user) => {
         if (roomId === _currentRoom.id) {
           debug('user_left %s, %o', roomId, user);
-          _currentRoom = _currentRoom.update('users', (users) => {
-            return users.remove(user.id);
-          });
+          _currentRoom = _currentRoom.update('users', users => users.remove(user.id));
+          this.emitChange();
         }
       })
-      .on(PokeyApiEvents.EstimateUpdated, () => {})
-      .on(PokeyApiEvents.RoomRevealed, () => {})
-      .on(PokeyApiEvents.RoomCleared, () => {})
-      .on(PokeyApiEvents.RoomClosed, () => {})
-      .on(PokeyApiEvents.Error, () => {});
+      .on(PokeyApiEvents.EstimateUpdated, (roomId, userId, estimate) => {
+        if (_currentRoom.id === roomId) {
+          debug('estimate_updated %s, %s, %o', roomId, userId, estimate);
+
+          _currentRoom =
+            _currentRoom.update('estimates', estimates => estimates.set(userId, estimate));
+
+          this.emitChange();
+        }
+      })
+      .on(PokeyApiEvents.RoomRevealed, (roomId, estimates) => {
+        if (_currentRoom.id === roomId) {
+          debug('room_revealed %s, %o', roomId, estimates);
+
+          _currentRoom =
+            _currentRoom
+              .set('isRevealed', true)
+              .set('estimates', Map(estimates));
+
+          this.emitChange();
+        }
+      })
+      .on(PokeyApiEvents.RoomCleared, roomId => {
+        debug('room_cleared %s', roomId);
+
+        _currentRoom =
+          _currentRoom
+            .set('isRevealed', false)
+            .set('estimates', Map());
+
+        this.emitChange();
+      })
+      .on(PokeyApiEvents.RoomClosed, roomId => {
+        debug('room_closed %s', roomId);
+        this.emitChange();
+      })
+      .on(PokeyApiEvents.Error, msg => {
+        debug('error_received %s', msg);
+      });
   }
 
   init() {
@@ -163,7 +201,7 @@ class PokeyStore extends EventEmitter {
     return _currentUser;
   }
 
-  getCurrentRoom() {
+  getRoom() {
     return _currentRoom;
   }
 

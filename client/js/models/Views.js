@@ -18,7 +18,7 @@ export const View = {
       return this._roomId;
     }
   }
-}
+};
 
 const Views = {
   lobby: new View.Lobby(),

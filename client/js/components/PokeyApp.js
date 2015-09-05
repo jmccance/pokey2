@@ -28,14 +28,16 @@ class PokeyApp extends React.Component {
   }
 
   render() {
-    const viewState = this.state.view;
+    const state = this.state;
+    const viewState = state.view;
     let view;
 
     if (viewState instanceof View.Lobby) {
       view = <LobbyView />;
-    } else if (viewState instanceof View.Room) {
+    } else if (viewState instanceof View.Room && state.user) {
       // TODO Validate whether or not we're the owner
-      view = <RoomView isOwner={true} />;
+      const isOwner = state.room.ownerId === state.user.id;
+      view = <RoomView isOwner={isOwner} room={state.room} />;
     } else {
       // TODO Display a 404 page or redirect to Lobby.
       view = (<div className='container'><h1>404 :(</h1></div>);
@@ -51,6 +53,7 @@ class PokeyApp extends React.Component {
 
   _getState() {
     return {
+      room: PokeyStore.getRoom(),
       user: PokeyStore.getUser(),
       view: PokeyStore.getView()
     };
