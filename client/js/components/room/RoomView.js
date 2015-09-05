@@ -17,7 +17,7 @@ export default class extends React.Component {
           </div>
 
           <div className='col-md-2'>
-            {this.props.isOwner ? <RoomOwnerControls /> : '&nbsp;'}
+            {this.props.isOwner ? <RoomOwnerControls /> : ''}
           </div>
         </div>
 
