@@ -20,6 +20,15 @@ const PokeyActionCreator = {
     });
   },
 
+  estimateSubmitted(roomId, estimate) {
+    debug('submitEstimate %s, %o', roomId, estimate);
+    AppDispatcher.dispatch({
+      type: PokeyActions.EstimateSubmitted,
+      roomId,
+      estimate
+    });
+  },
+
   viewChanged(view) {
     debug('viewChanged %o', view);
     AppDispatcher.dispatch({

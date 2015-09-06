@@ -1,49 +1,43 @@
 import React from 'react';
-import {Col, Grid, Row} from 'react-bootstrap';
+import {
+  Button,
+  ButtonInput,
+  Col,
+  FormGroup,
+  Grid,
+  Input,
+  Row
+} from 'react-bootstrap';
+
+import PokeyActionCreator from '../../actions/PokeyActionCreator';
 
 export default class extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onSubmit = (e) => {
+      e.preventDefault();
+      const estimate = {
+        value: this.refs.estimate.getValue(),
+        comment: this.refs.comment.getValue()
+      };
+      PokeyActionCreator.estimateSubmitted(props.roomId, estimate);
+    }
+  }
+
   render() {
     return (
       <form name='estimate'
-            data-role='form'>
-        <Grid fluid>
-          <Row>
-            <Col xs={1}>
-              <label htmlFor='estimate-hours'>
-                Estimate
-              </label>
-            </Col>
-
-            <Col xs={2}>
-              <input id='estimate-hours'
-                     className='form-control'
-                     type='number'
-                     min='1'
-                     max='12'
-                     step='1' />
-            </Col>
-
-            <Col xs={1}>
-              <label htmlFor='estimate-comment'>
-                  Comment
-              </label>
-            </Col>
-
-            <Col xs={7}>
-              <input id='estimate-comment'
-                     className='form-control'
-                     pattern='.*\w.*'
-                     type='text'
-                     maxLength='255'/>
-            </Col>
-
-            <Col xs={1}>
-              <button className='btn btn-primary' type='submit'>
-                  Submit
-              </button>
-            </Col>
-          </Row>
-        </Grid>
+            className='form-inline'
+            data-role='form'
+            onSubmit={this.onSubmit}>
+        <Input ref='estimate'
+               type='number'
+               label='Estimate' />
+        <Input ref='comment'
+               type='text'
+               label='Comment' />
+        <ButtonInput type='submit' bsStyle='primary' value='Submit' />
       </form>
     );
   }

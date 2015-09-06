@@ -13,7 +13,7 @@ export default class extends React.Component {
       <div className='container'>
         <div className='row'>
           <div className='col-md-10'>
-            <EstimateForm />
+            <EstimateForm roomId={props.room.id}/>
           </div>
 
           <div className='col-md-2'>
