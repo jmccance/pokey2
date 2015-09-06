@@ -1,15 +1,3 @@
-####################
-# Pokey Dockerfile #
-####################
+FROM heroku/jvm
 
-FROM dockerfile/java:oracle-java8
-MAINTAINER Joel McCance
-
-### BEGIN INSTALL ###
-
-ADD ./target/universal/pokey-2.0-SNAPSHOT.tgz /opt
-EXPOSE 9000
-
-### END INSTALL ###
-
-ENTRYPOINT ["/opt/pokey-2.0-SNAPSHOT/bin/pokey"]
+ADD ./target/universal/stage .

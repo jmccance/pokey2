@@ -1,0 +1,6 @@
+{
+  "name": "Pokey",
+  "description": "Planning poker with fancy charts",
+  "repository": "https://github.com/jmccance/pokey2",
+  "image": "heroku/jvm"
+}
