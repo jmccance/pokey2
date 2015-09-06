@@ -123,7 +123,10 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.UserLeft, (roomId, user) => {
         if (roomId === _currentRoom.id) {
           debug('user_left %s, %o', roomId, user);
-          _currentRoom = _currentRoom.update('users', users => users.remove(user.id));
+          _currentRoom =
+            _currentRoom
+              .update('users', users => users.remove(user.id))
+              .update('estimates', estimates => estimates.remove(user.id));
           this.emitChange();
         }
       })

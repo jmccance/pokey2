@@ -25,7 +25,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     subscriber ! RoomUpdated(room.roomInfo)
     room.users.foreach(user => subscriber ! UserJoined(room.id, user))
     room.publicEstimates.foreach {
-      case (userId, oEstimate) => EstimateUpdated(room.id, userId, oEstimate)
+      case (userId, oEstimate) => subscriber ! EstimateUpdated(room.id, userId, oEstimate)
     }
   }
 
