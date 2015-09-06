@@ -47,7 +47,9 @@ export default class extends React.Component {
           </div>
 
           <div className='col-md-7'>
-             <EstimateHistogram />
+             { room.isRevealed
+               ? <EstimateHistogram estimates={room.estimates} />
+               : '' }
           </div>
         </div>
       </div>
