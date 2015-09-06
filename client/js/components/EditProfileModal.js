@@ -1,6 +1,5 @@
 import React from 'react';
-import Button from 'react-bootstrap/lib/Button';
-import Modal from 'react-bootstrap/lib/Modal';
+import {Button, Modal} from 'react-bootstrap';
 
 import PokeyActionCreator from '../actions/PokeyActionCreator';
 

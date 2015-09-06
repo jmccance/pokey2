@@ -1,5 +1,5 @@
 import React from 'react';
-import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import {Glyphicon} from 'react-bootstrap';
 
 export default class extends React.Component {
   render() {

@@ -1,6 +1,5 @@
 import React from 'react';
-import Button from 'react-bootstrap/lib/Button';
-import Jumbotron from 'react-bootstrap/lib/Jumbotron';
+import {Button, Jumbotron} from 'react-bootstrap';
 
 import PokeyActionCreator from '../../actions/PokeyActionCreator';
 
