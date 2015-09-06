@@ -29,15 +29,21 @@ export default class extends React.Component {
     return (
       <form name='estimate'
             className='form-inline'
+            id='estimate-form'
             data-role='form'
             onSubmit={this.onSubmit}>
-        <Input ref='estimate'
-               type='number'
-               label='Estimate' />
-        <Input ref='comment'
-               type='text'
-               label='Comment' />
-        <ButtonInput type='submit' bsStyle='primary' value='Submit' />
+          <Input ref='estimate'
+                 type='number'
+                 label='Estimate'
+                 groupClassName='estimate' />
+          <Input ref='comment'
+                 type='text'
+                 label='Comment'
+                 groupClassName='comment' />
+          <ButtonInput type='submit'
+                       bsStyle='primary'
+                       value='Submit'
+                       groupClassName='submit-button'/>
       </form>
     );
   }

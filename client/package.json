@@ -4,7 +4,7 @@
   "description": "Web client for the Pokey planning poker app",
   "repository": "http://github.com/jmccance/pokey2.git",
   "dependencies": {
-    "bootstrap": "3.3.4",
+    "bootstrap": "3.3.5",
     "debug": "^2.2.0",
     "director": "^1.2.8",
     "flux": "2.0.1",
