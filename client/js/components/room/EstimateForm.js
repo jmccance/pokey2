@@ -12,14 +12,31 @@ import {
 import PokeyActionCreator from '../../actions/PokeyActionCreator';
 
 export default class extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      value: '',
+      comment: ''
+    };
+  }
+
   render() {
-    const onSubmit = (e) => {
+    const onChange = () => {
+      this.setState({
+        value: this.refs.value.getValue(),
+        comment: this.refs.comment.getValue()
+      });
+    };
+
+    const onSubmit = e => {
       e.preventDefault();
       const estimate = {
-        value: this.refs.estimate.getValue(),
+        value: this.refs.value.getValue(),
         comment: this.refs.comment.getValue()
       };
       PokeyActionCreator.estimateSubmitted(this.props.roomId, estimate);
+      this.resetState();
     };
 
     return (
@@ -28,19 +45,27 @@ export default class extends React.Component {
             id='estimate-form'
             data-role='form'
             onSubmit={onSubmit}>
-          <Input ref='estimate'
+          <Input ref='value'
                  type='number'
                  label='Estimate'
-                 groupClassName='estimate' />
+                 groupClassName='value'
+                 value={this.state.value}
+                 onChange={onChange}/>
           <Input ref='comment'
                  type='text'
                  label='Comment'
-                 groupClassName='comment' />
+                 groupClassName='comment'
+                 value={this.state.comment}
+                 onChange={onChange} />
           <ButtonInput type='submit'
                        bsStyle='primary'
                        value='Submit'
                        groupClassName='submit-button'/>
       </form>
     );
+  }
+
+  resetState() {
+    this.setState({value: '', comment: ''});
   }
 }

@@ -10,16 +10,16 @@
   padding-right: 1em;
 }
 
-#estimate-form .estimate {
+#estimate-form .value {
   padding-right: 1em;
   width: 18%;
 }
 
-#estimate-form .estimate label {
+#estimate-form .value label {
 
 }
 
-#estimate-form .estimate input {
+#estimate-form .value input {
   width: 5em;
 }
 
