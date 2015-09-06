@@ -8,17 +8,17 @@ scripts/update
 echo
 
 echo "==> Building client-side assets..."
-{
+(
   cd client
   gulp | sed -e 's/^/[gulp] /'
-}
+)
 echo "==> Done!"
 echo
 
 echo "==> Building application..."
-{
+(
   ./activator universal:stage
-}
+  )
 echo "==> Done!"
 echo
 
