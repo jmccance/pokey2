@@ -170,11 +170,11 @@ class PokeyStore extends EventEmitter {
 
   init() {
     this.addChangeListener(() => {
-      const currentRoute = PokeyRouter.getPath();
+      const currentRoute = '/' + (PokeyRouter.getRoute().join('/'));
       const newView = this.getView();
-      debug('update_route old=%s, new=%s', currentRoute, newView.route);
 
       if (newView !== null && newView.route !== currentRoute) {
+        debug('update_route old=%s, new=%s', currentRoute, newView.route);
         PokeyRouter.setRoute(newView.route);
       }
     });
