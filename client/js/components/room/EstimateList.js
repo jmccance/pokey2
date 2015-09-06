@@ -20,7 +20,7 @@ export default class extends React.Component {
 
     return (
       <div>
-        <Table striped>
+        <Table striped=true>
           <tr>
             <th>User</th>
             <th>Estimate</th>

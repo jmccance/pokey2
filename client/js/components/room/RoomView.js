@@ -5,29 +5,43 @@ import EstimateHistogram from './EstimateHistogram';
 import EstimateList from './EstimateList';
 import RoomOwnerControls from './RoomOwnerControls';
 
+const OWNER_CONTROLS_WIDTH = 2;
+
+function formWidth(isOwner) {
+  if (isOwner) {
+    return `col-md-${12 - OWNER_CONTROLS_WIDTH}`;
+  } else {
+    return `col-md-12`;
+  }
+}
+
+function roomOwnerControls(roomId) {
+  return (
+    <div className='col-md-2'>
+      <RoomOwnerControls roomId={roomId} />
+    </div>
+  );
+}
+
 export default class extends React.Component {
   render() {
-    const props = this.props;
+    const {isOwner: isOwner, room: room} = this.props;
 
     return (
       <div className='container'>
         <div className='row'>
-          <div className='col-md-10'>
-            <EstimateForm roomId={props.room.id}/>
+          <div className={formWidth(isOwner)}>
+            <EstimateForm roomId={room.id}/>
           </div>
 
-          <div className='col-md-2'>
-            {this.props.isOwner ? <RoomOwnerControls /> : ''}
-          </div>
+          {isOwner ? roomOwnerControls(room.id) : ''}
         </div>
-
-        <div className='row'>&nbsp;</div>
 
         <div className='row'>
           <div className='col-md-5'>
-            <EstimateList users={props.room.users}
-                          estimates={props.room.estimates}
-                          isRevealed={props.room.isRevealed} />
+            <EstimateList users={room.users}
+                          estimates={room.estimates}
+                          isRevealed={room.isRevealed} />
           </div>
 
           <div className='col-md-7'>
