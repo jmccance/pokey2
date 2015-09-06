@@ -13,10 +13,26 @@ const PokeyActionCreator = {
     });
   },
 
+  roomCleared(roomId) {
+    debug('roomCleared %s', roomId);
+    AppDispatcher.dispatch({
+      type: PokeyActions.RoomCleared,
+      roomId
+    });
+  },
+
   roomCreated() {
     debug('roomCreated');
     AppDispatcher.dispatch({
       type: PokeyActions.RoomCreated
+    });
+  },
+
+  roomRevealed(roomId) {
+    debug('roomRevealed %s', roomId);
+    AppDispatcher.dispatch({
+      type: PokeyActions.RoomRevealed,
+      roomId
     });
   },
 

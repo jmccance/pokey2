@@ -11,7 +11,7 @@ export default class extends React.Component {
 
     let commentComp = '';
     let estimateComp = '';
-    if (isRevealed) {
+    if (isRevealed && estimate) {
       estimateComp = estimate.value;
       commentComp = estimate.comment;
     } else if (estimate) {

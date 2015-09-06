@@ -12,26 +12,22 @@ import {
 import PokeyActionCreator from '../../actions/PokeyActionCreator';
 
 export default class extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.onSubmit = (e) => {
+  render() {
+    const onSubmit = (e) => {
       e.preventDefault();
       const estimate = {
         value: this.refs.estimate.getValue(),
         comment: this.refs.comment.getValue()
       };
-      PokeyActionCreator.estimateSubmitted(props.roomId, estimate);
-    }
-  }
+      PokeyActionCreator.estimateSubmitted(this.props.roomId, estimate);
+    };
 
-  render() {
     return (
       <form name='estimate'
             className='form-inline'
             id='estimate-form'
             data-role='form'
-            onSubmit={this.onSubmit}>
+            onSubmit={onSubmit}>
           <Input ref='estimate'
                  type='number'
                  label='Estimate'

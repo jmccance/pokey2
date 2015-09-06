@@ -37,6 +37,8 @@ export default class extends React.Component {
           {isOwner ? roomOwnerControls(room.id) : ''}
         </div>
 
+        <div className='row'>&nbsp;</div>
+
         <div className='row'>
           <div className='col-md-5'>
             <EstimateList users={room.users}

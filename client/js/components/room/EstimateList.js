@@ -11,16 +11,17 @@ export default class extends React.Component {
       isRevealed: isRevealed
     } = this.props;
 
-    const estimateListItems = this.props.users.map(user =>
-      <EstimateListItem
-        name={user.name}
-        estimate={estimates.get(user.id)}
-        isRevealed={isRevealed} />
-    );
+    const estimateListItems =
+      users.map(user =>
+        <EstimateListItem
+          name={user.name}
+          estimate={estimates.get(user.id)}
+          isRevealed={isRevealed} />
+      );
 
     return (
       <div>
-        <Table striped=true>
+        <Table striped>
           <tr>
             <th>User</th>
             <th>Estimate</th>
