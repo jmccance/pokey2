@@ -1,19 +1,26 @@
 import React from 'react';
+import Table from 'react-bootstrap/lib/Table';
 
 import EstimateListItem from './EstimateListItem';
 
 export default class extends React.Component {
   render() {
+    const {
+      users: users,
+      estimates: estimates,
+      isRevealed: isRevealed
+    } = this.props;
+
     const estimateListItems = this.props.users.map(user =>
       <EstimateListItem
-        key={user.id}
         name={user.name}
-        estimate={this.props.estimates.get(user.id)} />
+        estimate={estimates.get(user.id)}
+        isRevealed={isRevealed} />
     );
 
     return (
       <div>
-        <table className='table table-striped'>
+        <Table striped>
           <tr>
             <th>User</th>
             <th>Estimate</th>
@@ -21,7 +28,7 @@ export default class extends React.Component {
           </tr>
 
           {estimateListItems}
-        </table>
+        </Table>
       </div>
     );
   }
