@@ -19,10 +19,15 @@ trait UserService {
   def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]]
 }
 
-class DefaultUserService(userRegistry: ActorRef) extends UserService {
+class DefaultUserService(userRegistry: ActorRef,
+                         private[this] var ids: Stream[String]) extends UserService {
   private[this] implicit val timeout = Timeout(2.seconds)
 
-  override def nextUserId(): String = new java.rmi.server.UID().toString
+  override def nextUserId(): String = ids.synchronized {
+    val id #:: rest = ids
+    ids = rest
+    id
+  }
 
   override def createUserForId(id: String)(implicit ec: ExecutionContext): Future[UserProxy] =
     (userRegistry ? UserRegistry.CreateProxyForId(id)).mapTo[UserProxy]

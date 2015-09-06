@@ -1,7 +1,7 @@
 package pokey.user.service
 
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{ UserProxy, UserRegistry }
+import pokey.user.actor.{UserProxy, UserRegistry}
 
 class DefaultUserServiceSpec extends AkkaUnitSpec {
   // In this class, "self" will be playing the role of the UserRegistry.
@@ -59,5 +59,6 @@ class DefaultUserServiceSpec extends AkkaUnitSpec {
     }
   }
 
-  private[this] def newUserService(): UserService = new DefaultUserService(self)
+  private[this] def newUserService(): UserService =
+    new DefaultUserService(self, pokey.util.uidStream)
 }

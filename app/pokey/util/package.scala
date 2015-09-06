@@ -6,5 +6,9 @@ package object util {
     instance
   }
 
-  def uidStream: Stream[String] = Stream.continually(new java.rmi.server.UID().toString)
+  def uidStream: Stream[String] = {
+    val encBase64 = java.util.Base64.getEncoder.encode(_: Array[Byte])
+
+    Stream.continually(java.util.UUID.randomUUID().toString)
+  }
 }

@@ -49,7 +49,7 @@ case class Room(id: String,
   def clearedBy(userId: String): Room Or UnauthorizedErr =
     if (userId == ownerId) {
       val clearedEstimates = estimates.mapValues(_ => None)
-      Good(this.copy(estimates = clearedEstimates))
+      Good(this.copy(estimates = clearedEstimates, isRevealed = false))
     } else {
       Bad(UnauthorizedErr("Only the room owner may clear the room's estimates"))
     }

@@ -1,0 +1,23 @@
+{
+  "parser": "babel-eslint",
+
+  "ecmaFeatures": {
+    "arrowFunctions": true,
+    "blockBindings": true,
+    "classes": true,
+    "jsx": true,
+    "modules": true
+  },
+
+  "env": {
+    "browser": true,
+    "node": true
+  },
+
+  "rules": {
+    "new-cap": false,
+    "new-parens": false,
+    "no-underscore-dangle": false,
+    "quotes": "single"
+  }
+}

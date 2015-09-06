@@ -1,0 +1,41 @@
+#estimate-form {
+
+}
+
+#estimate-form label {
+  padding-right: 1em;
+}
+
+#estimate-form input {
+  padding-right: 1em;
+}
+
+#estimate-form .estimate {
+  padding-right: 1em;
+  width: 18%;
+}
+
+#estimate-form .estimate label {
+
+}
+
+#estimate-form .estimate input {
+  width: 5em;
+}
+
+#estimate-form .comment {
+  width: 74%;
+}
+
+#estimate-form .comment label {
+  width: 12%;
+}
+
+#estimate-form .comment input {
+  width: 88%;
+}
+
+#estimate-form .submit-button {
+  width: 8%;
+  padding-left: 1em;
+}

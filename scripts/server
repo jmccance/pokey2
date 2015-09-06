@@ -9,7 +9,7 @@ echo
 
 echo "==> Building client-side assets..."
 {
-  cd app/assets
+  cd client
   gulp watch | sed -e 's/^/[gulp] /'
 } &
 GULP_ID=$$
