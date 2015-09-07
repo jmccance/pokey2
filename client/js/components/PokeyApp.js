@@ -2,7 +2,7 @@ import React from 'react';
 import {Grid, Button} from 'react-bootstrap';
 
 import PokeyStore from '../pokey/PokeyStore';
-import Views, { View } from '../models/Views';
+import Views, { View } from '../pokey/model/Views';
 import AppRouter from '../router/AppRouter';
 import AlertsView from './AlertsView';
 import MainNav from './MainNav';

@@ -15,10 +15,16 @@ class AlertStore extends EventEmitter {
   constructor() {
     super();
 
-    this._alerts = List(['panic', 'plague', 'disco']);
+    this._alerts = List();
 
     AppDispatcher.register((action) => {
       switch (action.type) {
+        case AlertActions.AlertCreated:
+          debug('alert_created %o', action.alert);
+          this._alerts = this._alerts.push(action.alert);
+          this._emitChange();
+          break;
+
         case AlertActions.AlertDismissed:
           debug('alert_dismissed %i', action.index);
           this._alerts = this._alerts.remove(action.index);
@@ -26,7 +32,7 @@ class AlertStore extends EventEmitter {
           break;
 
         default:
-          // do nothing
+          debug('unhandled_event %o', action);
       }
     });
   }

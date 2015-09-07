@@ -24,8 +24,8 @@ export default class extends React.Component {
     const alerts = this.state.alerts;
 
     const alertItems = alerts.map((alert, i) =>
-      <Alert bsStyle='danger' onDismiss={this.onDismiss(i)}>
-        {alert}
+      <Alert bsStyle={alert.level} onDismiss={this.onDismiss(i)}>
+        {alert.message}
       </Alert>
     );
 

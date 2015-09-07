@@ -1,9 +1,9 @@
 import director from 'director';
 
-import Views from '../models/Views';
 import PokeyActionCreator from '../pokey/PokeyActionCreator';
 import PokeyStore from '../pokey/PokeyStore';
 import Debug from '../util/Debug';
+import Views from '../pokey/model/Views';
 
 const debug = Debug('router:AppRouter');
 

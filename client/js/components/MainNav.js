@@ -24,6 +24,9 @@ class MainNav extends React.Component {
 
     return (
       <Navbar brand='Pokey' className='staticTop'>
+        <Nav>
+          <NavItem href='#/'>Lobby</NavItem>
+        </Nav>
         <Nav right>
           <NavItem>
             <span onClick={this.openEditProfileModal}>

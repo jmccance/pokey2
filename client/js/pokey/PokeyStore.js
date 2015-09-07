@@ -1,15 +1,17 @@
 import EventEmitter from 'events';
 import { Map } from 'immutable';
 
+import AlertActionCreator from '../alerts/AlertActionCreator';
+import Alert from '../alerts/model/Alert';
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
-import Room from '../models/Room';
-import User from '../models/User';
-import Views, { View } from '../models/Views';
 import AppRouter from '../router/AppRouter';
 import Debug from '../util/Debug';
 import PokeyActions from './PokeyActions'
+import Room from './model/Room';
+import User from './model/User';
+import Views, { View } from './model/Views';
 
 const debug = Debug('pokey:PokeyStore');
 
@@ -76,7 +78,7 @@ class PokeyStore extends EventEmitter {
           break;
 
         default:
-          // do nothing
+          debug('unhandled_action %o', action);
       }
     });
 
@@ -168,6 +170,7 @@ class PokeyStore extends EventEmitter {
       })
       .on(PokeyApiEvents.Error, msg => {
         debug('error_received %s', msg);
+        AlertActionCreator.alertCreated(new Alert({message: msg}));
       });
   }
 

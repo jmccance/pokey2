@@ -5,6 +5,14 @@ import AlertActions from './AlertActions';
 const debug = Debug('alerts:AlertActionCreator');
 
 const AlertActionCreator = {
+  alertCreated(alert) {
+    debug('alertCreated %o', alert);
+    AppDispatcher.dispatch({
+      type: AlertActions.AlertCreated,
+      alert
+    });
+  },
+
   alertDismissed(index) {
     debug('alertDismissed %o', index);
     AppDispatcher.dispatch({
@@ -12,6 +20,6 @@ const AlertActionCreator = {
       index
     });
   }
-}
+};
 
 export default AlertActionCreator;
