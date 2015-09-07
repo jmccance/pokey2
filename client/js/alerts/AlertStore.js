@@ -1,11 +1,11 @@
 import EventEmitter from 'events';
 import { List } from 'immutable';
 
-import AlertActions from '../actions/AlertActions';
 import AppDispatcher from '../dispatcher/appDispatcher';
 import Debug from '../util/Debug';
+import AlertActions from './AlertActions';
 
-const debug = Debug('stores:AlertStore');
+const debug = Debug('alerts:AlertStore');
 
 const InternalEvents = {
   Change: 'CHANGE'

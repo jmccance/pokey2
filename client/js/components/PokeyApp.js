@@ -1,9 +1,9 @@
 import React from 'react';
 import {Grid, Button} from 'react-bootstrap';
 
-import PokeyStore from '../stores/PokeyStore';
+import PokeyStore from '../pokey/PokeyStore';
 import Views, { View } from '../models/Views';
-import PokeyRouter from '../router/PokeyRouter';
+import AppRouter from '../router/AppRouter';
 import AlertsView from './AlertsView';
 import MainNav from './MainNav';
 import LobbyView from './lobby/LobbyView';

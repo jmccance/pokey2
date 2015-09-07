@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Jumbotron} from 'react-bootstrap';
 
-import PokeyActionCreator from '../../actions/PokeyActionCreator';
+import PokeyActionCreator from '../../pokey/PokeyActionCreator';
 
 export default class extends React.Component {
   render() {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PokeyActionCreator from '../../actions/PokeyActionCreator';
+import PokeyActionCreator from '../../pokey/PokeyActionCreator';
 
 export default class extends React.Component {
   render() {

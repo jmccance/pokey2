@@ -1,8 +1,8 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-import AlertActionCreator from '../actions/AlertActionCreator';
-import AlertStore from '../stores/AlertStore';
+import AlertActionCreator from '../alerts/AlertActionCreator';
+import AlertStore from '../alerts/AlertStore';
 
 export default class extends React.Component {
   constructor(props) {

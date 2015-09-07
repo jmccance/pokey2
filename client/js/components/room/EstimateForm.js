@@ -9,7 +9,7 @@ import {
   Row
 } from 'react-bootstrap';
 
-import PokeyActionCreator from '../../actions/PokeyActionCreator';
+import PokeyActionCreator from '../../pokey/PokeyActionCreator';
 
 export default class extends React.Component {
   constructor(props) {

@@ -1,13 +1,13 @@
 import director from 'director';
 
-import PokeyActionCreator from '../actions/PokeyActionCreator';
 import Views from '../models/Views';
-import PokeyStore from '../stores/PokeyStore';
+import PokeyActionCreator from '../pokey/PokeyActionCreator';
+import PokeyStore from '../pokey/PokeyStore';
 import Debug from '../util/Debug';
 
-const debug = Debug('PokeyRouter');
+const debug = Debug('router:AppRouter');
 
-const PokeyRouter = new director.Router({
+const AppRouter = new director.Router({
   '/': () => {
     debug('route_changed /');
     PokeyActionCreator.viewChanged(Views.lobby);
@@ -19,4 +19,4 @@ const PokeyRouter = new director.Router({
   }
 });
 
-export default PokeyRouter;
+export default AppRouter;

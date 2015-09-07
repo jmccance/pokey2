@@ -1,17 +1,17 @@
 import EventEmitter from 'events';
 import { Map } from 'immutable';
 
-import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
 import Room from '../models/Room';
 import User from '../models/User';
 import Views, { View } from '../models/Views';
-import PokeyRouter from '../router/PokeyRouter';
+import AppRouter from '../router/AppRouter';
 import Debug from '../util/Debug';
+import PokeyActions from './PokeyActions'
 
-const debug = Debug('stores:PokeyStore');
+const debug = Debug('pokey:PokeyStore');
 
 const InternalEvents = {
   Change: 'CHANGE',
@@ -173,19 +173,19 @@ class PokeyStore extends EventEmitter {
 
   init() {
     this.addChangeListener(() => {
-      const currentRoute = '/' + (PokeyRouter.getRoute().join('/'));
+      const currentRoute = '/' + (AppRouter.getRoute().join('/'));
       const newView = this.getView();
 
       if (newView !== null && newView.route !== currentRoute) {
         debug('update_route old=%s, new=%s', currentRoute, newView.route);
-        PokeyRouter.setRoute(newView.route);
+        AppRouter.setRoute(newView.route);
       }
     });
 
-    window.router = PokeyRouter;
+    window.router = AppRouter;
 
     PokeyApi.openConnection();
-    PokeyRouter.init(Views.lobby.route);
+    AppRouter.init(Views.lobby.route);
   }
 
   emitChange() {
