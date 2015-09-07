@@ -2,7 +2,7 @@ import AppDispatcher from '../dispatcher/appDispatcher';
 import Debug from '../util/Debug';
 import PokeyActions from './PokeyActions';
 
-const debug = Debug('PokeyActionCreator');
+const debug = Debug('actions:PokeyActionCreator');
 
 const PokeyActionCreator = {
   nameSet(name) {

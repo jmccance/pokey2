@@ -1,11 +1,12 @@
 import React from 'react';
-import {Button} from 'react-bootstrap';
+import {Grid, Button} from 'react-bootstrap';
 
 import PokeyStore from '../stores/PokeyStore';
 import Views, { View } from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
+import AlertsView from './AlertsView';
+import MainNav from './MainNav';
 import LobbyView from './lobby/LobbyView';
-import MainNav from './MainNav'
 import RoomView from './room/RoomView';
 
 class PokeyApp extends React.Component {
@@ -46,7 +47,10 @@ class PokeyApp extends React.Component {
     return (
       <div>
         <MainNav user={this.state.user} />
-        {view}
+        <Grid>
+          <AlertsView />
+          {view}
+        </Grid>
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import _, { Map } from 'immutable';
+import { Map } from 'immutable';
 
 import PokeyActions from '../actions/PokeyActions'
 import PokeyApi from '../api/PokeyApi';
@@ -11,7 +11,7 @@ import Views, { View } from '../models/Views';
 import PokeyRouter from '../router/PokeyRouter';
 import Debug from '../util/Debug';
 
-const debug = Debug('PokeyStore');
+const debug = Debug('stores:PokeyStore');
 
 const InternalEvents = {
   Change: 'CHANGE',
