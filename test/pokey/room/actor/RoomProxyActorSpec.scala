@@ -78,9 +78,10 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
 
       "is not joined to the room" should {
         "reply with an error" in withContext { ctx =>
-          ctx.rpa ! SubmitEstimate(someUser.id, someEstimate)
+          val unauthorizedConnP = TestProbe()
+          unauthorizedConnP.send(ctx.rpa, SubmitEstimate(someUser.id, someEstimate))
 
-          expectMsgType[UnauthorizedErr]
+          unauthorizedConnP.expectMsgType[UnauthorizedErr]
         }
       }
     }
