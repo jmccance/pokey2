@@ -60,6 +60,7 @@ ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageExcludedPackages := Seq(
   "<empty>",
   ".*\\.controller\\.javascript",
-  ".*\\.controller\\.ref"
+  ".*\\.controller\\.ref",
+  "router.*"
 ).mkString(";")
 
