@@ -9,20 +9,21 @@ echo
 
 echo "==> Building client-side assets..."
 (
+  set -e
   cd client
-  gulp | sed -e 's/^/[gulp] /'
+  ./node_modules/.bin/gulp | sed -e 's/^/[gulp] /'
 )
 echo "==> Done!"
 echo
 
 echo "==> Building application..."
 (
+  set -e
   ./activator universal:stage
-  )
+)
 echo "==> Done!"
 echo
 
 echo "==> Releasing to Heroku"
 sudo heroku docker:release
 echo "==> Done!"
-  

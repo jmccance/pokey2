@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+scripts/update
+echo
+
+echo "==> Building client-side assets..."
+(
+  set -e
+  cd client
+  npm install
+  ./node_modules/.bin/gulp | sed -e 's/^/[gulp] /'
+)
+echo "==> Done!"
+echo
+
+echo "==> Building application..."
+(
+  set -e
+  ./activator universal:packageZipTarball
+)
+echo "==> Done!"
+echo

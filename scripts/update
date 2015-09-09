@@ -8,15 +8,17 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "==> Updating backend assets..."
-{
+(
+  set -e
   ./activator update
-}
+)
 echo "==> Done!"
 
 echo ""
 echo "==> Updating client-side assets..."
-{
+(
+  set -e
   cd client
   npm install
-}
+)
 echo "==> Done!"

@@ -8,17 +8,17 @@ scripts/update
 echo
 
 echo "==> Building client-side assets..."
-{
+(
+  set -e
   cd client
   gulp watch | sed -e 's/^/[gulp] /'
-} &
+) &
 GULP_ID=$$
 trap "{ kill $GULP_ID; }" EXIT
 echo "==> Continuous build started."
 
 echo
 echo "==> Running server..."
-{
+(
   ./activator run
-}
-  
+)
