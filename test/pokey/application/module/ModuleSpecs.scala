@@ -17,29 +17,25 @@ import concurrent.{ ExecutionContext, Future }
 class ModuleSpecs extends AkkaUnitSpec {
 
   "A WebModule" should {
-    val module = new WebModule :: mockServiceModule
+    implicit val module = new WebModule :: mockServiceModule :: mockDependencies
 
     "provide a binding for AssetController" in {
-      implicit val m = module
       inject[AssetController]
     }
 
     "provide a binding for ConnectionController" in {
-      implicit val m = module
       inject[ConnectionController]
     }
   }
 
   "A ServiceModule" should {
-    val module = new ServiceModule :: mockDependencies
+    implicit val module = new ServiceModule :: mockDependencies
 
     "provide a binding for UserService" in {
-      implicit val m = module
       inject[UserService]
     }
 
     "provide a binding for RoomService" in {
-      implicit val m = module
       inject[RoomService]
     }
   }
@@ -63,6 +59,7 @@ class ModuleSpecs extends AkkaUnitSpec {
   private[this] def mockDependencies = new Module {
     bind[ActorSystem] to system
     bind[Configuration] to Configuration.from(Map(
+      "pokey.connection.heartbeat-interval" -> "50s",
       "pokey.users.max-idle-time" -> "10s"
     ))
   }

@@ -14,11 +14,14 @@ import pokey.user.actor.{ UserProxy, UserProxyActor }
 import pokey.user.model.User
 import pokey.util.using
 
-import concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.duration._
 
 class ConnectionHandlerSpec extends AkkaUnitSpec {
 
   // In these tests, the role of the WebSocket client ("out") will be played by "self".
+
+  val settings = ConnectionHandler.Settings(1.hour)
 
   "A ConnectionHandler" which {
     val userId = "1"
@@ -229,13 +232,13 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
 
     def init(roomService: RoomService = new TestRoomService,
              userRef: ActorRef = TestProbe().ref) =
-      using(system.actorOf(ConnectionHandler.props(roomService, UserProxy(userId, userRef), self))) { handler =>
+      using(system.actorOf(ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self))) { handler =>
         expectMsgType[ConnectionInfo]
       }
 
     def initWithProbe(roomService: RoomService = new TestRoomService,
                       userProbe: TestProbe = TestProbe()) =
-      using(system.actorOf(ConnectionHandler.props(roomService, UserProxy(userId, userProbe.ref), self))) { handler =>
+      using(system.actorOf(ConnectionHandler.props(roomService, settings)(UserProxy(userId, userProbe.ref))(self))) { handler =>
         userProbe.expectMsg(UserProxyActor.NewConnection(handler))
         expectMsgType[ConnectionInfo]
       }

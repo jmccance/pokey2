@@ -27,6 +27,7 @@ object Event {
       case r: RoomRevealedEvent => RoomRevealedEvent.writer.writes(r)
       case r: RoomClearedEvent => RoomClearedEvent.writer.writes(r)
       case r: RoomClosedEvent => RoomClosedEvent.writer.writes(r)
+      case HeartbeatEvent => HeartbeatEvent.writer.writes(HeartbeatEvent)
       case r: ErrorEvent => ErrorEvent.writer.writes(r)
     }
   )
@@ -176,6 +177,15 @@ object Events {
   object RoomClosedEvent {
     val writer = OWrites[RoomClosedEvent] {
       case RoomClosedEvent(roomId) => EventJsObject("roomClosed")("roomId" -> roomId)
+    }
+  }
+
+  /**
+   * Event sent to keep the connection alive.
+   */
+  case object HeartbeatEvent extends Event {
+    val writer = OWrites[HeartbeatEvent.type] { _ =>
+      EventJsObject("heartbeat")()
     }
   }
 
