@@ -22,13 +22,17 @@ export default class extends React.Component {
     return (
       <div>
         <Table striped>
-          <tr>
-            <th>User</th>
-            <th>Estimate</th>
-            <th>Comment</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Estimate</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
 
-          {estimateListItems}
+          <tbody>
+            {estimateListItems}
+          </tbody>
         </Table>
       </div>
     );
