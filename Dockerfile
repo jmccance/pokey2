@@ -10,8 +10,8 @@ RUN ln -s $(which nodejs) /usr/bin/node
 COPY . /tmp
 WORKDIR /tmp
 RUN ./scripts/dist \
-  && tar zxvf ./target/universal/pokey-2.0-SNAPSHOT.tgz -C /opt \
+  && tar zxvf ./target/universal/pokey-2.0-SNAPSHOT.tgz -C /app \
   && rm -rf /tmp/*
 
 EXPOSE 9000
-CMD ["/opt/pokey-2.0-SNAPSHOT/bin/pokey"]
+CMD ["/app/pokey-2.0-SNAPSHOT/bin/pokey"]

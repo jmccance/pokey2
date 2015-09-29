@@ -1,1 +1,1 @@
-web: /opt/pokey-2.0-SNAPSHOT/bin/pokey -Dhttp.port=$PORT
+web: /app/pokey-2.0-SNAPSHOT/bin/pokey -Dhttp.port=$PORT
