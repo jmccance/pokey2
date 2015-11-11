@@ -45,6 +45,11 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
           case _ => false
         }
       }
+
+      "publish the updated version to new users that join" in pending
+      // The bug appears to be in RoomProxyActor. When handling UserUpdated messages, we publish the
+      // update to subscribers, but we don't update our internal cache. The internal cache is only
+      // used during the join-room workflow, so this is the only spot where we see the issue.
     }
 
     "it receives a LeaveRoom message" which {
