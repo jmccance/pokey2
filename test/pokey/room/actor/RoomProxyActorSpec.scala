@@ -22,6 +22,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
       "subscribe to the supplied UserProxy, subscribe the connection to itself, and publish a " +
         "UserJoined Message" in withContext {
           case Context(rpa, ownerProbe, conn, _) =>
+
             val userProbe = TestProbe()
             val userProxy = UserProxy(someUser.id, userProbe.ref)
 
@@ -46,10 +47,29 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
         }
       }
 
-      "publish the updated version to new users that join" in pending
-      // The bug appears to be in RoomProxyActor. When handling UserUpdated messages, we publish the
-      // update to subscribers, but we don't update our internal cache. The internal cache is only
-      // used during the join-room workflow, so this is the only spot where we see the issue.
+      "publish the updated version to new users that join" in
+        withContextWithUsers(someUser) {
+          case Context(rpa, ownerProbe, connProbe, _) =>
+
+            // "someUser" changes their name.
+            val updatedSomeUser = someUser.copy(name = s"${someUser.name} II")
+            rpa ! UserProxyActor.UserUpdated(updatedSomeUser)
+
+            // "anotherUser" joins
+            val anotherUserProbe = TestProbe()
+            val anotherUserProxy = UserProxy(anotherUser.id, anotherUserProbe.ref)
+
+            rpa ! JoinRoom(anotherUserProxy)
+
+            // "anotherUser" should see the new name.
+            fishForMessage(hint = "Did not receive UserJoined for updated user") {
+              case UserJoined(`roomId`, User(someUser.id, name)) =>
+                name shouldBe updatedSomeUser.name
+                true
+
+              case msg => false
+            }
+        }
     }
 
     "it receives a LeaveRoom message" which {
