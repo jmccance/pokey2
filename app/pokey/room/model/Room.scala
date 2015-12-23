@@ -26,7 +26,11 @@ case class Room(id: String,
 
   def +(user: User): Room = {
     val mUsers = usersById + (user.id -> user)
-    val mEstimates = estimates + (user.id -> None)
+
+    val mEstimates =
+      if (usersById.contains(user.id)) estimates
+      else estimates + (user.id -> None)
+
     this.copy(usersById = mUsers, estimates = mEstimates)
   }
 
