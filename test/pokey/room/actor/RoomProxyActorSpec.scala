@@ -52,17 +52,18 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
           case Context(rpa, ownerProbe, connProbe, _) =>
 
             // "someUser" changes their name.
+            val someUserProxyProbe = TestProbe()
             val updatedSomeUser = someUser.copy(name = s"${someUser.name} II")
-            rpa ! UserProxyActor.UserUpdated(updatedSomeUser)
+            someUserProxyProbe.send(rpa, UserProxyActor.UserUpdated(updatedSomeUser))
 
             // "anotherUser" joins
-            val anotherUserProbe = TestProbe()
-            val anotherUserProxy = UserProxy(anotherUser.id, anotherUserProbe.ref)
+            val anotherUserConnProbe = TestProbe()
+            val anotherUserProxy = UserProxy(anotherUser.id, TestProbe().ref)
 
-            rpa ! JoinRoom(anotherUserProxy)
+            anotherUserConnProbe.send(rpa, JoinRoom(anotherUserProxy))
 
             // "anotherUser" should see the new name.
-            fishForMessage(hint = "Did not receive UserJoined for updated user") {
+            anotherUserConnProbe.fishForMessage(hint = "Did not receive UserJoined for updated user") {
               case UserJoined(`roomId`, User(someUser.id, name)) =>
                 name shouldBe updatedSomeUser.name
                 true
