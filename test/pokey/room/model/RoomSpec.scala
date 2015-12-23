@@ -9,11 +9,13 @@ class RoomSpec extends UnitSpec {
 
   "A Room" when {
     val users = Seq(User("1", "John"), User("2", "George"), User("3", "Paul"), User("4", "Ringo"))
+    val someUser = users.head
     val estimates = Seq(
       Some(Estimate(Some("3"), None)),
       Some(Estimate(None, Some("No idea"))),
       None,
       None)
+    val estimatesByUserId = users.map(_.id).zip(estimates).toMap
     val owner = users.head
     val notOwner = users.last
     val emptyRoom = Room("1234", owner.id)
@@ -24,7 +26,7 @@ class RoomSpec extends UnitSpec {
         "1234",
         owner.id,
         usersById = users.map(u => (u.id, u)).toMap,
-        estimates = users.map(_.id).zip(estimates).toMap)
+        estimates = estimatesByUserId)
 
     val someEstimate = Estimate(Some("2"), Some("foo"))
 
@@ -38,11 +40,22 @@ class RoomSpec extends UnitSpec {
       }
     }
 
-    "a user is added" should {
-      "add that user with an unfilled estimate" in {
-        val updatedRoom = emptyRoom + newUser
+    "a user is added" which {
+      "is not already in the room" should {
+        "add that user with an unfilled estimate" in {
+          val updatedRoom = emptyRoom + newUser
 
-        updatedRoom(newUser.id) shouldBe (newUser, None)
+          updatedRoom(newUser.id) shouldBe (newUser, None)
+        }
+      }
+
+      "is already in the room" should {
+        "update the user but maintain the original estimate" in {
+          val updatedUser = someUser.copy(name = s"${someUser.name} II")
+          val updatedRoom = someRoom + updatedUser
+
+          updatedRoom.get(someUser.id) shouldBe Some((updatedUser, estimatesByUserId(someUser.id)))
+        }
       }
     }
 

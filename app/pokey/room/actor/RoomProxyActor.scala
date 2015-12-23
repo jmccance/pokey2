@@ -45,6 +45,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     case update @ UserProxyActor.UserUpdated(user) =>
       if (room.contains(user.id)) {
         log.info("room: {}, user_updated, user: {}", room.id, user)
+        room += user
         self ! Publish(update)
       } else {
         // We're assuming that we'll never be mistakenly sent an update message for a user who has

@@ -22,6 +22,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
       "subscribe to the supplied UserProxy, subscribe the connection to itself, and publish a " +
         "UserJoined Message" in withContext {
           case Context(rpa, ownerProbe, conn, _) =>
+
             val userProbe = TestProbe()
             val userProxy = UserProxy(someUser.id, userProbe.ref)
 
@@ -45,6 +46,31 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
           case _ => false
         }
       }
+
+      "publish the updated version to new users that join" in
+        withContextWithUsers(someUser) {
+          case Context(rpa, ownerProbe, connProbe, _) =>
+
+            // "someUser" changes their name.
+            val someUserProxyProbe = TestProbe()
+            val updatedSomeUser = someUser.copy(name = s"${someUser.name} II")
+            someUserProxyProbe.send(rpa, UserProxyActor.UserUpdated(updatedSomeUser))
+
+            // "anotherUser" joins
+            val anotherUserConnProbe = TestProbe()
+            val anotherUserProxy = UserProxy(anotherUser.id, TestProbe().ref)
+
+            anotherUserConnProbe.send(rpa, JoinRoom(anotherUserProxy))
+
+            // "anotherUser" should see the new name.
+            anotherUserConnProbe.fishForMessage(hint = "Did not receive UserJoined for updated user") {
+              case UserJoined(`roomId`, User(someUser.id, name)) =>
+                name shouldBe updatedSomeUser.name
+                true
+
+              case msg => false
+            }
+        }
     }
 
     "it receives a LeaveRoom message" which {
