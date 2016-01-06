@@ -1,6 +1,8 @@
 Pokey v2
 ========
 
+[![Join the chat at https://gitter.im/jmccance/pokey2](https://badges.gitter.im/jmccance/pokey2.svg)](https://gitter.im/jmccance/pokey2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [ ![Codeship Status for jmccance/pokey2](https://codeship.com/projects/65568ed0-3884-0133-5366-6a70bfa410cb/status?branch=master)](https://codeship.com/projects/101327)
 
 **NOTE: Pokey v2 is still in development and is not functional in any way, shape, or form.**
