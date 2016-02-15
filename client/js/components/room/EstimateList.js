@@ -12,12 +12,14 @@ export default class extends React.Component {
     } = this.props;
 
     const estimateListItems =
-      users.map(user =>
-        <EstimateListItem
-          name={user.name}
-          estimate={estimates.get(user.id)}
-          isRevealed={isRevealed} />
-      );
+      users
+        .sort((u1, u2) => u1.name.localeCompare(u2.name))
+        .map(user =>
+          <EstimateListItem
+            name={user.name}
+            estimate={estimates.get(user.id)}
+            isRevealed={isRevealed} />
+        );
 
     return (
       <div>
