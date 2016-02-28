@@ -22,6 +22,7 @@ const InternalEvents = {
 
 var _currentUser = null;
 var _currentRoom = null;
+var _isReconnecting = false;
 var _view = null;
 
 class PokeyStore extends EventEmitter {
@@ -78,12 +79,15 @@ class PokeyStore extends EventEmitter {
     });
 
     PokeyApi
-      .on(PokeyApiEvents.ConnectionClosed, msg => {
+      .on(PokeyApiEvents.ConnectionClosed, () => {
         debug('connection_closed');
         AlertActionCreator.alertCreated(
           new Alert({
-            message: 'Lost connection to server. Please refresh the page.'
-          }));
+            message: 'Connection lost. Attempting to reconnect...'
+          })
+        );
+        _isReconnecting = true;
+        PokeyApi.openConnection();
       })
       .on(PokeyApiEvents.ConnectionInfo, (userId) => {
         debug('connection_info %s', userId);
@@ -92,6 +96,16 @@ class PokeyStore extends EventEmitter {
       })
       .on(PokeyApiEvents.ConnectionOpened, () => {
         debug('connection_opened');
+        if (_isReconnecting) {
+          _isReconnecting = false;
+          AlertActionCreator.alertCreated(
+            new Alert({
+              message: 'Connection re-established.'
+            })
+          );
+          AppRouter.setRoute('/reconnected');
+          AppRouter.setRoute(_view.route);
+        }
       })
       .on(PokeyApiEvents.UserUpdated, (user) => {
         debug('user_updated %o', user);
