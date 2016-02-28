@@ -33,6 +33,7 @@ class PokeyApi extends EventEmitter {
       const messages = this._messages;
       this._messages = [];
       messages.forEach((msg) => this._sendMessage(msg));
+      this.emit(PokeyApiEvents.ConnectionOpened);
     };
 
     this.conn.onclose = () => {

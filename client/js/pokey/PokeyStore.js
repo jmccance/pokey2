@@ -53,13 +53,6 @@ class PokeyStore extends EventEmitter {
           PokeyApi.createRoom();
           break;
 
-        case PokeyActions.RoomJoined:
-          debug('room_joined %s', action.roomId);
-          _currentRoom = new Room({ id: action.roomId });
-          _view = Views.room(action.roomId);
-          this.emitChange();
-          break;
-
         case PokeyActions.RoomRevealed:
           debug('room_revealed %s', action.roomId);
           PokeyApi.revealRoom(action.roomId);
@@ -72,6 +65,8 @@ class PokeyStore extends EventEmitter {
           if (_view instanceof View.Room) {
             _currentRoom = new Room({ id: _view.roomId });
             PokeyApi.joinRoom(_view.roomId);
+          } else {
+            _currentRoom = false;
           }
 
           this.emitChange();
@@ -83,10 +78,20 @@ class PokeyStore extends EventEmitter {
     });
 
     PokeyApi
+      .on(PokeyApiEvents.ConnectionClosed, msg => {
+        debug('connection_closed');
+        AlertActionCreator.alertCreated(
+          new Alert({
+            message: 'Lost connection to server. Please refresh the page.'
+          }));
+      })
       .on(PokeyApiEvents.ConnectionInfo, (userId) => {
         debug('connection_info %s', userId);
         _currentUser = new User({ id: userId });
         this.emitChange();
+      })
+      .on(PokeyApiEvents.ConnectionOpened, () => {
+        debug('connection_opened');
       })
       .on(PokeyApiEvents.UserUpdated, (user) => {
         debug('user_updated %o', user);
@@ -167,11 +172,6 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.RoomClosed, roomId => {
         debug('room_closed %s', roomId);
         this.emitChange();
-      })
-      .on(PokeyApiEvents.ConnectionClosed, msg => {
-        debug('connection_closed');
-        AlertActionCreator.alertCreated(
-          new Alert({message: 'Lost connection to server. Please refresh the page.'}));
       })
       .on(PokeyApiEvents.Error, msg => {
         debug('error_received %s', msg);
