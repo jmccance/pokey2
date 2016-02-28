@@ -36,11 +36,9 @@ class PokeyApp extends React.Component {
     if (viewState instanceof View.Lobby) {
       view = <LobbyView />;
     } else if (viewState instanceof View.Room && state.user) {
-      // TODO Validate whether or not we're the owner
       const isOwner = state.room.ownerId === state.user.id;
       view = <RoomView isOwner={isOwner} room={state.room} />;
     } else {
-      // TODO Display a 404 page or redirect to Lobby.
       view = (<div className='container'><h1>404 :(</h1></div>);
     }
 
