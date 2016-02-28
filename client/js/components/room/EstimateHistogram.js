@@ -44,7 +44,7 @@ export default class extends React.Component {
   }
 
   _categories() {
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
   }
 
   _data() {
