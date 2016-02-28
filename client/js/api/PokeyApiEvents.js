@@ -9,7 +9,11 @@ const PokeyApiEvents = {
   RoomRevealed: 'ROOM_REVEALED',
   RoomCleared: 'ROOM_CLEARED',
   RoomClosed: 'ROOM_CLOSED',
-  Error: 'ERROR'
+  Error: 'ERROR',
+
+  // Meta-API events.
+  ConnectionOpened: 'CONNECTION_OPENED',
+  ConnectionClosed: 'CONNECTION_CLOSED'
 };
 
 export default PokeyApiEvents;

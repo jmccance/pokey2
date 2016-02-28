@@ -22,16 +22,22 @@ class PokeyApi extends EventEmitter {
     window.PokeyApi = this;
   }
 
-
   openConnection() {
     const url = _getUrl();
     debug('open_socket %s', url);
     this._messages = [];
     this.conn = new WebSocket(url);
+
     this.conn.onopen = () => {
+      debug('connection_opened');
       const messages = this._messages;
       this._messages = [];
       messages.forEach((msg) => this._sendMessage(msg));
+    };
+
+    this.conn.onclose = () => {
+      debug('connection_closed');
+      this.emit(PokeyApiEvents.ConnectionClosed);
     };
 
     this.conn.onmessage = (message) => {

@@ -168,6 +168,11 @@ class PokeyStore extends EventEmitter {
         debug('room_closed %s', roomId);
         this.emitChange();
       })
+      .on(PokeyApiEvents.ConnectionClosed, msg => {
+        debug('connection_closed');
+        AlertActionCreator.alertCreated(
+          new Alert({message: 'Lost connection to server. Please refresh the page.'}));
+      })
       .on(PokeyApiEvents.Error, msg => {
         debug('error_received %s', msg);
         AlertActionCreator.alertCreated(new Alert({message: msg}));
