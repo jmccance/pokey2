@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert, Fade } from 'react-bootstrap';
 
 import AlertActionCreator from '../alerts/AlertActionCreator';
 import AlertStore from '../alerts/AlertStore';

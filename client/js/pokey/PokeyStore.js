@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import { Map } from 'immutable';
 
 import AlertActionCreator from '../alerts/AlertActionCreator';
-import Alert from '../alerts/model/Alert';
+import Alerts from '../alerts/model/Alerts';
 import PokeyApi from '../api/PokeyApi';
 import PokeyApiEvents from '../api/PokeyApiEvents';
 import AppDispatcher from '../dispatcher/appDispatcher';
@@ -14,6 +14,10 @@ import User from './model/User';
 import Views, { View } from './model/Views';
 
 const debug = Debug('pokey:PokeyStore');
+
+const AlertIdentifiers = {
+  ConnectionClosed: 'CONNECTION_CLOSED'
+};
 
 const InternalEvents = {
   Change: 'CHANGE',
@@ -82,9 +86,10 @@ class PokeyStore extends EventEmitter {
       .on(PokeyApiEvents.ConnectionClosed, () => {
         debug('connection_closed');
         AlertActionCreator.alertCreated(
-          new Alert({
-            message: 'Connection lost. Attempting to reconnect...'
-          })
+          Alerts.danger(
+            'Connection lost. Attempting to reconnect...',
+            AlertIdentifiers.ConnectionClosed
+          )
         );
         _isReconnecting = true;
         PokeyApi.openConnection();
@@ -98,11 +103,13 @@ class PokeyStore extends EventEmitter {
         debug('connection_opened');
         if (_isReconnecting) {
           _isReconnecting = false;
+
           AlertActionCreator.alertCreated(
-            new Alert({
-              message: 'Connection re-established.'
-            })
+            Alerts.success('Connection re-established.')
           );
+
+          AlertActionCreator.allDismissed(AlertIdentifiers.ConnectionClosed);
+
           AppRouter.setRoute('/reconnected');
           AppRouter.setRoute(_view.route);
         }
@@ -189,7 +196,7 @@ class PokeyStore extends EventEmitter {
       })
       .on(PokeyApiEvents.Error, msg => {
         debug('error_received %s', msg);
-        AlertActionCreator.alertCreated(new Alert({message: msg}));
+        AlertActionCreator.alertCreated(Alert.danger(msg));
       });
   }
 

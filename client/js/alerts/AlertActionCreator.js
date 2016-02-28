@@ -19,6 +19,19 @@ const AlertActionCreator = {
       type: AlertActions.AlertDismissed,
       index
     });
+  },
+
+  allDismissed(identifier) {
+    if (identifier === undefined) {
+      debug('allDismissed')
+    } else {
+      debug('allDismissed %s', identifier);
+    }
+
+    AppDispatcher.dispatch({
+      type: AlertActions.AllDismissed,
+      identifier
+    });
   }
 };
 

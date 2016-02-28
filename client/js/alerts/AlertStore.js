@@ -31,6 +31,17 @@ class AlertStore extends EventEmitter {
           this._emitChange();
           break;
 
+        case AlertActions.AllDismissed:
+          if (action.identifier === undefined) {
+            debug('all_dismissed', action.identifier);
+            this._alerts = List();
+          } else {
+            debug('all_dismissed %s', action.identifier);
+            this._alerts = this._alerts.filter(a => a.identifier !== action.identifier);
+          }
+          this._emitChange();
+          break;
+
         default:
           debug('unhandled_event %o', action);
       }
