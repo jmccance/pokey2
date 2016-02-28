@@ -3,7 +3,7 @@ import { Record } from 'immutable';
 const Alert = Record({
   level: '',
   identifier: '',
-  message: '',
+  message: ''
 });
 
 const Alerts = {
@@ -24,6 +24,6 @@ const Alerts = {
     identifier: identifier,
     message: msg
   })
-}
+};
 
 export default Alerts;

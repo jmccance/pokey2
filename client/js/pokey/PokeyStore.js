@@ -196,7 +196,7 @@ class PokeyStore extends EventEmitter {
       })
       .on(PokeyApiEvents.Error, msg => {
         debug('error_received %s', msg);
-        AlertActionCreator.alertCreated(Alert.danger(msg));
+        AlertActionCreator.alertCreated(Alerts.danger(msg));
       });
   }
 

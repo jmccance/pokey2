@@ -23,7 +23,7 @@ const AlertActionCreator = {
 
   allDismissed(identifier) {
     if (identifier === undefined) {
-      debug('allDismissed')
+      debug('allDismissed');
     } else {
       debug('allDismissed %s', identifier);
     }
