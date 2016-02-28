@@ -1,6 +1,6 @@
 package pokey.connection.actor
 
-import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import akka.actor._
 import akka.pattern.pipe
 import play.api.mvc.WebSocket
 import pokey.connection.model.Events.ErrorEvent
@@ -58,6 +58,10 @@ class ConnectionHandler(roomService: RoomService,
 
             case None => client ! Events.ErrorEvent(s"No room found with id '$roomId'")
           }
+
+        case KillConnection =>
+          log.info("userId: {}, command: killConnection", connUserId)
+          self ! PoisonPill
 
         // TODO Make below methods handle invalid commands more correctly.
 

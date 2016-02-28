@@ -18,6 +18,11 @@ function _getUrl() {
 }
 
 class PokeyApi extends EventEmitter {
+  constructor() {
+    window.PokeyApi = this;
+  }
+
+
   openConnection() {
     const url = _getUrl();
     debug('open_socket %s', url);
@@ -120,6 +125,12 @@ class PokeyApi extends EventEmitter {
     this._sendMessage({
       command: 'revealRoom',
       roomId: roomId
+    });
+  }
+
+  killConnection() {
+    this._sendMessage({
+      command: 'killConnection'
     });
   }
 

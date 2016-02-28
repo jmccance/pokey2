@@ -22,6 +22,7 @@ object Command {
       orElse SubmitEstimateCommand.reader
       orElse RevealRoomCommand.reader
       orElse ClearRoomCommand.reader
+      orElse KillConnection.reader
       orElse InvalidCommand.reader,
     // $COVERAGE-OFF$
     // We never write this, so skipping implementation.
@@ -92,5 +93,16 @@ object Commands {
 
     val reader: Reads[Command] =
       validateType andKeep (JsPath \ "roomId").read[String].map(ClearRoomCommand(_))
+  }
+
+  /**
+   * Command to terminate the connection.
+   *
+   * Use case: Debugging client-side reconnection behavior.
+   */
+  case object KillConnection extends Command with CommandCompanion {
+    val jsonId = "killConnection"
+
+    val reader: Reads[Command] = validateType andKeep Reads.pure(KillConnection)
   }
 }
