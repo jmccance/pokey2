@@ -44,13 +44,19 @@ export default class extends React.Component {
   }
 
   _categories() {
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, '> 13'];
   }
 
   _data() {
     const tally = this.props.estimates
       .filter(e => e)
-      .countBy(e => e.value);
+      .countBy(e => {
+        if (e.value <= 13) {
+          return e.value;
+        } else {
+          return '> 13';
+        }
+      });
 
     const data = this._categories().map(c => tally.get(c.toString()) || 0);
     debug(data);
