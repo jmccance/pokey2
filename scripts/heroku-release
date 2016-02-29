@@ -25,5 +25,5 @@ echo "==> Done!"
 echo
 
 echo "==> Releasing to Heroku"
-sudo heroku docker:release
+heroku docker:release
 echo "==> Done!"
