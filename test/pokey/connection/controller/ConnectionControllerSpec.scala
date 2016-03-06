@@ -1,6 +1,7 @@
 package pokey.connection.controller
 
 import akka.actor.{ Actor, ActorRef, Props }
+import play.api.Application
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -18,13 +19,14 @@ class ConnectionControllerSpec extends PlayUnitSpec {
 
     "the client connects without a valid user id" should {
       "return an Unauthorized error" in withScaldiApp() {
+        import play.api.Play.current
         val controller = newController()
-        val result = controller.connect.f(FakeRequest()).map(_.left.get)
+        val result = controller.connect(FakeRequest()).map(_.left.get)
         status(result) mustBe UNAUTHORIZED
       }
     }
 
-    def newController() = {
+    def newController()(implicit app: Application) = {
       val mockService = mock[UserService]
       val propsFactory: ConnectionHandler.PropsFactory =
         (userProxy: UserProxy) =>

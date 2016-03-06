@@ -2,7 +2,7 @@ package pokey.connection.model
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.api.mvc.WebSocket.FrameFormatter
+import play.api.mvc.WebSocket.{ MessageFlowTransformer, FrameFormatter }
 import pokey.room.model.Estimate
 
 sealed trait Command
@@ -15,22 +15,16 @@ object InvalidCommand {
 object Command {
   import Commands._
 
-  implicit val formatter = Format[Command](
+  implicit val reader = (
     SetNameCommand.reader
-      orElse CreateRoomCommand.reader
-      orElse JoinRoomCommand.reader
-      orElse SubmitEstimateCommand.reader
-      orElse RevealRoomCommand.reader
-      orElse ClearRoomCommand.reader
-      orElse KillConnection.reader
-      orElse InvalidCommand.reader,
-    // $COVERAGE-OFF$
-    // We never write this, so skipping implementation.
-    Writes[Command](_ => ???)
-  // $COVERAGE-ON$
+    orElse CreateRoomCommand.reader
+    orElse JoinRoomCommand.reader
+    orElse SubmitEstimateCommand.reader
+    orElse RevealRoomCommand.reader
+    orElse ClearRoomCommand.reader
+    orElse KillConnection.reader
+    orElse InvalidCommand.reader
   )
-
-  implicit val frameFormatter: FrameFormatter[Command] = FrameFormatter.jsonFrame[Command]
 }
 
 trait CommandCompanion {

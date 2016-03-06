@@ -1,6 +1,6 @@
 package pokey.application.module
 
-import play.api.Configuration
+import _root_.play.api.{ Application, Configuration }
 import pokey.assets.controller.AssetController
 import pokey.connection.actor.ConnectionHandler
 import pokey.connection.controller.ConnectionController
@@ -15,7 +15,8 @@ class WebModule extends Module {
 
   binding to injected[ConnectionController](
     'userService -> inject[UserService],
-    'connectionHandlerProps -> inject[ConnectionHandler.PropsFactory]
+    'connectionHandlerProps -> inject[ConnectionHandler.PropsFactory],
+    'app -> inject[Application]
   )
 
   bind[ConnectionHandler.Settings] to {
