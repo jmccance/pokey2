@@ -137,9 +137,11 @@ object RoomProxyActor extends TopicProtocol {
 
   case class UserLeft(roomId: String, user: User) extends Event
 
-  case class EstimateUpdated(roomId: String,
-                             userId: String,
-                             estimate: Option[PublicEstimate]) extends Event
+  case class EstimateUpdated(
+    roomId: String,
+    userId: String,
+    estimate: Option[PublicEstimate]
+  ) extends Event
 
   case class Revealed(roomId: String, estimates: Map[String, Option[PublicEstimate]]) extends Event
 

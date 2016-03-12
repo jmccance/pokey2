@@ -137,6 +137,7 @@ class RoomSpec extends UnitSpec {
 
         (json \ "id").as[String] shouldBe "1234"
         (json \ "ownerId").as[String] shouldBe "abc"
+        (json \ "topic").as[String] shouldBe someTopic
         (json \ "isRevealed").as[Boolean] shouldBe false
       }
     }

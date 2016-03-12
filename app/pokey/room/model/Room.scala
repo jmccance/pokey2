@@ -5,12 +5,14 @@ import play.api.libs.json.{ Json, OWrites }
 import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
 
-case class Room(id: String,
-                ownerId: String,
-                topic: String,
-                isRevealed: Boolean = false,
-                private val usersById: Map[String, User] = Map.empty,
-                estimates: Map[String, Option[Estimate]] = Map.empty) {
+case class Room(
+    id: String,
+    ownerId: String,
+    topic: String,
+    isRevealed: Boolean = false,
+    private val usersById: Map[String, User] = Map.empty,
+    estimates: Map[String, Option[Estimate]] = Map.empty
+) {
   lazy val users = usersById.values
   lazy val roomInfo: RoomInfo = RoomInfo(id, ownerId, topic, isRevealed)
 
