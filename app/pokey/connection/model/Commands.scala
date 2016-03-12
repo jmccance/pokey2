@@ -65,8 +65,10 @@ object Commands {
       validateType andKeep (JsPath \ "roomId").read[String].map(JoinRoomCommand(_))
   }
 
-  case class SubmitEstimateCommand(roomId: String,
-                                   estimate: Estimate) extends Command
+  case class SubmitEstimateCommand(
+    roomId: String,
+    estimate: Estimate
+  ) extends Command
 
   object SubmitEstimateCommand extends CommandCompanion {
     val jsonId = "submitEstimate"

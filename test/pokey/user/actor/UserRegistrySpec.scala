@@ -74,7 +74,8 @@ class UserRegistrySpec extends AkkaUnitSpec {
 
       val registry = system.actorOf(
         UserRegistry.props(UserProxyActor.props(settings, _)),
-        s"user-registry-${java.util.UUID.randomUUID()}")
+        s"user-registry-${java.util.UUID.randomUUID()}"
+      )
 
       EventFilter.info(pattern = "^new_user.*", occurrences = 1) intercept {
         registry ! CreateProxyForId(existingUserId)

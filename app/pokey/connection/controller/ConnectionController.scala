@@ -11,8 +11,10 @@ import pokey.user.service.UserService
 
 import scala.concurrent.Future
 
-class ConnectionController(userService: UserService,
-                           connectionHandlerProps: ConnectionHandler.PropsFactory)
+class ConnectionController(
+  userService: UserService,
+  connectionHandlerProps: ConnectionHandler.PropsFactory
+)
     extends Controller {
 
   private[this] val log = Logger(this.getClass)

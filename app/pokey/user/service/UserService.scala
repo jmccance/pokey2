@@ -19,8 +19,10 @@ trait UserService {
   def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]]
 }
 
-class DefaultUserService(userRegistry: ActorRef,
-                         private[this] var ids: Stream[String]) extends UserService {
+class DefaultUserService(
+  userRegistry: ActorRef,
+    private[this] var ids: Stream[String]
+) extends UserService {
   private[this] implicit val timeout = Timeout(2.seconds)
 
   override def nextUserId(): String = ids.synchronized {

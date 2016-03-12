@@ -185,10 +185,12 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     }
   }
 
-  case class Context(rpa: ActorRef,
-                     ownerP: TestProbe,
-                     connP: TestProbe,
-                     users: Map[String, UserContext] = Map.empty)
+  case class Context(
+    rpa: ActorRef,
+    ownerP: TestProbe,
+    connP: TestProbe,
+    users: Map[String, UserContext] = Map.empty
+  )
 
   case class UserContext(connP: TestProbe, user: User, proxyP: TestProbe) {
     lazy val proxy = UserProxy(user.id, proxyP.ref)
@@ -201,7 +203,8 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     val conn = TestProbe()
     val rpa = system.actorOf(
       RoomProxyActor.props(room, UserProxy(owner.id, ownerProbe.ref)),
-      s"room-proxy-actor-${now.toMillis}")
+      s"room-proxy-actor-${now.toMillis}"
+    )
 
     val userMap: Map[String, UserContext] = users.zipWithIndex.map {
       case (user, index) =>

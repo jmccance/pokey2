@@ -122,9 +122,11 @@ object Events {
    * @param userId the id of the user who updated their estimate
    * @param estimate the "public-facing" estimate, or None if they do not have an estimate
    */
-  case class EstimateUpdatedEvent(roomId: String,
-                                  userId: String,
-                                  estimate: Option[PublicEstimate]) extends Event
+  case class EstimateUpdatedEvent(
+    roomId: String,
+    userId: String,
+    estimate: Option[PublicEstimate]
+  ) extends Event
 
   object EstimateUpdatedEvent {
     val writer = OWrites[EstimateUpdatedEvent] {
@@ -143,8 +145,10 @@ object Events {
    * @param roomId the id of the room that has been revealed
    * @param estimates the revealed estimates for this room
    */
-  case class RoomRevealedEvent(roomId: String,
-                               estimates: Map[String, Option[PublicEstimate]]) extends Event
+  case class RoomRevealedEvent(
+    roomId: String,
+    estimates: Map[String, Option[PublicEstimate]]
+  ) extends Event
 
   object RoomRevealedEvent {
     val writer = OWrites[RoomRevealedEvent] {

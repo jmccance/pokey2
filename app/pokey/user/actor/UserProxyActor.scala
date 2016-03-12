@@ -63,8 +63,10 @@ class UserProxyActor(settings: Settings, initialUser: User)
     case Terminated(conn) if connections.contains(conn) =>
       connections = connections - conn
       if (connections.isEmpty) {
-        log.info("user_cleanup_scheduled, user_id: {}, eviction_time: {}",
-          user.id, DateTime.now().plusMillis(settings.maxIdleDuration.toMillis.toInt))
+        log.info(
+          "user_cleanup_scheduled, user_id: {}, eviction_time: {}",
+          user.id, DateTime.now().plusMillis(settings.maxIdleDuration.toMillis.toInt)
+        )
         oCancellableEviction = Option {
           context.system.scheduler.scheduleOnce(settings.maxIdleDuration, self, EvictUser)
         }

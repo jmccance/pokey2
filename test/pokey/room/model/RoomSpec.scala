@@ -15,7 +15,8 @@ class RoomSpec extends UnitSpec {
       Some(Estimate(Some("3"), None)),
       Some(Estimate(None, Some("No idea"))),
       None,
-      None)
+      None
+    )
     val estimatesByUserId = users.map(_.id).zip(estimates).toMap
     val owner = users.head
     val notOwner = users.last
@@ -28,7 +29,8 @@ class RoomSpec extends UnitSpec {
         owner.id,
         someTopic,
         usersById = users.map(u => (u.id, u)).toMap,
-        estimates = estimatesByUserId)
+        estimates = estimatesByUserId
+      )
 
     val someEstimate = Estimate(Some("2"), Some("foo"))
 

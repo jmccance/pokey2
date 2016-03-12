@@ -11,10 +11,12 @@ import pokey.user.actor.{ UserProxy, UserProxyActor }
 
 import scala.concurrent.duration._
 
-class ConnectionHandler(roomService: RoomService,
-                        settings: ConnectionHandler.Settings,
-                        userProxy: UserProxy,
-                        client: ActorRef) extends Actor with ActorLogging {
+class ConnectionHandler(
+  roomService: RoomService,
+    settings: ConnectionHandler.Settings,
+    userProxy: UserProxy,
+    client: ActorRef
+) extends Actor with ActorLogging {
   import ConnectionHandler._
   import settings._
   import context.dispatcher
@@ -26,7 +28,8 @@ class ConnectionHandler(roomService: RoomService,
       heartbeatInterval,
       heartbeatInterval,
       client,
-      Events.HeartbeatEvent)
+      Events.HeartbeatEvent
+    )
 
   userProxy.ref ! UserProxyActor.NewConnection(self)
   client ! Events.ConnectionInfo(connUserId)
@@ -66,8 +69,10 @@ class ConnectionHandler(roomService: RoomService,
         // TODO Make below methods handle invalid commands more correctly.
 
         case SubmitEstimateCommand(roomId, estimate) =>
-          log.info("userId: {}, command: estimate, roomId: {}, estimate: {}",
-            connUserId, roomId, estimate)
+          log.info(
+            "userId: {}, command: estimate, roomId: {}, estimate: {}",
+            connUserId, roomId, estimate
+          )
 
           rooms.get(roomId) match {
             case Some(roomProxy) =>
@@ -157,8 +162,10 @@ class ConnectionHandler(roomService: RoomService,
 object ConnectionHandler {
   case class Settings(heartbeatInterval: FiniteDuration)
 
-  def props(roomService: RoomService,
-            config: Settings)(userProxy: UserProxy)(client: ActorRef) =
+  def props(
+    roomService: RoomService,
+    config: Settings
+  )(userProxy: UserProxy)(client: ActorRef) =
     Props(new ConnectionHandler(roomService, config, userProxy, client))
 
   type PropsFactory = ((UserProxy) => WebSocket.HandlerProps)

@@ -22,7 +22,8 @@ class WebModule extends Module {
     val config = inject[Configuration]
 
     ConnectionHandler.Settings(
-      config.getMilliseconds("pokey.connection.heartbeat-interval").get.millis)
+      config.getMilliseconds("pokey.connection.heartbeat-interval").get.millis
+    )
   }
 
   (bind[ConnectionHandler.PropsFactory]
