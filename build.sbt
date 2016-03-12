@@ -1,6 +1,8 @@
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+
 import scalariform.formatter.preferences._
 
-name := """pokey"""
+name := "pokey"
 
 version := "2.0-SNAPSHOT"
 
@@ -33,11 +35,6 @@ scalacOptions in (Compile, compile) ++= Seq(
   "-Ywarn-value-discard",
   "-Xfuture"
 )
-
-scalariformSettings
-
-ScalariformKeys.preferences := ScalariformKeys.preferences.value
-  .setPreference(AlignParameters, true)
 
 ////////////////////////
 // Play Configuration
