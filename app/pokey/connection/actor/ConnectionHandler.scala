@@ -5,21 +5,23 @@ import akka.pattern.pipe
 import play.api.mvc.WebSocket
 import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model._
-import pokey.room.actor.{ RoomProxy, RoomProxyActor }
+import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.service.RoomService
-import pokey.user.actor.{ UserProxy, UserProxyActor }
+import pokey.user.actor.{UserProxy, UserProxyActor}
 
 import scala.concurrent.duration._
 
 class ConnectionHandler(
   roomService: RoomService,
-    settings: ConnectionHandler.Settings,
-    userProxy: UserProxy,
-    client: ActorRef
-) extends Actor with ActorLogging {
+  settings: ConnectionHandler.Settings,
+  userProxy: UserProxy,
+  client: ActorRef
+) extends Actor
+    with ActorLogging
+    with CommandHandlers {
   import ConnectionHandler._
-  import settings._
   import context.dispatcher
+  import settings._
 
   private[this] val connUserId = userProxy.id
   private[this] var rooms: Map[String, ActorRef] = Map.empty
@@ -38,7 +40,7 @@ class ConnectionHandler(
     case req: Command =>
       import pokey.connection.model.Commands._
 
-      req match {
+      val commandHandlers: PartialFunction[Command, Unit] = {
         case SetNameCommand(name) =>
           log.info("userId: {}, command: setName, name: {}", connUserId, name)
           userProxy.ref ! UserProxyActor.SetName(name)
@@ -62,7 +64,7 @@ class ConnectionHandler(
             case None => client ! Events.ErrorEvent(s"No room found with id '$roomId'")
           }
 
-        case KillConnection =>
+        case KillConnectionCommand =>
           log.info("userId: {}, command: killConnection", connUserId)
           self ! PoisonPill
 
@@ -98,10 +100,14 @@ class ConnectionHandler(
             case None => client ! ErrorEvent(s"Room $roomId is not associated with this connection")
           }
 
+        // NOTE: The InvalidCommand case *must* come last.
         case InvalidCommand(json) =>
           log.error("userId: {}, command: invalidCommand: {}", connUserId, json.toString())
           client ! Events.ErrorEvent("Invalid command")
       }
+
+      (commandHandlers
+        orElse setTopicCommandHandler(client, connUserId, rooms))(req)
 
     case RoomJoined(roomProxy) =>
       rooms += roomProxy.id -> roomProxy.ref

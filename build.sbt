@@ -1,6 +1,4 @@
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
-import scalariform.formatter.preferences._
 
 name := "pokey"
 
@@ -16,10 +14,10 @@ libraryDependencies ++= Seq(
   "org.scaldi" %% "scaldi" % "0.5.6",
   "org.scaldi" %% "scaldi-akka" % "0.5.6",
   "org.scaldi" %% "scaldi-play" % "0.5.8",
-  "org.mockito" % "mockito-core" % "1.9.5" % "test",
-  "org.pegdown" % "pegdown" % "1.5.0" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
-  "org.scalatestplus" %% "play" % "1.4.0-M3" % "test"
+  "org.mockito" % "mockito-core" % "1.9.5" % Test,
+  "org.pegdown" % "pegdown" % "1.5.0" % Test,
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % Test,
+  "org.scalatestplus" %% "play" % "1.4.0-M3" % Test
 )
 
 scalacOptions in (Compile, compile) ++= Seq(

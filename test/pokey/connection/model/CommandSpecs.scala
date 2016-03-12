@@ -20,6 +20,21 @@ class CommandSpecs extends UnitSpec {
     }
   }
 
+  "A SetTopicCommand" should {
+    "deserialize from JSON correctly" in {
+      val json =
+        """
+          |{
+          |  "command": "setTopic",
+          |  "roomId": "8675309",
+          |  "topic": "Hot Topic"
+          |}
+        """.stripMargin
+
+      parseCommand(json).value shouldBe SetTopicCommand("8675309", "Hot Topic")
+    }
+  }
+
   "A CreateRoomCommand" should {
     "deserialize from JSON correctly" in {
       val json =

@@ -1,11 +1,11 @@
 package pokey.room.actor
 
 import akka.actor._
-import org.scalactic.{ Bad, Good }
-import pokey.room.model.{ Estimate, PublicEstimate, Room, RoomInfo }
-import pokey.user.actor.{ UserProxy, UserProxyActor }
+import org.scalactic.{Bad, Good}
+import pokey.room.model.{Estimate, PublicEstimate, Room, RoomInfo}
+import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
-import pokey.util.{ Subscribable, TopicProtocol }
+import pokey.util.{Subscribable, TopicProtocol}
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     extends Actor
@@ -98,10 +98,19 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         case Bad(error) => sender ! error
       }
 
+    case SetTopic(userId: String, topic: String) =>
+      room.topicSetBy(userId, topic) match {
+        case Good(updatedRoom) =>
+          room = updatedRoom
+          self ! Publish(RoomUpdated(room.roomInfo))
+
+        case Bad(error) => sender ! error
+      }
+
     case Terminated(ownerProxy.ref) =>
       log.info("room_closed: {}, owner_id: {}", room.id, room.ownerId)
+      // Publishing a Closed message will terminate the RoomProxyActor.
       self ! Publish(Closed(room.id))
-    // Publishing a Closed message will terminate the RoomProxyActor.
 
     case _: UserProxyActor.Subscribed | _: UserProxyActor.Unsubscribed =>
     /* Expected, but not actionable */
@@ -125,6 +134,8 @@ object RoomProxyActor extends TopicProtocol {
   case class RevealFor(userId: String) extends Command
 
   case class ClearFor(userId: String) extends Command
+
+  case class SetTopic(userId: String, topic: String) extends Command
 
   ///////////
   // Events

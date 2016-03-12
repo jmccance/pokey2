@@ -1,7 +1,7 @@
 package pokey.room.model
 
-import org.scalactic.{ Bad, Good, Or }
-import play.api.libs.json.{ Json, OWrites }
+import org.scalactic.{Bad, Good, Or}
+import play.api.libs.json.{Json, OWrites}
 import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
 
@@ -50,7 +50,7 @@ case class Room(
       val updatedEstimates = estimates + (userId -> Some(estimate))
       Good(this.copy(estimates = updatedEstimates))
     } else {
-      Bad(UnauthorizedErr("Only a member of a room may submit an estimate to it"))
+      Bad(UnauthorizedErr("Only a member of a room may submit an estimate to it."))
     }
 
   def clearedBy(userId: String): Room Or UnauthorizedErr =
@@ -58,7 +58,7 @@ case class Room(
       val clearedEstimates = estimates.mapValues(_ => None)
       Good(this.copy(estimates = clearedEstimates, isRevealed = false))
     } else {
-      Bad(UnauthorizedErr("Only the room owner may clear the room's estimates"))
+      Bad(UnauthorizedErr("Only the room owner may clear the room's estimates."))
     }
 
   def revealedBy(userId: String): Room Or UnauthorizedErr =
@@ -66,6 +66,13 @@ case class Room(
       Good(this.copy(isRevealed = true))
     } else {
       Bad(UnauthorizedErr("Only the room owner may reveal the room's estimates."))
+    }
+
+  def topicSetBy(userId: String, topic: String): Room Or UnauthorizedErr =
+    if (userId == ownerId) {
+      Good(this.copy(topic = topic))
+    } else {
+      Bad(UnauthorizedErr("Only the room owner may set the room topic."))
     }
 }
 

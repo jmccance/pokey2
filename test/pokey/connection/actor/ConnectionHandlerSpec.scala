@@ -6,16 +6,16 @@ import play.api.libs.json.JsString
 import pokey.connection.model.Commands._
 import pokey.connection.model.Events._
 import pokey.connection.model.InvalidCommand
-import pokey.room.actor.{ RoomProxy, RoomProxyActor }
-import pokey.room.model.{ Estimate, RoomInfo }
-import pokey.room.service.{ RoomService, StubRoomService }
+import pokey.room.actor.{RoomProxy, RoomProxyActor}
+import pokey.room.model.{Estimate, RoomInfo}
+import pokey.room.service.{RoomService, StubRoomService}
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{ UserProxy, UserProxyActor }
+import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
 import pokey.util.using
 
-import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConnectionHandlerSpec extends AkkaUnitSpec {
 
@@ -29,6 +29,16 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
     val roomId = "42"
     val someUser = User("616", "Esme")
     val someEstimate = Estimate(Some("999"), Some("No can do"))
+
+    "receives a KillConnection command" should {
+      "stop" in {
+        val handler = init()
+
+        watch(handler)
+        handler ! KillConnectionCommand
+        expectTerminated(handler)
+      }
+    }
 
     "receives a SetNameCommand" should {
       "send a SetName message to its UserProxy" in {
@@ -234,10 +244,15 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
     def init(
       roomService: RoomService = new TestRoomService,
       userRef: ActorRef = TestProbe().ref
-    ) =
-      using(system.actorOf(ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self))) { handler =>
-        expectMsgType[ConnectionInfo]
-      }
+    ) = {
+      using(
+        system.actorOf(
+          ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self)
+        )
+      ) { handler =>
+          expectMsgType[ConnectionInfo]
+        }
+    }
 
     def initWithProbe(
       roomService: RoomService = new TestRoomService,

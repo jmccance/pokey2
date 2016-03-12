@@ -4,9 +4,9 @@ import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import pokey.common.error.UnauthorizedErr
 import pokey.room.actor.RoomProxyActor._
-import pokey.room.model.{ Estimate, Room }
+import pokey.room.model.{Estimate, Room, RoomInfo}
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{ UserProxy, UserProxyActor }
+import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
 
 class RoomProxyActorSpec extends AkkaUnitSpec {
@@ -17,6 +17,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
 
   val roomId = "R-1"
   val someTopic = "Hot topic"
+  val someOtherTopic = "Cold topic"
   val room = Room("R-1", owner.id, someTopic)
 
   "A RoomProxy" when {
@@ -161,6 +162,32 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
           }
         }
 
+      }
+    }
+
+    "it receives a SetTopic message for a userId" which {
+      "is allowed to set the room topic" should {
+        "update the room topic and publish the change" in
+          withContextWithUsers(owner, someUser) { ctx =>
+            val ownerCtx = ctx.users(owner.id)
+            ownerCtx.connP.send(ctx.rpa, SetTopic(owner.id, someOtherTopic))
+
+            ctx.users(someUser.id).connP.expectMsgEventually(
+              RoomUpdated(RoomInfo(roomId, owner.id, someOtherTopic, isRevealed = false))
+            )
+          }
+      }
+
+      "is not allowed to set the room topic" should {
+        "forward the error back to the connection" in withContextWithUsers(someUser) { ctx =>
+          val someUserCtx = ctx.users(someUser.id)
+          someUserCtx.connP.send(ctx.rpa, SetTopic(someUser.id, someOtherTopic))
+
+          someUserCtx.connP.fishForMessage() {
+            case _: UnauthorizedErr => true
+            case _ => false
+          }
+        }
       }
     }
 

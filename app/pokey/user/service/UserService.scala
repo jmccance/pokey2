@@ -3,10 +3,10 @@ package pokey.user.service
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
-import pokey.user.actor.{ UserProxy, UserRegistry }
+import pokey.user.actor.{UserProxy, UserRegistry}
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait UserService {
   /**
@@ -20,7 +20,7 @@ trait UserService {
 }
 
 class DefaultUserService(
-  userRegistry: ActorRef,
+    userRegistry: ActorRef,
     private[this] var ids: Stream[String]
 ) extends UserService {
   private[this] implicit val timeout = Timeout(2.seconds)

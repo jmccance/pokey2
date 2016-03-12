@@ -1,12 +1,13 @@
 package pokey.connection.model
 
-import play.api.libs.json.{ JsObject, Json }
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json._
 import pokey.connection.model.Events._
-import pokey.room.model.{ RevealedEstimate, RoomInfo }
+import pokey.room.model.{RevealedEstimate, RoomInfo}
 import pokey.test.UnitSpec
 import pokey.user.model.User
 
-import util.{ Success, Try }
+import scala.util.{Success, Try}
 
 class EventSpecs extends UnitSpec {
 
@@ -17,7 +18,7 @@ class EventSpecs extends UnitSpec {
   "A ConnectionInfoEvent event" should {
     "serialize to JSON correctly" in {
       val event = ConnectionInfo(someUser.id)
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "connectionInfo",
         "userId" -> someUser.id
       )
@@ -27,7 +28,7 @@ class EventSpecs extends UnitSpec {
   "A UserUpdatedEvent event" should {
     "serialize to JSON correctly" in {
       val event = UserUpdatedEvent(someUser)
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "userUpdated",
         "user" -> someUser
       )
@@ -38,7 +39,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = RoomCreatedEvent(someRoom.id)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "roomCreated",
         "roomId" -> someRoom.id
       )
@@ -49,7 +50,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = RoomUpdatedEvent(someRoom)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "roomUpdated",
         "room" -> someRoom
       )
@@ -60,7 +61,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = UserJoinedEvent(someRoom.id, someUser)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "userJoined",
         "roomId" -> someRoom.id,
         "user" -> someUser
@@ -72,7 +73,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = UserLeftEvent(someRoom.id, someUser)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "userLeft",
         "roomId" -> someRoom.id,
         "user" -> someUser
@@ -84,7 +85,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = EstimateUpdatedEvent(someRoom.id, someUser.id, someEstimate)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "estimateUpdated",
         "roomId" -> someRoom.id,
         "userId" -> someUser.id,
@@ -98,7 +99,7 @@ class EventSpecs extends UnitSpec {
       val estimates = Map(someUser.id -> someEstimate)
       val event = RoomRevealedEvent(someRoom.id, estimates)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "roomRevealed",
         "roomId" -> someRoom.id,
         "estimates" -> estimates
@@ -110,7 +111,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = RoomClearedEvent(someRoom.id)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "roomCleared",
         "roomId" -> someRoom.id
       )
@@ -121,7 +122,7 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = RoomClosedEvent(someRoom.id)
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "roomClosed",
         "roomId" -> someRoom.id
       )
@@ -141,12 +142,22 @@ class EventSpecs extends UnitSpec {
     "serialize to JSON correctly" in {
       val event = ErrorEvent("Oops")
 
-      writeEvent(event) shouldBe Json.obj(
+      writeEvent(event) shouldBe obj(
         "event" -> "error",
         "message" -> event.message
       )
     }
   }
 
-  def writeEvent(event: Event): JsObject = Json.toJson(event).as[JsObject]
+  "A HeartbeatEvent event" should {
+    "serialize to JSON correctly" in {
+      val event = HeartbeatEvent
+
+      writeEvent(event) shouldBe obj(
+        "event" -> "heartbeat"
+      )
+    }
+  }
+
+  def writeEvent(event: Event): JsObject = toJson(event).as[JsObject]
 }

@@ -22,7 +22,9 @@ object Command {
       orElse SubmitEstimateCommand.reader
       orElse RevealRoomCommand.reader
       orElse ClearRoomCommand.reader
-      orElse KillConnection.reader
+      orElse KillConnectionCommand.reader
+      orElse SetTopicCommand.reader
+      // NOTE: The InvalidCommand.reader *must* come last.
       orElse InvalidCommand.reader,
     // $COVERAGE-OFF$
     // We never write this, so skipping implementation.
@@ -102,9 +104,20 @@ object Commands {
    *
    * Use case: Debugging client-side reconnection behavior.
    */
-  case object KillConnection extends Command with CommandCompanion {
+  case object KillConnectionCommand extends Command with CommandCompanion {
     val jsonId = "killConnection"
 
-    val reader: Reads[Command] = validateType andKeep Reads.pure(KillConnection)
+    val reader: Reads[Command] = validateType andKeep Reads.pure(KillConnectionCommand)
+  }
+
+  case class SetTopicCommand(roomId: String, topic: String) extends Command
+
+  object SetTopicCommand extends CommandCompanion {
+    val jsonId = "setTopic"
+
+    val reader: Reads[Command] =
+      validateType andKeep
+        ((JsPath \ "roomId").read[String]
+          and (JsPath \ "topic").read[String])(SetTopicCommand.apply _)
   }
 }
