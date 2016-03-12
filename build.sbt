@@ -1,5 +1,3 @@
-import scoverage.ScoverageSbtPlugin._
-
 import scalariform.formatter.preferences._
 
 name := """pokey"""
@@ -53,11 +51,11 @@ javaOptions in Test += "-Dconfig.resource=test.conf"
 
 testOptions in Test += Tests.Argument("-h", "target/test-reports-html")
 
-ScoverageKeys.coverageMinimum := 90
+coverageMinimum := 90
 
-ScoverageKeys.coverageFailOnMinimum := true
+coverageFailOnMinimum := true
 
-ScoverageKeys.coverageExcludedPackages := Seq(
+coverageExcludedPackages := Seq(
   "<empty>",
   ".*\\.controller\\.javascript",
   ".*\\.controller\\.ref",
