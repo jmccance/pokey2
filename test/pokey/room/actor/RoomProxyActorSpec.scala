@@ -14,8 +14,10 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
   val someUser = User("U-2", "Magrat")
   val someEstimate = Estimate(Some("2"), None)
   val anotherUser = User("U-3", "Nanny")
+
   val roomId = "R-1"
-  val room = Room("R-1", owner.id)
+  val someTopic = "Hot topic"
+  val room = Room("R-1", owner.id, someTopic)
 
   "A RoomProxy" when {
     "it receives a JoinRoom message from a connection" should {

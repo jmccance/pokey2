@@ -6,11 +6,13 @@ import pokey.user.model.User
 class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor with ActorLogging {
   import UserRegistry._
 
+  private[this] val DefaultName = "Guest"
+
   def withUsers(users: Map[String, UserProxy]): Receive = {
     case CreateProxyForId(id) if users.contains(id) => sender ! users(id)
 
     case CreateProxyForId(id) if !users.contains(id) =>
-      val user = User(id, "Guest")
+      val user = User(id, DefaultName)
       val userProxy =
         UserProxy(user.id, context.actorOf(userProxyProps(user), s"user-proxy-$id"))
       context.watch(userProxy.ref)

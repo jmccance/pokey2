@@ -22,6 +22,7 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
   // In these tests, the role of the WebSocket client ("out") will be played by "self".
 
   val settings = ConnectionHandler.Settings(1.hour)
+  val someTopic = "Hours to brew potion"
 
   "A ConnectionHandler" which {
     val userId = "1"
@@ -168,7 +169,7 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
     "receives a RoomUpdated message" should {
       "send a RoomUpdated event to the client" in {
         val handler = init()
-        val roomInfo = RoomInfo(roomId, "Bad Axe", isRevealed = false)
+        val roomInfo = RoomInfo(roomId, "Bad Axe", someTopic, isRevealed = false)
 
         handler ! RoomProxyActor.RoomUpdated(roomInfo)
         expectMsg(RoomUpdatedEvent(roomInfo))

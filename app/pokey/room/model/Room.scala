@@ -7,11 +7,12 @@ import pokey.user.model.User
 
 case class Room(id: String,
                 ownerId: String,
+                topic: String,
                 isRevealed: Boolean = false,
                 private val usersById: Map[String, User] = Map.empty,
                 estimates: Map[String, Option[Estimate]] = Map.empty) {
   lazy val users = usersById.values
-  lazy val roomInfo: RoomInfo = RoomInfo(id, ownerId, isRevealed)
+  lazy val roomInfo: RoomInfo = RoomInfo(id, ownerId, topic, isRevealed)
 
   lazy val publicEstimates: Map[String, Option[PublicEstimate]] =
     if (isRevealed) estimates.mapValues(_.map(_.asRevealed))
@@ -66,14 +67,15 @@ case class Room(id: String,
     }
 }
 
-case class RoomInfo(id: String, ownerId: String, isRevealed: Boolean)
+case class RoomInfo(id: String, ownerId: String, topic: String, isRevealed: Boolean)
 
 object RoomInfo {
   implicit val writer: OWrites[RoomInfo] = OWrites[RoomInfo] {
-    case RoomInfo(id, ownerId, isRevealed) =>
+    case RoomInfo(id, ownerId, topic, isRevealed) =>
       Json.obj(
         "id" -> id,
         "ownerId" -> ownerId,
+        "topic" -> topic,
         "isRevealed" -> isRevealed
       )
   }
