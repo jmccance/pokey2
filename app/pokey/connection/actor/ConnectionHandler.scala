@@ -1,9 +1,8 @@
 package pokey.connection.actor
 
 import akka.actor._
-import akka.pattern.pipe
 import play.api.mvc.WebSocket
-import pokey.connection.model.Events.ErrorEvent
+import pokey.connection.actor.CommandHandlers._
 import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.service.RoomService
@@ -18,7 +17,7 @@ class ConnectionHandler(
   client: ActorRef
 ) extends Actor
     with ActorLogging
-    with CommandHandlers {
+    with CommandLoggers {
   import ConnectionHandler._
   import context.dispatcher
   import settings._
@@ -38,76 +37,8 @@ class ConnectionHandler(
 
   def receive: Receive = {
     case req: Command =>
-      import pokey.connection.model.Commands._
-
-      val commandHandlers: PartialFunction[Command, Unit] = {
-        case SetNameCommand(name) =>
-          log.info("userId: {}, command: setName, name: {}", connUserId, name)
-          userProxy.ref ! UserProxyActor.SetName(name)
-
-        case CreateRoomCommand =>
-          log.info("userId: {}, command: createRoom", connUserId)
-          roomService
-            .createRoom(connUserId)
-            .map(proxy => Events.RoomCreatedEvent(proxy.id))
-            .recover(ErrorEvent.mapThrowable)
-            .pipeTo(client)
-          ()
-
-        case JoinRoomCommand(roomId) =>
-          log.info("userId: {}, command: joinRoom, roomId: {}", connUserId, roomId)
-          roomService.getRoom(roomId).foreach {
-            case Some(roomProxy) =>
-              roomProxy.ref ! RoomProxyActor.JoinRoom(userProxy)
-              self ! RoomJoined(roomProxy)
-
-            case None => client ! Events.ErrorEvent(s"No room found with id '$roomId'")
-          }
-
-        case KillConnectionCommand =>
-          log.info("userId: {}, command: killConnection", connUserId)
-          self ! PoisonPill
-
-        // TODO Make below methods handle invalid commands more correctly.
-
-        case SubmitEstimateCommand(roomId, estimate) =>
-          log.info(
-            "userId: {}, command: estimate, roomId: {}, estimate: {}",
-            connUserId, roomId, estimate
-          )
-
-          rooms.get(roomId) match {
-            case Some(roomProxy) =>
-              roomProxy ! RoomProxyActor.SubmitEstimate(connUserId, estimate)
-
-            case None =>
-              client ! ErrorEvent(s"Room $roomId is not associated with this connection")
-          }
-
-        case RevealRoomCommand(roomId) =>
-          log.info("userId: {}, command: reveal, roomId: {}", connUserId, roomId)
-          rooms.get(roomId) match {
-            case Some(roomProxy) => roomProxy ! RoomProxyActor.RevealFor(connUserId)
-
-            case None => client ! ErrorEvent(s"Room $roomId is not associated with this connection")
-          }
-
-        case ClearRoomCommand(roomId) =>
-          log.info("userId: {}, command: clear, roomId: {}", connUserId, roomId)
-          rooms.get(roomId) match {
-            case Some(roomProxy) => roomProxy ! RoomProxyActor.ClearFor(connUserId)
-
-            case None => client ! ErrorEvent(s"Room $roomId is not associated with this connection")
-          }
-
-        // NOTE: The InvalidCommand case *must* come last.
-        case InvalidCommand(json) =>
-          log.error("userId: {}, command: invalidCommand: {}", connUserId, json.toString())
-          client ! Events.ErrorEvent("Invalid command")
-      }
-
-      (commandHandlers
-        orElse setTopicCommandHandler(client, connUserId, rooms))(req)
+      (logCommands(connUserId)
+        andThen handleCommandWith(client, connUserId, rooms, roomService, userProxy))(req)
 
     case RoomJoined(roomProxy) =>
       rooms += roomProxy.id -> roomProxy.ref
@@ -179,5 +110,5 @@ object ConnectionHandler {
   def propsFactory(roomService: RoomService, config: Settings): PropsFactory =
     props(roomService, config)
 
-  private case class RoomJoined(roomProxy: RoomProxy)
+  private[actor] case class RoomJoined(roomProxy: RoomProxy)
 }

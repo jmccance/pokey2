@@ -6,11 +6,6 @@ import play.api.mvc.WebSocket.FrameFormatter
 import pokey.room.model.Estimate
 
 sealed trait Command
-sealed case class InvalidCommand(json: JsValue) extends Command
-
-object InvalidCommand {
-  implicit val reader: Reads[Command] = Reads.of[JsValue].map(InvalidCommand(_))
-}
 
 object Command {
   import Commands._
@@ -119,5 +114,11 @@ object Commands {
       validateType andKeep
         ((JsPath \ "roomId").read[String]
           and (JsPath \ "topic").read[String])(SetTopicCommand.apply _)
+  }
+
+  case class InvalidCommand(json: JsValue) extends Command
+
+  object InvalidCommand {
+    implicit val reader: Reads[Command] = Reads.of[JsValue].map(InvalidCommand(_))
   }
 }

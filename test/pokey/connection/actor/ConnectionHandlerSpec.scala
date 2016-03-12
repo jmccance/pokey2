@@ -5,7 +5,6 @@ import akka.testkit.TestProbe
 import play.api.libs.json.JsString
 import pokey.connection.model.Commands._
 import pokey.connection.model.Events._
-import pokey.connection.model.InvalidCommand
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.model.{Estimate, RoomInfo}
 import pokey.room.service.{RoomService, StubRoomService}
