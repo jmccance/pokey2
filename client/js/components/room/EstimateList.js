@@ -6,9 +6,9 @@ import EstimateListItem from './EstimateListItem';
 export default class extends React.Component {
   render() {
     const {
-      users: users,
-      estimates: estimates,
-      isRevealed: isRevealed
+      users,
+      estimates,
+      isRevealed
     } = this.props;
 
     const estimateListItems =

@@ -4,9 +4,9 @@ import {Glyphicon} from 'react-bootstrap';
 export default class extends React.Component {
   render() {
     const {
-      name: name,
-      estimate: estimate,
-      isRevealed: isRevealed
+      name,
+      estimate,
+      isRevealed
     } = this.props;
 
     let commentComp = '';

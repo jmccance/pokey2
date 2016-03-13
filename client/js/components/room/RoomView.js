@@ -1,9 +1,12 @@
 import React from 'react';
+import {Glyphicon, PageHeader} from 'react-bootstrap';
 
 import EstimateForm from './EstimateForm';
 import EstimateHistogram from './EstimateHistogram';
 import EstimateList from './EstimateList';
 import RoomOwnerControls from './RoomOwnerControls';
+import RoomTopicView from './RoomTopicView';
+import RoomTopicOwnerView from './RoomTopicOwnerView';
 
 const OWNER_CONTROLS_WIDTH = 2;
 
@@ -25,10 +28,18 @@ function roomOwnerControls(roomId) {
 
 export default class extends React.Component {
   render() {
-    const {isOwner: isOwner, room: room} = this.props;
+    const {isOwner, room} = this.props;
+
+    let topicView;
+    if (isOwner) {
+      topicView = <RoomTopicOwnerView topic={room.topic} roomId={room.id}/>;
+    } else {
+      topicView = <RoomTopicView topic={room.topic}/>;
+    }
 
     return (
       <div className='container'>
+        {topicView}
         <div className='row'>
           <div className={formWidth(isOwner)}>
             <EstimateForm roomId={room.id}/>

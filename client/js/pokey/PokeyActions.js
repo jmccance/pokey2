@@ -5,6 +5,7 @@ const PokeyActions = {
   RoomCleared: 'ROOM_CLEARED',
   RoomCreated: 'ROOM_CREATED',
   RoomRevealed: 'ROOM_REVEALED',
+  TopicSet: 'TOPIC_SET',
   ViewChanged: 'VIEW_CHANGED'
 };
 

@@ -5,6 +5,15 @@ import PokeyActions from './PokeyActions';
 const debug = Debug('pokey:PokeyActionCreator');
 
 const PokeyActionCreator = {
+  estimateSubmitted(roomId, estimate) {
+    debug('estimateSubmitted %s, %o', roomId, estimate);
+    AppDispatcher.dispatch({
+      type: PokeyActions.EstimateSubmitted,
+      roomId,
+      estimate
+    });
+  },
+
   nameSet(name) {
     debug('nameSet %s', name);
     AppDispatcher.dispatch({
@@ -36,12 +45,12 @@ const PokeyActionCreator = {
     });
   },
 
-  estimateSubmitted(roomId, estimate) {
-    debug('submitEstimate %s, %o', roomId, estimate);
+  topicSet(roomId, topic) {
+    debug('topicSet %s, %s', roomId, topic);
     AppDispatcher.dispatch({
-      type: PokeyActions.EstimateSubmitted,
+      type: PokeyActions.TopicSet,
       roomId,
-      estimate
+      topic
     });
   },
 

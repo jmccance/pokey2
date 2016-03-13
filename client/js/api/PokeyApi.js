@@ -135,6 +135,14 @@ class PokeyApi extends EventEmitter {
     });
   }
 
+  setTopic(roomId, topic) {
+    this._sendMessage({
+      command: 'setTopic',
+      roomId,
+      topic
+    });
+  }
+
   killConnection() {
     this._sendMessage({
       command: 'killConnection'

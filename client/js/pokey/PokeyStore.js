@@ -63,6 +63,11 @@ class PokeyStore extends EventEmitter {
           PokeyApi.revealRoom(action.roomId);
           break;
 
+        case PokeyActions.TopicSet:
+          debug('topic_set %s, %s', action.roomId, action.topic);
+          PokeyApi.setTopic(action.roomId, action.topic);
+          break;
+
         case PokeyActions.ViewChanged:
           debug('view_changed %o', action.view);
           _view = action.view;
@@ -133,11 +138,17 @@ class PokeyStore extends EventEmitter {
         _view = Views.room(roomId);
         this.emitChange();
       })
-      .on(PokeyApiEvents.RoomUpdated, (room) => {
-        if (room.id === _currentRoom.id) {
-          debug('room_updated %o', room);
-          _currentRoom = new Room(room);
+      .on(PokeyApiEvents.RoomUpdated, (roomInfo) => {
+        if (roomInfo.id === _currentRoom.id) {
+          debug('room_updated %o', roomInfo);
+          _currentRoom =
+            _currentRoom
+              .set('ownerId', roomInfo.ownerId)
+              .set('topic', roomInfo.topic)
+              .set('isRevealed', roomInfo.isRevealed);
+
           _view = Views.room(_currentRoom.id);
+
           this.emitChange();
         }
       })
