@@ -14,7 +14,7 @@ class RoomRegistry(
   import RoomRegistry._
   import context.dispatcher
 
-  private[this] val DefaultTopic = "Default Topic"
+  private[this] val DefaultTopic = ""
 
   def receive = withRooms(Map.empty)
 
