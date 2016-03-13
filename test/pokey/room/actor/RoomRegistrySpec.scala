@@ -1,17 +1,17 @@
 package pokey.room.actor
 
-import akka.actor.{ ActorRef, Props }
+import akka.actor.{ActorRef, Props}
 import akka.pattern.ask
 import akka.testkit.EventFilter
 import akka.util.Timeout
-import pokey.room.actor.RoomRegistry.{ CreateRoomError, CreateRoomFor, GetRoomProxy }
+import pokey.room.actor.RoomRegistry.{CreateRoomError, CreateRoomFor, GetRoomProxy}
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxy
-import pokey.user.service.{ StubUserService, UserService }
+import pokey.user.service.{StubUserService, UserService}
 import pokey.util.using
 
 import concurrent.duration._
-import concurrent.{ ExecutionContext, Future }
+import concurrent.{ExecutionContext, Future}
 
 class RoomRegistrySpec extends AkkaUnitSpec {
 

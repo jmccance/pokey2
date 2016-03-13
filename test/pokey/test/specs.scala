@@ -1,11 +1,11 @@
 package pokey.test
 
 import akka.actor.ActorSystem
-import akka.testkit.{ ImplicitSender, TestKit, TestProbe }
+import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import org.scalatest._
 import concurrent.ScalaFutures
 import mock.MockitoSugar
-import org.scalatestplus.play.{ OneAppPerSuite, PlaySpec }
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Results
 
 trait BaseSpec

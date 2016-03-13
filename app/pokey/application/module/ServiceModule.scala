@@ -1,11 +1,11 @@
 package pokey.application.module
 
-import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.{ActorRef, ActorSystem}
 import play.api.Configuration
 import pokey.room.actor.RoomRegistry
-import pokey.room.service.{ DefaultRoomService, RoomService }
-import pokey.user.actor.{ UserProxyActor, UserRegistry }
-import pokey.user.service.{ DefaultUserService, UserService }
+import pokey.room.service.{DefaultRoomService, RoomService}
+import pokey.user.actor.{UserProxyActor, UserRegistry}
+import pokey.user.service.{DefaultUserService, UserService}
 import pokey.util.uidStream
 import scaldi.Module
 

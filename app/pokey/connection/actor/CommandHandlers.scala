@@ -1,14 +1,14 @@
 package pokey.connection.actor
 
-import akka.actor.{ ActorRef, PoisonPill }
+import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.pipe
 import pokey.connection.actor.ConnectionHandler.RoomJoined
 import pokey.connection.model.Commands._
 import pokey.connection.model.Events.ErrorEvent
-import pokey.connection.model.{ Command, Events }
+import pokey.connection.model.{Command, Events}
 import pokey.room.actor.RoomProxyActor
 import pokey.room.service.RoomService
-import pokey.user.actor.{ UserProxy, UserProxyActor }
+import pokey.user.actor.{UserProxy, UserProxyActor}
 
 import scala.concurrent.ExecutionContext
 

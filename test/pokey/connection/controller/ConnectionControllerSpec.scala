@@ -1,6 +1,6 @@
 package pokey.connection.controller
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._

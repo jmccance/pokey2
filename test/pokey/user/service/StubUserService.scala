@@ -2,7 +2,7 @@ package pokey.user.service
 
 import pokey.user.actor.UserProxy
 
-import concurrent.{ ExecutionContext, Future }
+import concurrent.{ExecutionContext, Future}
 
 class StubUserService extends UserService {
   private[this] var ids = Stream.from(0)

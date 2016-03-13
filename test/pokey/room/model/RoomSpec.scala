@@ -1,6 +1,6 @@
 package pokey.room.model
 
-import play.api.libs.json.{ JsObject, Json }
+import play.api.libs.json.{JsObject, Json}
 import pokey.common.error.UnauthorizedErr
 import pokey.test.UnitSpec
 import pokey.user.model.User

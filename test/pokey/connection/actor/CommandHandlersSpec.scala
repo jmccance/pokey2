@@ -1,19 +1,103 @@
 package pokey.connection.actor
 
+import akka.actor.ActorRef
 import akka.testkit.TestProbe
+import play.api.libs.json.JsString
 import pokey.connection.actor.CommandHandlers._
-import pokey.connection.model.Commands.SetTopicCommand
-import pokey.connection.model.Events.ErrorEvent
-import pokey.room.actor.RoomProxyActor
+import pokey.connection.model.Commands._
+import pokey.connection.model.Events.{RoomCreatedEvent, ErrorEvent}
+import pokey.room.actor.{RoomProxy, RoomProxyActor}
+import pokey.room.model.Estimate
+import pokey.room.service.StubRoomService
 import pokey.test.AkkaUnitSpec
+import pokey.user.actor.{UserProxyActor, UserProxy}
+
+import scala.concurrent.{Future, ExecutionContext}
 
 class CommandHandlersSpec extends AkkaUnitSpec {
   "CommandHandlers" when {
+    "handling a ClearRoomCommand" when {
+      "the room is known" should {
+        "send a ClearRoom message to the RoomProxy" in new Scenario {
+          handler(ClearRoomCommand(ownedRoomId))
+          ownedRoomP.expectMsg(RoomProxyActor.ClearFor(connUserId))
+        }
+      }
+
+      "the room is not known" should {
+        "send an ErrorEvent to the client" in new Scenario {
+          handler(ClearRoomCommand(unknownRoomId))
+          clientP.expectMsgType[ErrorEvent]
+        }
+      }
+    }
+
+    "handling a CreateRoomCommand" should {
+      "create a room for the UserProxy" in new Scenario {
+        handler(CreateRoomCommand)
+        clientP.expectMsg(RoomCreatedEvent(newRoomId))
+      }
+    }
+
+    "handling an InvalidCommand" should {
+      "send an ErrorEvent to the client" in new Scenario {
+        handler(InvalidCommand(JsString("lolwut")))
+        clientP.expectMsgType[ErrorEvent]
+      }
+    }
+
+    "handling a JoinRoomCommand" when {
+      "the room exists" should {
+        "send a JoinRoom message to the RoomProxy" in new Scenario {
+          handler(JoinRoomCommand(unjoinedRoomId))
+          unjoinedRoomProxyP.expectMsg(RoomProxyActor.JoinRoom(userProxy))
+        }
+      }
+
+      "the room does not exist" should {
+        "send an ErrorEvent to the client" in new Scenario {
+          handler(JoinRoomCommand(unknownRoomId))
+          clientP.expectMsgType[ErrorEvent]
+        }
+      }
+    }
+
+    "handling a KillConnectionCommand" should {
+      "send a PoisonPill to the implicit sender" in new Scenario {
+        clientP.watch(self)
+
+        handler(KillConnectionCommand)
+        clientP.expectTerminated(self)
+      }
+    }
+
+    "handling a SetNameCommand" should {
+      "send a SetName message to the UserProxy" in new Scenario {
+        handler(SetNameCommand(newName))
+        userProxyP.expectMsg(UserProxyActor.SetName(newName))
+      }
+    }
+
+    "handling a RevealRoomCommand" when {
+      "the room is known" should {
+        "send a RevealRoom message to the RoomProxy" in new Scenario {
+          handler(RevealRoomCommand(ownedRoomId))
+          ownedRoomP.expectMsg(RoomProxyActor.RevealFor(connUserId))
+        }
+      }
+
+      "the room is not known" should {
+        "send an ErrorEvent to the client" in new Scenario {
+          handler(RevealRoomCommand(unknownRoomId))
+          clientP.expectMsgType[ErrorEvent]
+        }
+      }
+    }
+
     "handling a SetTopicCommand" when {
       "the room is known" should {
         "send a SetTopic message to the RoomProxy" in new Scenario {
-          val handler = handleSetTopicCommand(clientP.ref, connUserId, rooms)
-          val command = SetTopicCommand(someOwnedRoomId, someTopic)
+          val command = SetTopicCommand(ownedRoomId, someTopic)
 
           handler(command)
           ownedRoomP.expectMsg(RoomProxyActor.SetTopic(connUserId, command.topic))
@@ -21,10 +105,24 @@ class CommandHandlersSpec extends AkkaUnitSpec {
       }
 
       "the room does not exist" should {
-        "reply with an ErrorEvent" in new Scenario {
-          val handler = handleSetTopicCommand(clientP.ref, connUserId, rooms)
-
+        "send an ErrorEvent to the client" in new Scenario {
           handler(SetTopicCommand(unknownRoomId, someTopic))
+          clientP.expectMsgType[ErrorEvent]
+        }
+      }
+    }
+
+    "handling a SubmitEstimateCommand" when {
+      "the room exists" should {
+        "send a SubmitEstimate message to the RoomProxy" in new Scenario {
+          handler(SubmitEstimateCommand(ownedRoomId, someEstimate))
+          ownedRoomP.expectMsg(RoomProxyActor.SubmitEstimate(connUserId, someEstimate))
+        }
+      }
+
+      "the room does not exist" should {
+        "send an ErrorEvent to the client" in new Scenario {
+          handler(SubmitEstimateCommand(unknownRoomId, someEstimate))
           clientP.expectMsgType[ErrorEvent]
         }
       }
@@ -32,16 +130,42 @@ class CommandHandlersSpec extends AkkaUnitSpec {
   }
 
   class Scenario {
+    implicit val ec = system.dispatcher
+
     val clientP = TestProbe()
     val ownedRoomP = TestProbe()
+    val userProxyP = TestProbe()
 
     val connUserId = "conn-user-id-0000"
+    val userProxy = UserProxy(connUserId, userProxyP.ref)
 
+    val newName = "Magrat"
+
+    val newRoomId = "new-room-id-0000"
     val unknownRoomId = "unknown-room-id-0000"
-    val someOwnedRoomId = "known-room-id-0000"
+    val ownedRoomId = "known-room-id-0000"
+    val unjoinedRoomId = "known-room-id-0000"
 
-    val rooms = Map(someOwnedRoomId -> ownedRoomP.ref)
+    val unjoinedRoomProxyP = TestProbe()
 
+    val roomService = new TestRoomService(unjoinedRoomId -> unjoinedRoomProxyP.ref)
+
+    val rooms = Map(ownedRoomId -> ownedRoomP.ref)
+
+    val someEstimate = Estimate(Option("1"), Option("asdf"))
     val someTopic = "hot topic"
+
+    val handler = handleCommandWith(clientP.ref, connUserId, rooms, roomService, userProxy)
+
+    class TestRoomService(_rooms: (String, ActorRef)*) extends StubRoomService {
+      private[this] val rooms = Map(_rooms: _*)
+
+      // For the purposes of the current specs, this does not actually need to work.
+      override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] =
+        Future.successful(RoomProxy(newRoomId, TestProbe().ref))
+
+      override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
+        Future.successful(rooms.get(id).map(ref => RoomProxy(id, ref)))
+    }
   }
 }

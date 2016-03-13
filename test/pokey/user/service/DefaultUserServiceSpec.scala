@@ -1,7 +1,7 @@
 package pokey.user.service
 
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{ UserProxy, UserRegistry }
+import pokey.user.actor.{UserProxy, UserRegistry}
 
 class DefaultUserServiceSpec extends AkkaUnitSpec {
   // In this class, "self" will be playing the role of the UserRegistry.

@@ -12,7 +12,7 @@ import pokey.user.service.UserService
 import scaldi.Injectable._
 import scaldi.Module
 
-import concurrent.{ ExecutionContext, Future }
+import concurrent.{ExecutionContext, Future}
 
 class ModuleSpecs extends AkkaUnitSpec {
 

@@ -4,7 +4,7 @@ import akka.pattern.ask
 import akka.testkit.EventFilter
 import akka.util.Timeout
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.UserRegistry.{ CreateProxyForId, GetUserProxy }
+import pokey.user.actor.UserRegistry.{CreateProxyForId, GetUserProxy}
 
 import concurrent.duration._
 

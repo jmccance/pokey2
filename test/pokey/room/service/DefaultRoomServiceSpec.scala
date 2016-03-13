@@ -1,6 +1,6 @@
 package pokey.room.service
 
-import pokey.room.actor.{ RoomProxy, RoomRegistry }
+import pokey.room.actor.{RoomProxy, RoomRegistry}
 import pokey.test.AkkaUnitSpec
 
 class DefaultRoomServiceSpec extends AkkaUnitSpec {
