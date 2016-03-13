@@ -32,15 +32,13 @@ export default class extends React.Component {
       }
     };
 
-    this.handleSubmit = (event) => {
+    this.handleSubmit = () => {
       const newTopic = this.state.editedTopic.trim();
       PokeyActionCreator.topicSet(props.roomId, newTopic);
     };
   }
 
   render() {
-    const {topic} = this.props;
-
     return (
       <PageHeader>
         <input
