@@ -7,7 +7,7 @@ import pokey.connection.model.Commands._
 trait CommandLoggers {
   this: ActorLogging =>
 
-  private[this]type CommandLogger = PartialFunction[Command, Command]
+  private[this]type CommandLogger = Command => Command
 
   def logCommands(connUserId: String): CommandLogger = logger {
     case ClearRoomCommand(roomId) => logMsg(connUserId, "clear", "roomId" -> roomId)

@@ -37,8 +37,10 @@ class ConnectionHandler(
 
   def receive: Receive = {
     case req: Command =>
-      (logCommands(connUserId)
-        andThen handleCommandWith(client, connUserId, rooms, roomService, userProxy))(req)
+      (
+        logCommands(connUserId)
+        andThen handleCommandWith(client, connUserId, rooms, roomService, userProxy)
+      )(req)
 
     case RoomJoined(roomProxy) =>
       rooms += roomProxy.id -> roomProxy.ref
