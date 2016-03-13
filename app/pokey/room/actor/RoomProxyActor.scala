@@ -1,11 +1,11 @@
 package pokey.room.actor
 
 import akka.actor._
-import org.scalactic.{Bad, Good}
-import pokey.room.model.{Estimate, PublicEstimate, Room, RoomInfo}
-import pokey.user.actor.{UserProxy, UserProxyActor}
+import org.scalactic.{ Bad, Good }
+import pokey.room.model.{ Estimate, PublicEstimate, Room, RoomInfo }
+import pokey.user.actor.{ UserProxy, UserProxyActor }
 import pokey.user.model.User
-import pokey.util.{Subscribable, TopicProtocol}
+import pokey.util.{ Subscribable, TopicProtocol }
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     extends Actor

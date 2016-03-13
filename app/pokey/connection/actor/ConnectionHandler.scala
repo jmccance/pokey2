@@ -4,9 +4,9 @@ import akka.actor._
 import play.api.mvc.WebSocket
 import pokey.connection.actor.CommandHandlers._
 import pokey.connection.model._
-import pokey.room.actor.{RoomProxy, RoomProxyActor}
+import pokey.room.actor.{ RoomProxy, RoomProxyActor }
 import pokey.room.service.RoomService
-import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.actor.{ UserProxy, UserProxyActor }
 
 import scala.concurrent.duration._
 

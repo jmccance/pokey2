@@ -1,7 +1,7 @@
 package pokey.room.model
 
-import org.scalactic.{Bad, Good, Or}
-import play.api.libs.json.{Json, OWrites}
+import org.scalactic.{ Bad, Good, Or }
+import play.api.libs.json.{ Json, OWrites }
 import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
 
