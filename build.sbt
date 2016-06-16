@@ -1,3 +1,4 @@
+import com.typesafe.sbt.packager.docker._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
@@ -64,3 +65,17 @@ coverageExcludedPackages := Seq(
   "router.*"
 ).mkString(";")
 
+//////////////////////////
+// Docker Configuration
+
+dockerCommands := dockerCommands.value.filterNot {
+  case ExecCmd("CMD", _*) => true
+  case ExecCmd("ENTRYPOINT", _*) => true
+  case _ => false
+}
+
+dockerCommands ++= Seq(
+  Cmd("CMD", "bin/pokey -Dhttp.port=$PORT")
+)
+
+dockerRepository := Some("registry.heroku.com/pokey/web")
