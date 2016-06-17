@@ -68,6 +68,10 @@ coverageExcludedPackages := Seq(
 //////////////////////////
 // Docker Configuration
 
+packageName in Docker := "web"
+version in Docker := "latest"
+dockerRepository := Some("registry.heroku.com/pokey")
+
 dockerCommands := dockerCommands.value.filterNot {
   case ExecCmd("CMD", _*) => true
   case ExecCmd("ENTRYPOINT", _*) => true
@@ -75,7 +79,5 @@ dockerCommands := dockerCommands.value.filterNot {
 }
 
 dockerCommands ++= Seq(
-  Cmd("CMD", "bin/pokey -Dhttp.port=$PORT")
+  ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT")
 )
-
-dockerRepository := Some("registry.heroku.com/pokey/web")
