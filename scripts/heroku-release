@@ -5,5 +5,5 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "==> Releasing to Heroku"
-heroku docker:release
+heroku web/docker:release
 echo "==> Done!"

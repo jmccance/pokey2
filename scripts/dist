@@ -20,7 +20,7 @@ echo
 echo "==> Building application..."
 (
   set -e
-  ./activator universal:packageZipTarball
+  ./activator web/universal:packageZipTarball
 )
 echo "==> Done!"
 echo

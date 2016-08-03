@@ -5,4 +5,4 @@ set -e
 cd "$(dirname "$0")/.."
 
 ./scripts/update
-./activator console
+./activator web/console

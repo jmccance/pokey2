@@ -1,83 +1,99 @@
-import com.typesafe.sbt.packager.docker._
+import Dependencies._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import com.typesafe.sbt.packager.docker._
+
 import scalariform.formatter.preferences._
 
-name := "pokey"
+organization in ThisBuild := "net.jmccance"
+version in ThisBuild := "2.0-SNAPSHOT"
+scalaVersion in ThisBuild := "2.11.8"
 
-version := "2.0-SNAPSHOT"
+// TODO: Once the Scala.js client exists, rename it to just "client".
+lazy val clientSJS =
+  (project in file("clientSJS"))
+    .enablePlugins(ScalaJSPlugin)
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val core = crossProject in file("core")
+lazy val coreJS = core.js
+lazy val coreJVM = core.jvm
 
-scalaVersion := "2.11.7"
+lazy val web =
+  (project in file("web"))
+    .enablePlugins(PlayScala)
+    .disablePlugins(PlayLayoutPlugin)
+    .dependsOn(coreJVM)
+    .settings(
+      name := "pokey-web",
 
-libraryDependencies ++= Seq(
-  "joda-time" % "joda-time" % "2.7",
-  "org.scalactic" %% "scalactic" % "2.2.4",
-  "org.scaldi" %% "scaldi" % "0.5.6",
-  "org.scaldi" %% "scaldi-akka" % "0.5.6",
-  "org.scaldi" %% "scaldi-play" % "0.5.8",
-  "org.mockito" % "mockito-core" % "1.9.5" % Test,
-  "org.pegdown" % "pegdown" % "1.5.0" % Test,
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % Test,
-  "org.scalatestplus" %% "play" % "1.4.0-M3" % Test
-)
+      libraryDependencies ++= Seq(
+        JodaTime,
+        Scalactic,
+        Scaldi.Scaldi,
+        Scaldi.ScaldiAkka,
+        Scaldi.ScaldiPlay
+      ),
 
-scalacOptions in (Compile, compile) ++= Seq(
-  "-deprecation",
-  "-encoding", "UTF-8",       // yes, this is 2 args
-  "-feature",
-  "-unchecked",
-  "-Xfatal-warnings",
-  "-Xlint",
-  "-Yno-adapted-args",
-  "-Ywarn-dead-code",        // N.B. doesn't work well with the ??? hole
-  "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
-  "-Xfuture"
-)
+      libraryDependencies ++= testDependencies(
+        MockitoCore,
+        Pegdown,
+        AkkaTestKit,
+        ScalaTestPlusPlay
+      ),
 
-////////////////////////
-// Scalariform
+      scalacOptions in(Compile, compile) ++= Seq(
+        "-deprecation",
+        "-encoding", "UTF-8", // yes, this is 2 args
+        "-feature",
+        "-unchecked",
+        "-Xfatal-warnings",
+        "-Xlint",
+        "-Yno-adapted-args",
+        "-Ywarn-dead-code", // N.B. doesn't work well with the ??? hole
+        "-Ywarn-numeric-widen",
+        "-Ywarn-value-discard",
+        "-Xfuture"
+      ),
 
-ScalariformKeys.preferences := ScalariformKeys.preferences.value
-    .setPreference(SpacesAroundMultiImports, false)
 
-////////////////////////
-// Play Configuration
+      // Play Config ////
 
-routesGenerator := InjectedRoutesGenerator
+      routesGenerator := InjectedRoutesGenerator,
 
-////////////////////////
-// Test Configuration
+      // Scalariform ////
 
-javaOptions in Test += "-Dconfig.resource=test.conf"
+      ScalariformKeys.preferences := ScalariformKeys.preferences.value
+        .setPreference(SpacesAroundMultiImports, false),
 
-testOptions in Test += Tests.Argument("-h", "target/test-reports-html")
+      // Test Configuration ////
 
-coverageMinimum := 90
+      javaOptions in Test += "-Dconfig.resource=test.conf",
 
-coverageFailOnMinimum := true
+      testOptions in Test += Tests.Argument("-h", "target/test-reports-html"),
 
-coverageExcludedPackages := Seq(
-  "<empty>",
-  ".*\\.controller\\.javascript",
-  ".*\\.controller\\.ref",
-  "router.*"
-).mkString(";")
+      coverageMinimum := 90,
 
-//////////////////////////
-// Docker Configuration
+      coverageFailOnMinimum := true,
 
-packageName in Docker := "web"
-version in Docker := "latest"
-dockerRepository := Some("registry.heroku.com/pokey")
+      coverageExcludedPackages := Seq(
+        "<empty>",
+        ".*\\.controller\\.javascript",
+        ".*\\.controller\\.ref",
+        "router.*"
+      ).mkString(";"),
 
-dockerCommands := dockerCommands.value.filterNot {
-  case ExecCmd("CMD", _*) => true
-  case ExecCmd("ENTRYPOINT", _*) => true
-  case _ => false
-}
+      // Docker Configuration ////
 
-dockerCommands ++= Seq(
-  ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT")
-)
+      packageName in Docker := "web",
+      version in Docker := "latest",
+      dockerRepository := Some("registry.heroku.com/pokey"),
+
+      dockerCommands := dockerCommands.value.filterNot {
+        case ExecCmd("CMD", _*) => true
+        case ExecCmd("ENTRYPOINT", _*) => true
+        case _ => false
+      },
+
+      dockerCommands ++= Seq(
+        ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT")
+      )
+    )

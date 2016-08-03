@@ -24,7 +24,7 @@ var src = {
 
 // Write output to the Play public directory.
 var target = {
-  root: '../public/dist',
+  root: '../web/src/main/public/dist',
   scripts: 'js',
   lib: 'lib'
 };
