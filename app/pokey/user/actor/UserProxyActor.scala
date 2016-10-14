@@ -1,7 +1,7 @@
 package pokey.user.actor
 
 import akka.actor._
-import org.joda.time.DateTime
+import java.time._
 import pokey.user.actor.UserProxyActor.Settings
 import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
@@ -65,7 +65,7 @@ class UserProxyActor(settings: Settings, initialUser: User)
       if (connections.isEmpty) {
         log.info(
           "user_cleanup_scheduled, user_id: {}, eviction_time: {}",
-          user.id, DateTime.now().plusMillis(settings.maxIdleDuration.toMillis.toInt)
+          user.id, Instant.now().plusMillis(settings.maxIdleDuration.toMillis)
         )
         oCancellableEviction = Option {
           context.system.scheduler.scheduleOnce(settings.maxIdleDuration, self, EvictUser)
