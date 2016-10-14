@@ -3,11 +3,12 @@ package pokey.assets.controller
 import org.mockito.Mockito._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import pokey.application.ApplicationController
 import pokey.test.PlayUnitSpec
 import pokey.user.service.UserService
 import scaldi.play.ScaldiApplicationBuilder._
 
-class AssetControllerSpec extends PlayUnitSpec {
+class ApplicationControllerSpec extends PlayUnitSpec {
   "An AssetController" when {
     "the user_id is not defined" should {
       "add the user_id to the session" in withScaldiApp() {
@@ -30,10 +31,11 @@ class AssetControllerSpec extends PlayUnitSpec {
       }
     }
 
-    def init(): (AssetController, UserService) = {
+    def init(): (ApplicationController, UserService) = {
+      val settings = ApplicationController.Settings(None)
       val userService = mock[UserService]
       when(userService.nextUserId()).thenReturn("asdf")
-      (new AssetController(userService), userService)
+      (new ApplicationController(settings, userService), userService)
     }
   }
 }

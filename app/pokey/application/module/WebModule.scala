@@ -1,7 +1,7 @@
 package pokey.application.module
 
 import play.api.Configuration
-import pokey.assets.controller.AssetController
+import pokey.application.ApplicationController
 import pokey.connection.actor.ConnectionHandler
 import pokey.connection.controller.ConnectionController
 import pokey.room.service.RoomService
@@ -11,7 +11,17 @@ import scaldi._
 import scala.concurrent.duration._
 
 class WebModule extends Module {
-  binding to injected[AssetController]
+  bind[ApplicationController.Settings] to {
+    val config = inject[Configuration].underlying
+
+    ApplicationController.Settings.from(config.getConfig("pokey"))
+      .fold(
+        identity,
+        errors => sys.error(errors.toString)
+      )
+  }
+
+  binding to injected[ApplicationController]
 
   binding to injected[ConnectionController](
     'userService -> inject[UserService],

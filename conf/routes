@@ -3,6 +3,6 @@
 # ~~~~
 
 GET     /connect             pokey.connection.controller.ConnectionController.connect
-# Map static resources from the /public folder to the /assets URL path
-GET     /                    pokey.assets.controller.AssetController.assets(path="/public", file="index.html")
-GET     /*file               pokey.assets.controller.AssetController.assets(path="/public", file)
+
+GET     /                    pokey.application.ApplicationController.index
+GET     /*file               pokey.application.ApplicationController.assets(path="/public", file)

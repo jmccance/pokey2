@@ -8,7 +8,7 @@ version := "2.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "joda-time" % "joda-time" % "2.7",
@@ -79,5 +79,5 @@ dockerCommands := dockerCommands.value.filterNot {
 }
 
 dockerCommands ++= Seq(
-  ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT")
+  ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT -Dpokey.tracking-id=$TRACKING_ID")
 )

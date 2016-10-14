@@ -2,7 +2,7 @@ package pokey.application.module
 
 import akka.actor.ActorSystem
 import play.api.Configuration
-import pokey.assets.controller.AssetController
+import pokey.application.ApplicationController
 import pokey.connection.controller.ConnectionController
 import pokey.room.actor.RoomProxy
 import pokey.room.service.RoomService
@@ -20,7 +20,7 @@ class ModuleSpecs extends AkkaUnitSpec {
     implicit val module = new WebModule :: mockServiceModule :: mockDependencies
 
     "provide a binding for AssetController" in {
-      inject[AssetController]
+      inject[ApplicationController]
     }
 
     "provide a binding for ConnectionController" in {
