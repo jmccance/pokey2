@@ -10,12 +10,7 @@ sealed trait Event
 object Event {
   import Events._
 
-  implicit val formatter = OFormat[Event](
-    // $COVERAGE-OFF$
-    // Formatter is only use for messages sent out of the WebSocket handler, so no need to define
-    // a reads.
-    Reads.pure[Event](???),
-    // $COVERAGE-ON$
+  implicit val writesEvent: Writes[Event] =
     OWrites[Event] {
       case r: ConnectionInfo => ConnectionInfo.writer.writes(r)
       case r: UserUpdatedEvent => UserUpdatedEvent.writer.writes(r)
@@ -30,10 +25,6 @@ object Event {
       case HeartbeatEvent => HeartbeatEvent.writer.writes(HeartbeatEvent)
       case r: ErrorEvent => ErrorEvent.writer.writes(r)
     }
-  )
-
-  implicit val responseFrameFormatter: FrameFormatter[Event] =
-    FrameFormatter.jsonFrame[Event]
 }
 
 object Events {

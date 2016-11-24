@@ -6,15 +6,15 @@ name := "pokey"
 
 version := "2.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+enablePlugins(PlayScala)
 
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "2.2.4",
-  "org.scaldi" %% "scaldi" % "0.5.6",
-  "org.scaldi" %% "scaldi-akka" % "0.5.6",
-  "org.scaldi" %% "scaldi-play" % "0.5.8",
+  "org.scaldi" %% "scaldi" % "0.5.8",
+  "org.scaldi" %% "scaldi-akka" % "0.5.8",
+  "org.scaldi" %% "scaldi-play" % "0.5.15",
   "org.mockito" % "mockito-core" % "1.9.5" % Test,
   "org.pegdown" % "pegdown" % "1.5.0" % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % Test,

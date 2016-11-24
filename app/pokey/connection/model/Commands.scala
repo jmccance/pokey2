@@ -10,8 +10,8 @@ sealed trait Command
 object Command {
   import Commands._
 
-  implicit val formatter = Format[Command](
-    SetNameCommand.reader
+  implicit val readsCommand: Reads[Command] =
+    (SetNameCommand.reader
       orElse CreateRoomCommand.reader
       orElse JoinRoomCommand.reader
       orElse SubmitEstimateCommand.reader
@@ -20,14 +20,7 @@ object Command {
       orElse KillConnectionCommand.reader
       orElse SetTopicCommand.reader
       // NOTE: The InvalidCommand.reader *must* come last.
-      orElse InvalidCommand.reader,
-    // $COVERAGE-OFF$
-    // We never write this, so skipping implementation.
-    Writes[Command](_ => ???)
-  // $COVERAGE-ON$
-  )
-
-  implicit val frameFormatter: FrameFormatter[Command] = FrameFormatter.jsonFrame[Command]
+      orElse InvalidCommand.reader)
 }
 
 trait CommandCompanion {

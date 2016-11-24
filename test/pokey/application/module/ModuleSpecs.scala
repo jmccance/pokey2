@@ -1,6 +1,7 @@
 package pokey.application.module
 
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import play.api.Configuration
 import pokey.application.ApplicationController
 import pokey.connection.controller.ConnectionController
@@ -62,6 +63,8 @@ class ModuleSpecs extends AkkaUnitSpec {
       "pokey.connection.heartbeat-interval" -> "50s",
       "pokey.users.max-idle-time" -> "10s"
     ))
+
+    bind[Materializer] to ActorMaterializer()
   }
 
 }
