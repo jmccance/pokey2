@@ -5,6 +5,7 @@ import play.api.Configuration
 import pokey.room.actor.RoomRegistry
 import pokey.room.service.{DefaultRoomService, RoomService}
 import pokey.user.actor.{UserProxyActor, UserRegistry}
+import pokey.user.model.User
 import pokey.user.service.{DefaultUserService, UserService}
 import pokey.util.uidStream
 import scaldi.Module
@@ -12,7 +13,9 @@ import scaldi.Module
 import scala.concurrent.duration._
 
 class ServiceModule extends Module {
+  bind[Stream[User.Id]] toProvider uidStream.map(User.Id.unsafeFrom)
   bind[Stream[String]] toProvider uidStream
+
   bind[UserService] to injected[DefaultUserService](
     'userRegistry -> inject[ActorRef](identified by UserRegistry.identifier)
   )
@@ -20,7 +23,8 @@ class ServiceModule extends Module {
   bind[UserProxyActor.PropsFactory] to {
     val config = inject[Configuration]
     val settings = new UserProxyActor.Settings {
-      override val maxIdleDuration = config.getMilliseconds("pokey.users.max-idle-time").get.millis
+      override val maxIdleDuration: FiniteDuration =
+        config.getMilliseconds("pokey.users.max-idle-time").get.millis
     }
 
     UserProxyActor.propsFactory(settings)
@@ -40,9 +44,9 @@ class ServiceModule extends Module {
   bind[ActorRef] identifiedBy required(RoomRegistry.identifier) to {
     implicit val system = inject[ActorSystem]
     val userService = inject[UserService]
-    val idStream = inject[Stream[String]]
+    val idStream = inject[Stream[User.Id]]
 
-    system.actorOf(RoomRegistry.props(idStream, userService), "room-registry")
+    system.actorOf(RoomRegistry.props(uidStream, userService), "room-registry")
   }
 
 }

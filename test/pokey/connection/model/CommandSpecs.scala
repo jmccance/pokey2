@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import pokey.connection.model.Commands._
 import pokey.room.model.Estimate
 import pokey.test.UnitSpec
+import pokey.user.model.User
 
 class CommandSpecs extends UnitSpec {
   "A SetNameCommand" should {
@@ -16,7 +17,7 @@ class CommandSpecs extends UnitSpec {
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe SetNameCommand("Cormen")
+      parseCommand(json).value shouldBe SetNameCommand(User.Name.unsafeFrom("Cormen"))
     }
   }
 

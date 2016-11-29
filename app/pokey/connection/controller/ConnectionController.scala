@@ -4,11 +4,12 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.streams.ActorFlow
 import play.api.mvc._
 import pokey.connection.actor.ConnectionHandler
 import pokey.connection.model
-import model.Event
-import play.api.libs.streams.ActorFlow
+import pokey.connection.model.Event
+import pokey.user.model.User
 import pokey.user.service.UserService
 
 import scala.concurrent.Future
@@ -25,7 +26,7 @@ class ConnectionController(
 
   def connect = WebSocket.acceptOrResult[model.Command, Event] { request =>
     log.info("Received WebSocket connection request")
-    request.session.get("user_id") match {
+    request.session.get("user_id").flatMap(User.Id.from) match {
       case Some(userId) =>
         userService.createUserForId(userId).map { userProxy =>
           Right(ActorFlow.actorRef(connectionHandlerProps(userProxy)))

@@ -2,18 +2,19 @@ package pokey.user.service
 
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.{UserProxy, UserRegistry}
+import pokey.user.model.User
 
 class DefaultUserServiceSpec extends AkkaUnitSpec {
   // In this class, "self" will be playing the role of the UserRegistry.
   import system.dispatcher
 
   "The DefaultUserServiceSpec" when {
-    val someId = "1234"
+    val someId = User.Id.unsafeFrom("1234")
     val someActorRef = system.deadLetters
 
     "generating a user id" should {
       "return a String" in {
-        newUserService().nextUserId() should not be empty
+        newUserService().nextUserId().value should not be empty
       }
     }
 
@@ -60,5 +61,5 @@ class DefaultUserServiceSpec extends AkkaUnitSpec {
   }
 
   private[this] def newUserService(): UserService =
-    new DefaultUserService(self, pokey.util.uidStream)
+    new DefaultUserService(self, pokey.util.uidStream.map(User.Id.unsafeFrom))
 }

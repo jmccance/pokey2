@@ -9,11 +9,12 @@ import pokey.room.actor.RoomProxy
 import pokey.room.service.RoomService
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxy
+import pokey.user.model.User
 import pokey.user.service.UserService
 import scaldi.Injectable._
 import scaldi.Module
 
-import concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class ModuleSpecs extends AkkaUnitSpec {
 
@@ -43,15 +44,15 @@ class ModuleSpecs extends AkkaUnitSpec {
 
   private[this] def mockServiceModule = new Module {
     bind[UserService] to new UserService {
-      override def nextUserId(): String = ???
+      override def nextUserId(): User.Id = ???
 
-      override def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]] = ???
+      override def getUser(id: User.Id)(implicit ec: ExecutionContext): Future[Option[UserProxy]] = ???
 
-      override def createUserForId(id: String)(implicit ec: ExecutionContext): Future[UserProxy] = ???
+      override def createUserForId(id: User.Id)(implicit ec: ExecutionContext): Future[UserProxy] = ???
     }
 
     bind[RoomService] to new RoomService {
-      override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] = ???
+      override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] = ???
 
       override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] = ???
     }

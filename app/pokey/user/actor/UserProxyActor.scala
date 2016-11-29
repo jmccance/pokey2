@@ -1,12 +1,13 @@
 package pokey.user.actor
 
-import akka.actor._
 import java.time._
+
+import akka.actor._
 import pokey.user.actor.UserProxyActor.Settings
 import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
 
-import concurrent.duration._
+import scala.concurrent.duration._
 
 class UserProxyActor(settings: Settings, initialUser: User)
     extends Actor
@@ -87,7 +88,7 @@ object UserProxyActor extends TopicProtocol {
 
   case class NewConnection(conn: ActorRef)
 
-  case class SetName(name: String)
+  case class SetName(name: User.Name)
 
   case class UserUpdated(user: User)
 

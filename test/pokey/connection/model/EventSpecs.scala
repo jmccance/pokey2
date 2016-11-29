@@ -11,8 +11,8 @@ import scala.util.{Success, Try}
 
 class EventSpecs extends UnitSpec {
 
-  private[this] val someUser = User("1234", "Phong")
-  private[this] val someRoom = RoomInfo("5678", "1234", "Hot topic", isRevealed = false)
+  private[this] val someUser = User.unsafeFrom("1234", "Phong")
+  private[this] val someRoom = RoomInfo("5678", someUser.id, "Hot topic", isRevealed = false)
   private[this] val someEstimate = Some(RevealedEstimate(Some("XXS"), None))
 
   "A ConnectionInfoEvent event" should {

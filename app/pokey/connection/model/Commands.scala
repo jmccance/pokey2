@@ -2,8 +2,8 @@ package pokey.connection.model
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.api.mvc.WebSocket.FrameFormatter
 import pokey.room.model.Estimate
+import pokey.user.model.User
 
 sealed trait Command
 
@@ -31,13 +31,13 @@ trait CommandCompanion {
 }
 
 object Commands {
-  case class SetNameCommand(name: String) extends Command
+  case class SetNameCommand(name: User.Name) extends Command
 
   object SetNameCommand extends CommandCompanion {
     val jsonId = "setName"
 
     val reader: Reads[Command] =
-      validateType andKeep (JsPath \ "name").read[String].map(SetNameCommand(_))
+      validateType andKeep (JsPath \ "name").read[User.Name].map(SetNameCommand(_))
   }
 
   case object CreateRoomCommand extends Command with CommandCompanion {

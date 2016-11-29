@@ -22,9 +22,9 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
   val someTopic = "Hours to brew potion"
 
   "A ConnectionHandler" which {
-    val userId = "1"
+    val userId = User.Id.unsafeFrom("1")
     val roomId = "42"
-    val someUser = User("616", "Esme")
+    val someUser = User.unsafeFrom("616", "Esme")
     val someEstimate = Estimate(Some("999"), Some("No can do"))
 
     "receives a UserUpdated message" should {
@@ -38,7 +38,7 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
     "receives a RoomUpdated message" should {
       "send a RoomUpdated event to the client" in {
         val handler = init()
-        val roomInfo = RoomInfo(roomId, "Bad Axe", someTopic, isRevealed = false)
+        val roomInfo = RoomInfo(roomId, User.Id.unsafeFrom("Bad Axe"), someTopic, isRevealed = false)
 
         handler ! RoomProxyActor.RoomUpdated(roomInfo)
         expectMsg(RoomUpdatedEvent(roomInfo))
@@ -108,16 +108,14 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
         system.actorOf(
           ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self)
         )
-      ) { handler =>
-          expectMsgType[ConnectionInfo]
-        }
+      )(_ => expectMsgType[ConnectionInfo])
     }
 
     class TestRoomService(_rooms: (String, ActorRef)*) extends StubRoomService {
       private[this] val rooms = Map(_rooms: _*)
 
       // For the purposes of the current specs, this does not actually need to work.
-      override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] =
+      override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
         Future.successful(RoomProxy(roomId, TestProbe().ref))
 
       override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =

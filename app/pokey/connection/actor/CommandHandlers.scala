@@ -9,6 +9,7 @@ import pokey.connection.model.{Command, Events}
 import pokey.room.actor.RoomProxyActor
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.model.User
 
 import scala.concurrent.ExecutionContext
 
@@ -17,7 +18,7 @@ object CommandHandlers {
 
   def handleCommandWith(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     rooms: Map[String, ActorRef],
     roomService: RoomService,
     userProxy: UserProxy
@@ -71,7 +72,7 @@ object CommandHandlers {
 
   def handleClearRoomCommand(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     rooms: Map[String, ActorRef]
   )(implicit self: ActorRef): Handler[ClearRoomCommand] = {
     case ClearRoomCommand(roomId) =>
@@ -84,7 +85,7 @@ object CommandHandlers {
 
   def handleCreateRoomCommand(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     roomService: RoomService
   )(implicit self: ActorRef, ec: ExecutionContext): Handler[CreateRoomCommand.type] = { _ =>
     roomService
@@ -117,7 +118,7 @@ object CommandHandlers {
 
   def handleRevealRoomCommand(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     rooms: Map[String, ActorRef]
   )(implicit self: ActorRef): Handler[RevealRoomCommand] = {
     case RevealRoomCommand(roomId) =>
@@ -136,7 +137,7 @@ object CommandHandlers {
 
   def handleSetTopicCommand(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     rooms: Map[String, ActorRef]
   )(implicit self: ActorRef): Handler[SetTopicCommand] = {
     case SetTopicCommand(roomId, topic) =>
@@ -151,7 +152,7 @@ object CommandHandlers {
 
   def handleSubmitEstimateCommand(
     client: ActorRef,
-    connUserId: String,
+    connUserId: User.Id,
     rooms: Map[String, ActorRef]
   )(implicit self: ActorRef): Handler[SubmitEstimateCommand] = {
     case SubmitEstimateCommand(roomId, estimate) =>
@@ -165,7 +166,7 @@ object CommandHandlers {
   }
 
   def handleInvalidCommand(
-    client: ActorRef, connUserId: String
+    client: ActorRef, connUserId: User.Id
   )(implicit self: ActorRef): Handler[InvalidCommand] = {
     case InvalidCommand(json) => client ! Events.ErrorEvent("Invalid command")
   }

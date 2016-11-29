@@ -6,15 +6,15 @@ import pokey.user.model.User
 class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor with ActorLogging {
   import UserRegistry._
 
-  private[this] val DefaultName = "Guest"
+  private[this] val DefaultName = User.Name.unsafeFrom("Guest")
 
-  def withUsers(users: Map[String, UserProxy]): Receive = {
+  def withUsers(users: Map[User.Id, UserProxy]): Receive = {
     case CreateProxyForId(id) if users.contains(id) => sender ! users(id)
 
     case CreateProxyForId(id) if !users.contains(id) =>
       val user = User(id, DefaultName)
       val userProxy =
-        UserProxy(user.id, context.actorOf(userProxyProps(user), s"user-proxy-$id"))
+        UserProxy(user.id, context.actorOf(userProxyProps(user), s"user-proxy-${id.value}"))
       context.watch(userProxy.ref)
       become(users + (id -> userProxy))
       log.info("new_user: {}", user)
@@ -36,16 +36,16 @@ class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor wi
 
   def receive = withUsers(Map.empty)
 
-  private[this] def become(users: Map[String, UserProxy]) = context.become(withUsers(users))
+  private[this] def become(users: Map[User.Id, UserProxy]) = context.become(withUsers(users))
 }
 
 object UserRegistry {
   /** Identifier for injecting with Scaldi. */
   val identifier = 'userRegistry
 
-  case class CreateProxyForId(id: String)
+  case class CreateProxyForId(id: User.Id)
 
-  case class GetUserProxy(id: String)
+  case class GetUserProxy(id: User.Id)
 
   def props(userProxyProps: UserProxyActor.PropsFactory) = Props(new UserRegistry(userProxyProps))
 }

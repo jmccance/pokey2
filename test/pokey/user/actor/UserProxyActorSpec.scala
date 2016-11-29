@@ -6,10 +6,11 @@ import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxyActor._
 import pokey.user.model.User
 
-import concurrent.duration._
+import scala.concurrent.duration._
 
 class UserProxyActorSpec extends AkkaUnitSpec {
-  val user = User("U-1", "Felmet")
+  val user = User(User.Id.unsafeFrom("U-1"), User.Name.unsafeFrom("Felmet"))
+  val newName = User.Name.unsafeFrom("Rincewind")
 
   "A UserProxyActor" when {
     "it receives a SetName message" should {
@@ -18,8 +19,8 @@ class UserProxyActorSpec extends AkkaUnitSpec {
         expectMsg(UserUpdated(user))
         expectMsg(Subscribed(self))
 
-        upa ! SetName("Rincewind")
-        expectMsg(UserUpdated(user.copy(name = "Rincewind")))
+        upa ! SetName(newName)
+        expectMsg(UserUpdated(user.copy(name = newName)))
       }
     }
 
@@ -41,11 +42,11 @@ class UserProxyActorSpec extends AkkaUnitSpec {
     }
   }
 
-  def withProxyActor(_maxIdleDuration: FiniteDuration = 1.day)(testcode: ActorRef => Unit) = {
+  def withProxyActor(_maxIdleDuration: FiniteDuration = 1.day)(testFn: ActorRef => Unit) = {
     val settings = new UserProxyActor.Settings {
       override val maxIdleDuration: FiniteDuration = _maxIdleDuration
     }
     val upa = system.actorOf(UserProxyActor.props(settings, user))
-    testcode(upa)
+    testFn(upa)
   }
 }

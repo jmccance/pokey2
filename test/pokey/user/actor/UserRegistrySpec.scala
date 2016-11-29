@@ -5,12 +5,13 @@ import akka.testkit.EventFilter
 import akka.util.Timeout
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserRegistry.{CreateProxyForId, GetUserProxy}
+import pokey.user.model.User
 
-import concurrent.duration._
+import scala.concurrent.duration._
 
 class UserRegistrySpec extends AkkaUnitSpec {
-  val existingUserId = "1234"
-  val newUserId = "5678"
+  val existingUserId = User.Id.unsafeFrom("1234")
+  val newUserId = User.Id.unsafeFrom("5678")
 
   "A UserRegistry" when {
 

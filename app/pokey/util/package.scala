@@ -6,9 +6,5 @@ package object util {
     instance
   }
 
-  def uidStream: Stream[String] = {
-    val encBase64 = java.util.Base64.getEncoder.encode(_: Array[Byte])
-
-    Stream.continually(java.util.UUID.randomUUID().toString)
-  }
+  def uidStream: Stream[String] = Stream.continually(java.util.UUID.randomUUID().toString)
 }

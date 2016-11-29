@@ -1,7 +1,6 @@
 package pokey.connection.model
 
 import play.api.libs.json._
-import play.api.mvc.WebSocket.FrameFormatter
 import pokey.room.model.{PublicEstimate, RoomInfo}
 import pokey.user.model.User
 
@@ -29,10 +28,10 @@ object Event {
 
 object Events {
 
-  case class ConnectionInfo(userId: String) extends Event
+  case class ConnectionInfo(userId: User.Id) extends Event
 
   object ConnectionInfo {
-    val writer = OWrites[ConnectionInfo] {
+    val writer: OWrites[ConnectionInfo] = OWrites {
       case ConnectionInfo(user) =>
         EventJsObject("connectionInfo")("userId" -> user)
     }
@@ -46,7 +45,7 @@ object Events {
   case class UserUpdatedEvent(user: User) extends Event
 
   object UserUpdatedEvent {
-    val writer = OWrites[UserUpdatedEvent] {
+    val writer: OWrites[UserUpdatedEvent] = OWrites {
       case UserUpdatedEvent(user) =>
         EventJsObject("userUpdated")("user" -> user)
     }
@@ -60,7 +59,7 @@ object Events {
   case class RoomCreatedEvent(roomId: String) extends Event
 
   object RoomCreatedEvent {
-    val writer = OWrites[RoomCreatedEvent] {
+    val writer: OWrites[RoomCreatedEvent] = OWrites {
       case RoomCreatedEvent(roomId) => EventJsObject("roomCreated")("roomId" -> roomId)
     }
   }
@@ -73,7 +72,7 @@ object Events {
   case class RoomUpdatedEvent(roomInfo: RoomInfo) extends Event
 
   object RoomUpdatedEvent {
-    val writer = OWrites[RoomUpdatedEvent] {
+    val writer: OWrites[RoomUpdatedEvent] = OWrites {
       case RoomUpdatedEvent(roomInfo) => EventJsObject("roomUpdated")("room" -> roomInfo)
     }
   }
@@ -87,7 +86,7 @@ object Events {
   case class UserJoinedEvent(roomId: String, user: User) extends Event
 
   object UserJoinedEvent {
-    val writer = OWrites[UserJoinedEvent] {
+    val writer: OWrites[UserJoinedEvent] = OWrites {
       case UserJoinedEvent(roomId, user) => EventJsObject("userJoined")("roomId" -> roomId, "user" -> user)
     }
   }
@@ -101,7 +100,7 @@ object Events {
   case class UserLeftEvent(roomId: String, user: User) extends Event
 
   object UserLeftEvent {
-    val writer = OWrites[UserLeftEvent] {
+    val writer: OWrites[UserLeftEvent] = OWrites {
       case UserLeftEvent(roomId, user) => EventJsObject("userLeft")("roomId" -> roomId, "user" -> user)
     }
   }
@@ -115,12 +114,12 @@ object Events {
    */
   case class EstimateUpdatedEvent(
     roomId: String,
-    userId: String,
+    userId: User.Id,
     estimate: Option[PublicEstimate]
   ) extends Event
 
   object EstimateUpdatedEvent {
-    val writer = OWrites[EstimateUpdatedEvent] {
+    val writer: OWrites[EstimateUpdatedEvent] = OWrites {
       case EstimateUpdatedEvent(roomId, userId, estimate) =>
         EventJsObject("estimateUpdated")(
           "roomId" -> roomId,
@@ -138,13 +137,18 @@ object Events {
    */
   case class RoomRevealedEvent(
     roomId: String,
-    estimates: Map[String, Option[PublicEstimate]]
+    estimates: Map[User.Id, Option[PublicEstimate]]
   ) extends Event
 
   object RoomRevealedEvent {
-    val writer = OWrites[RoomRevealedEvent] {
+    import play.api.libs.json.Json._
+
+    val writer: OWrites[RoomRevealedEvent] = OWrites {
       case RoomRevealedEvent(roomId, estimates) =>
-        EventJsObject("roomRevealed")("roomId" -> roomId, "estimates" -> estimates)
+        EventJsObject("roomRevealed")(
+          "roomId" -> roomId,
+          "estimates" -> estimates
+        )
     }
   }
 
@@ -157,7 +161,7 @@ object Events {
   case class RoomClearedEvent(roomId: String) extends Event
 
   object RoomClearedEvent {
-    val writer = OWrites[RoomClearedEvent] {
+    val writer: OWrites[RoomClearedEvent] = OWrites {
       case RoomClearedEvent(roomId) => EventJsObject("roomCleared")("roomId" -> roomId)
     }
   }
@@ -170,7 +174,7 @@ object Events {
   case class RoomClosedEvent(roomId: String) extends Event
 
   object RoomClosedEvent {
-    val writer = OWrites[RoomClosedEvent] {
+    val writer: OWrites[RoomClosedEvent] = OWrites {
       case RoomClosedEvent(roomId) => EventJsObject("roomClosed")("roomId" -> roomId)
     }
   }
@@ -179,7 +183,7 @@ object Events {
    * Event sent to keep the connection alive.
    */
   case object HeartbeatEvent extends Event {
-    val writer = OWrites[HeartbeatEvent.type] { _ =>
+    val writer: OWrites[HeartbeatEvent.type] = OWrites { _ =>
       EventJsObject("heartbeat")()
     }
   }
@@ -196,7 +200,7 @@ object Events {
       case e => ErrorEvent(e.getMessage)
     }
 
-    val writer = OWrites[ErrorEvent] {
+    val writer: OWrites[ErrorEvent] = OWrites {
       case ErrorEvent(message) => EventJsObject("error")("message" -> message)
     }
   }

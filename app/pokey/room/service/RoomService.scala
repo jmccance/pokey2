@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import pokey.room.actor.{RoomProxy, RoomRegistry}
+import pokey.user.model.User
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,7 +14,7 @@ trait RoomService {
    * @param ownerId the user id that should own this room
    * @return a Future with the id of a newly created room owned by the specified user id
    */
-  def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy]
+  def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy]
 
   /**
    * @param id the id of the room proxy to retrieve
@@ -25,7 +26,7 @@ trait RoomService {
 class DefaultRoomService(roomRegistry: ActorRef) extends RoomService {
   private[this] implicit val timeout = Timeout(2.seconds)
 
-  override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] =
+  override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
     (roomRegistry ? RoomRegistry.CreateRoomFor(ownerId)).mapTo[RoomProxy]
 
   override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =

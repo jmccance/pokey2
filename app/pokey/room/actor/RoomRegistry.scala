@@ -3,6 +3,7 @@ package pokey.room.actor
 import akka.actor._
 import pokey.room.model.Room
 import pokey.user.actor.UserProxy
+import pokey.user.model.User
 import pokey.user.service.UserService
 
 class RoomRegistry(
@@ -69,7 +70,7 @@ object RoomRegistry {
 
   case class GetRoomProxy(id: String)
 
-  case class CreateRoomFor(ownerId: String)
+  case class CreateRoomFor(ownerId: User.Id)
 
   /**
    * Internal message used to handle creating the room once we've asynchronously received the

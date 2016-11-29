@@ -5,14 +5,15 @@ import akka.testkit.TestProbe
 import play.api.libs.json.JsString
 import pokey.connection.actor.CommandHandlers._
 import pokey.connection.model.Commands._
-import pokey.connection.model.Events.{RoomCreatedEvent, ErrorEvent}
+import pokey.connection.model.Events.{ErrorEvent, RoomCreatedEvent}
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
 import pokey.room.model.Estimate
 import pokey.room.service.StubRoomService
 import pokey.test.AkkaUnitSpec
-import pokey.user.actor.{UserProxyActor, UserProxy}
+import pokey.user.actor.{UserProxy, UserProxyActor}
+import pokey.user.model.User
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class CommandHandlersSpec extends AkkaUnitSpec {
   "CommandHandlers" when {
@@ -136,10 +137,10 @@ class CommandHandlersSpec extends AkkaUnitSpec {
     val ownedRoomP = TestProbe()
     val userProxyP = TestProbe()
 
-    val connUserId = "conn-user-id-0000"
+    val connUserId = User.Id.unsafeFrom("conn-user-id-0000")
     val userProxy = UserProxy(connUserId, userProxyP.ref)
 
-    val newName = "Magrat"
+    val newName = User.Name.unsafeFrom("Magrat")
 
     val newRoomId = "new-room-id-0000"
     val unknownRoomId = "unknown-room-id-0000"
@@ -161,7 +162,7 @@ class CommandHandlersSpec extends AkkaUnitSpec {
       private[this] val rooms = Map(_rooms: _*)
 
       // For the purposes of the current specs, this does not actually need to work.
-      override def createRoom(ownerId: String)(implicit ec: ExecutionContext): Future[RoomProxy] =
+      override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
         Future.successful(RoomProxy(newRoomId, TestProbe().ref))
 
       override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =

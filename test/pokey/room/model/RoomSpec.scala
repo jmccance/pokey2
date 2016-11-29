@@ -8,7 +8,13 @@ import pokey.user.model.User
 class RoomSpec extends UnitSpec {
 
   "A Room" when {
-    val users = Seq(User("1", "John"), User("2", "George"), User("3", "Paul"), User("4", "Ringo"))
+    val users = Seq(
+      User.unsafeFrom("1", "John"),
+      User.unsafeFrom("2", "George"),
+      User.unsafeFrom("3", "Paul"),
+      User.unsafeFrom("4", "Ringo")
+    )
+
     val someUser = users.head
     val someTopic = "Hot topic"
     val estimates = Seq(
@@ -21,7 +27,7 @@ class RoomSpec extends UnitSpec {
     val owner = users.head
     val notOwner = users.last
     val emptyRoom = Room("1234", owner.id, someTopic)
-    val newUser = User("5", "Pete")
+    val newUser = User.unsafeFrom("5", "Pete")
 
     val someRoom =
       Room(
@@ -55,7 +61,7 @@ class RoomSpec extends UnitSpec {
 
       "is already in the room" should {
         "update the user but maintain the original estimate" in {
-          val updatedUser = someUser.copy(name = s"${someUser.name} II")
+          val updatedUser = someUser.copy(name = User.Name.unsafeFrom(s"${someUser.name} II"))
           val updatedRoom = someRoom + updatedUser
 
           updatedRoom.get(someUser.id) shouldBe Some((updatedUser, estimatesByUserId(someUser.id)))
@@ -134,7 +140,7 @@ class RoomSpec extends UnitSpec {
 
     "serialized to JSON" should {
       "have the correct fields and values" in {
-        val room = Room("1234", "abc", someTopic)
+        val room = Room("1234", User.Id.unsafeFrom("abc"), someTopic)
         val json = Json.toJson(room.roomInfo).as[JsObject]
 
         (json \ "id").as[String] shouldBe "1234"

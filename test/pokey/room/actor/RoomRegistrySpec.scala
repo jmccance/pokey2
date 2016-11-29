@@ -7,19 +7,20 @@ import akka.util.Timeout
 import pokey.room.actor.RoomRegistry.{CreateRoomError, CreateRoomFor, GetRoomProxy}
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxy
+import pokey.user.model.User
 import pokey.user.service.{StubUserService, UserService}
 import pokey.util.using
 
-import concurrent.duration._
-import concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class RoomRegistrySpec extends AkkaUnitSpec {
 
   "A RoomRegistry" which {
     val roomId = "0"
     val invalidRoomId = "XX"
-    val userId = "2222"
-    val invalidUserId = "XXXX"
+    val userId = User.Id.unsafeFrom("2222")
+    val invalidUserId = User.Id.unsafeFrom("XXXX")
 
     "receives a GetRoomProxy" should {
       "reply with the existing RoomProxy if it exists" in {
@@ -77,7 +78,7 @@ class RoomRegistrySpec extends AkkaUnitSpec {
             registry ! GetRoomProxy(roomId)
             expectMsg(None)
 
-          case other => assert(false, s"Expected Some[RoomProxy]; got: $other")
+          case other => fail(s"Expected Some[RoomProxy]; got: $other")
         }
       }
     }
@@ -86,11 +87,11 @@ class RoomRegistrySpec extends AkkaUnitSpec {
         extends RoomRegistry(Stream.from(0).map(_.toString), userService) {
     }
 
-    class TestUserService(users: (String, ActorRef)*)
+    class TestUserService(users: (User.Id, ActorRef)*)
         extends StubUserService {
       private[this] val _users = Map(userId -> system.deadLetters) ++ users
 
-      override def getUser(id: String)(implicit ec: ExecutionContext): Future[Option[UserProxy]] =
+      override def getUser(id: User.Id)(implicit ec: ExecutionContext): Future[Option[UserProxy]] =
         Future.successful(_users.get(id).map(ref => UserProxy(id, ref)))
     }
 

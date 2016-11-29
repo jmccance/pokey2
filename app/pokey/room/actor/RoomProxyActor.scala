@@ -80,7 +80,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         case Bad(error) => sender ! error
       }
 
-    case RevealFor(userId: String) =>
+    case RevealFor(userId) =>
       room.revealedBy(userId) match {
         case Good(updatedRoom) =>
           room = updatedRoom
@@ -89,7 +89,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         case Bad(error) => sender ! error
       }
 
-    case ClearFor(userId: String) =>
+    case ClearFor(userId) =>
       room.clearedBy(userId) match {
         case Good(updatedRoom) =>
           room = updatedRoom
@@ -98,7 +98,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
         case Bad(error) => sender ! error
       }
 
-    case SetTopic(userId: String, topic: String) =>
+    case SetTopic(userId, topic) =>
       room.topicSetBy(userId, topic) match {
         case Good(updatedRoom) =>
           room = updatedRoom
@@ -129,13 +129,13 @@ object RoomProxyActor extends TopicProtocol {
 
   case class LeaveRoom(userProxy: UserProxy) extends Command
 
-  case class SubmitEstimate(userId: String, estimate: Estimate) extends Command
+  case class SubmitEstimate(userId: User.Id, estimate: Estimate) extends Command
 
-  case class RevealFor(userId: String) extends Command
+  case class RevealFor(userId: User.Id) extends Command
 
-  case class ClearFor(userId: String) extends Command
+  case class ClearFor(userId: User.Id) extends Command
 
-  case class SetTopic(userId: String, topic: String) extends Command
+  case class SetTopic(userId: User.Id, topic: String) extends Command
 
   ///////////
   // Events
@@ -150,11 +150,11 @@ object RoomProxyActor extends TopicProtocol {
 
   case class EstimateUpdated(
     roomId: String,
-    userId: String,
+    userId: User.Id,
     estimate: Option[PublicEstimate]
   ) extends Event
 
-  case class Revealed(roomId: String, estimates: Map[String, Option[PublicEstimate]]) extends Event
+  case class Revealed(roomId: String, estimates: Map[User.Id, Option[PublicEstimate]]) extends Event
 
   case class Cleared(roomId: String) extends Event
 

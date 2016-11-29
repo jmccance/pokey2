@@ -10,10 +10,10 @@ import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
 
 class RoomProxyActorSpec extends AkkaUnitSpec {
-  val owner = User("U-1", "Esme")
-  val someUser = User("U-2", "Magrat")
+  val owner = User.unsafeFrom("U-1", "Esme")
+  val someUser = User.unsafeFrom("U-2", "Magrat")
   val someEstimate = Estimate(Some("2"), None)
-  val anotherUser = User("U-3", "Nanny")
+  val anotherUser = User.unsafeFrom("U-3", "Nanny")
 
   val roomId = "R-1"
   val someTopic = "Hot topic"
@@ -24,7 +24,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     "it receives a JoinRoom message from a connection" should {
       "subscribe to the supplied UserProxy, subscribe the connection to itself, and publish a " +
         "UserJoined Message" in withContext {
-          case Context(rpa, ownerProbe, conn, _) =>
+          case Context(rpa, _, _, _) =>
 
             val userProbe = TestProbe()
             val userProxy = UserProxy(someUser.id, userProbe.ref)
@@ -42,7 +42,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     "it receives a UserUpdated message for a member of the room" should {
       "publish the update to the room" in withContextWithUsers(someUser, anotherUser) { ctx =>
         val connP = ctx.users(anotherUser.id).connP
-        val updatedUser = someUser.copy(name = "Verence")
+        val updatedUser = someUser.copy(name = User.Name.unsafeFrom("Verence"))
         ctx.users(someUser.id).proxyP.send(ctx.rpa, UserProxyActor.UserUpdated(updatedUser))
         connP.fishForMessage() {
           case UserProxyActor.UserUpdated(`updatedUser`) => true
@@ -52,11 +52,11 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
 
       "publish the updated version to new users that join" in
         withContextWithUsers(someUser) {
-          case Context(rpa, ownerProbe, connProbe, _) =>
+          case Context(rpa, _, _, _) =>
 
             // "someUser" changes their name.
             val someUserProxyProbe = TestProbe()
-            val updatedSomeUser = someUser.copy(name = s"${someUser.name} II")
+            val updatedSomeUser = someUser.copy(name = User.Name.unsafeFrom(s"${someUser.name} II"))
             someUserProxyProbe.send(rpa, UserProxyActor.UserUpdated(updatedSomeUser))
 
             // "anotherUser" joins
@@ -71,7 +71,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
                 name shouldBe updatedSomeUser.name
                 true
 
-              case msg => false
+              case _ => false
             }
         }
     }
@@ -193,7 +193,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
 
     "the room's owner terminates" should {
       "publish a room closed message and self-terminate" in withContext {
-        case Context(rpa, ownerProxy, conn, _) =>
+        case Context(rpa, ownerProxy, _, _) =>
           val probe = TestProbe()
           val connProbe = TestProbe()
           val memberProbe = TestProbe()
@@ -216,7 +216,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     rpa: ActorRef,
     ownerP: TestProbe,
     connP: TestProbe,
-    users: Map[String, UserContext] = Map.empty
+    users: Map[User.Id, UserContext] = Map.empty
   )
 
   case class UserContext(connP: TestProbe, user: User, proxyP: TestProbe) {
@@ -233,20 +233,19 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
       s"room-proxy-actor-${now.toMillis}"
     )
 
-    val userMap: Map[String, UserContext] = users.zipWithIndex.map {
-      case (user, index) =>
-        val connP = TestProbe()
-        val proxyP = TestProbe()
-        val proxy = UserProxy(user.id, proxyP.ref)
+    val userMap: Map[User.Id, UserContext] = users.map { user =>
+      val connP = TestProbe()
+      val proxyP = TestProbe()
+      val proxy = UserProxy(user.id, proxyP.ref)
 
-        connP.ignoreMsg { case _ => true }
+      connP.ignoreMsg { case _ => true }
 
-        connP.send(rpa, JoinRoom(proxy))
-        proxyP.expectMsg(UserProxyActor.Subscribe(rpa))
-        proxyP.send(rpa, UserProxyActor.Subscribed(rpa))
-        proxyP.send(rpa, UserProxyActor.UserUpdated(user))
+      connP.send(rpa, JoinRoom(proxy))
+      proxyP.expectMsg(UserProxyActor.Subscribe(rpa))
+      proxyP.send(rpa, UserProxyActor.Subscribed(rpa))
+      proxyP.send(rpa, UserProxyActor.UserUpdated(user))
 
-        (user.id, UserContext(connP, user, proxyP))
+      (user.id, UserContext(connP, user, proxyP))
     }.toMap
 
     userMap.values.foreach(_.connP.ignoreNoMsg())
