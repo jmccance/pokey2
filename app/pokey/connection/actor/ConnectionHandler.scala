@@ -5,6 +5,7 @@ import play.api.mvc.WebSocket
 import pokey.connection.actor.CommandHandlers._
 import pokey.connection.model._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
+import pokey.room.model.Room
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
 
@@ -23,7 +24,7 @@ class ConnectionHandler(
   import settings._
 
   private[this] val connUserId = userProxy.id
-  private[this] var rooms: Map[String, ActorRef] = Map.empty
+  private[this] var rooms: Map[Room.Id, ActorRef] = Map.empty
   private[this] val heartbeatCancellable =
     context.system.scheduler.schedule(
       heartbeatInterval,

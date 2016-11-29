@@ -3,7 +3,7 @@ package pokey.connection.model
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json._
 import pokey.connection.model.Events._
-import pokey.room.model.{RevealedEstimate, RoomInfo}
+import pokey.room.model.{RevealedEstimate, Room, RoomInfo}
 import pokey.test.UnitSpec
 import pokey.user.model.User
 
@@ -12,7 +12,14 @@ import scala.util.{Success, Try}
 class EventSpecs extends UnitSpec {
 
   private[this] val someUser = User.unsafeFrom("1234", "Phong")
-  private[this] val someRoom = RoomInfo("5678", someUser.id, "Hot topic", isRevealed = false)
+  private[this] val someRoom =
+    RoomInfo(
+      Room.Id.unsafeFrom("5678"),
+      someUser.id,
+      "Hot topic",
+      isRevealed = false
+    )
+
   private[this] val someEstimate = Some(RevealedEstimate(Some("XXS"), None))
 
   "A ConnectionInfoEvent event" should {

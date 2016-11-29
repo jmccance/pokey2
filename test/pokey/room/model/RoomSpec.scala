@@ -26,12 +26,13 @@ class RoomSpec extends UnitSpec {
     val estimatesByUserId = users.map(_.id).zip(estimates).toMap
     val owner = users.head
     val notOwner = users.last
-    val emptyRoom = Room("1234", owner.id, someTopic)
+    val roomId = Room.Id.unsafeFrom("1234")
+    val emptyRoom = Room(roomId, owner.id, someTopic)
     val newUser = User.unsafeFrom("5", "Pete")
 
     val someRoom =
       Room(
-        "1234",
+        roomId,
         owner.id,
         someTopic,
         usersById = users.map(u => (u.id, u)).toMap,
@@ -140,13 +141,13 @@ class RoomSpec extends UnitSpec {
 
     "serialized to JSON" should {
       "have the correct fields and values" in {
-        val room = Room("1234", User.Id.unsafeFrom("abc"), someTopic)
+        val room = Room(roomId, User.Id.unsafeFrom("abc"), someTopic)
         val json = Json.toJson(room.roomInfo).as[JsObject]
 
-        (json \ "id").as[String] shouldBe "1234"
-        (json \ "ownerId").as[String] shouldBe "abc"
-        (json \ "topic").as[String] shouldBe someTopic
-        (json \ "isRevealed").as[Boolean] shouldBe false
+        (json \ "id").as[String] shouldBe room.id.value
+        (json \ "ownerId").as[String] shouldBe room.ownerId.value
+        (json \ "topic").as[String] shouldBe room.topic
+        (json \ "isRevealed").as[Boolean] shouldBe room.isRevealed
       }
     }
   }

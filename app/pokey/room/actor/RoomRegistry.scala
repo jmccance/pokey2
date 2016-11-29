@@ -7,7 +7,7 @@ import pokey.user.model.User
 import pokey.user.service.UserService
 
 class RoomRegistry(
-  private[this] var ids: Stream[String],
+  private[this] var ids: Stream[Room.Id],
   userService: UserService
 )
     extends Actor
@@ -17,9 +17,9 @@ class RoomRegistry(
 
   private[this] val DefaultTopic = ""
 
-  def receive = withRooms(Map.empty)
+  def receive: Receive = withRooms(Map.empty)
 
-  private[this] def withRooms(rooms: Map[String, RoomProxy]): Receive = {
+  private[this] def withRooms(rooms: Map[Room.Id, RoomProxy]): Receive = {
     case GetRoomProxy(id) => sender ! rooms.get(id)
 
     case CreateRoomFor(ownerId) =>
@@ -38,7 +38,7 @@ class RoomRegistry(
       val room = Room(id, ownerProxy.id, DefaultTopic)
       val roomProxy = RoomProxy(
         room.id,
-        context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id}")
+        context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id.value}")
       )
       context.watch(roomProxy.ref)
       become(rooms + (room.id -> roomProxy))
@@ -57,18 +57,18 @@ class RoomRegistry(
       }
   }
 
-  private[this] def become(rooms: Map[String, RoomProxy]) = context.become(withRooms(rooms))
+  private[this] def become(rooms: Map[Room.Id, RoomProxy]) = context.become(withRooms(rooms))
 }
 
 object RoomRegistry {
   val identifier = 'roomRegistry
 
   def props(
-    ids: Stream[String],
+    ids: Stream[Room.Id],
     userService: UserService
   ) = Props(new RoomRegistry(ids, userService))
 
-  case class GetRoomProxy(id: String)
+  case class GetRoomProxy(id: Room.Id)
 
   case class CreateRoomFor(ownerId: User.Id)
 

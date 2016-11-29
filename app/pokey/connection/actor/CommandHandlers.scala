@@ -7,6 +7,7 @@ import pokey.connection.model.Commands._
 import pokey.connection.model.Events.ErrorEvent
 import pokey.connection.model.{Command, Events}
 import pokey.room.actor.RoomProxyActor
+import pokey.room.model.Room
 import pokey.room.service.RoomService
 import pokey.user.actor.{UserProxy, UserProxyActor}
 import pokey.user.model.User
@@ -19,7 +20,7 @@ object CommandHandlers {
   def handleCommandWith(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[String, ActorRef],
+    rooms: Map[Room.Id, ActorRef],
     roomService: RoomService,
     userProxy: UserProxy
   )(implicit
@@ -73,7 +74,7 @@ object CommandHandlers {
   def handleClearRoomCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[String, ActorRef]
+    rooms: Map[Room.Id, ActorRef]
   )(implicit self: ActorRef): Handler[ClearRoomCommand] = {
     case ClearRoomCommand(roomId) =>
       rooms.get(roomId) match {
@@ -119,7 +120,7 @@ object CommandHandlers {
   def handleRevealRoomCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[String, ActorRef]
+    rooms: Map[Room.Id, ActorRef]
   )(implicit self: ActorRef): Handler[RevealRoomCommand] = {
     case RevealRoomCommand(roomId) =>
       rooms.get(roomId) match {
@@ -138,7 +139,7 @@ object CommandHandlers {
   def handleSetTopicCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[String, ActorRef]
+    rooms: Map[Room.Id, ActorRef]
   )(implicit self: ActorRef): Handler[SetTopicCommand] = {
     case SetTopicCommand(roomId, topic) =>
       rooms.get(roomId) match {
@@ -153,7 +154,7 @@ object CommandHandlers {
   def handleSubmitEstimateCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[String, ActorRef]
+    rooms: Map[Room.Id, ActorRef]
   )(implicit self: ActorRef): Handler[SubmitEstimateCommand] = {
     case SubmitEstimateCommand(roomId, estimate) =>
       rooms.get(roomId) match {

@@ -7,7 +7,7 @@ import pokey.connection.actor.CommandHandlers._
 import pokey.connection.model.Commands._
 import pokey.connection.model.Events.{ErrorEvent, RoomCreatedEvent}
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
-import pokey.room.model.Estimate
+import pokey.room.model.{Estimate, Room}
 import pokey.room.service.StubRoomService
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.{UserProxy, UserProxyActor}
@@ -142,10 +142,10 @@ class CommandHandlersSpec extends AkkaUnitSpec {
 
     val newName = User.Name.unsafeFrom("Magrat")
 
-    val newRoomId = "new-room-id-0000"
-    val unknownRoomId = "unknown-room-id-0000"
-    val ownedRoomId = "known-room-id-0000"
-    val unjoinedRoomId = "known-room-id-0000"
+    val newRoomId = Room.Id.unsafeFrom("new-room-id-0000")
+    val unknownRoomId = Room.Id.unsafeFrom("unknown-room-id-0000")
+    val ownedRoomId = Room.Id.unsafeFrom("known-room-id-0000")
+    val unjoinedRoomId = Room.Id.unsafeFrom("known-room-id-0000")
 
     val unjoinedRoomProxyP = TestProbe()
 
@@ -158,14 +158,14 @@ class CommandHandlersSpec extends AkkaUnitSpec {
 
     val handler = handleCommandWith(clientP.ref, connUserId, rooms, roomService, userProxy)
 
-    class TestRoomService(_rooms: (String, ActorRef)*) extends StubRoomService {
+    class TestRoomService(_rooms: (Room.Id, ActorRef)*) extends StubRoomService {
       private[this] val rooms = Map(_rooms: _*)
 
       // For the purposes of the current specs, this does not actually need to work.
       override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
         Future.successful(RoomProxy(newRoomId, TestProbe().ref))
 
-      override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
+      override def getRoom(id: Room.Id)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
         Future.successful(rooms.get(id).map(ref => RoomProxy(id, ref)))
     }
   }

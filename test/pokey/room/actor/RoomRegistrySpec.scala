@@ -5,6 +5,7 @@ import akka.pattern.ask
 import akka.testkit.EventFilter
 import akka.util.Timeout
 import pokey.room.actor.RoomRegistry.{CreateRoomError, CreateRoomFor, GetRoomProxy}
+import pokey.room.model.Room
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.UserProxy
 import pokey.user.model.User
@@ -17,8 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class RoomRegistrySpec extends AkkaUnitSpec {
 
   "A RoomRegistry" which {
-    val roomId = "0"
-    val invalidRoomId = "XX"
+    val roomId = Room.Id.unsafeFrom("0")
+    val invalidRoomId = Room.Id.unsafeFrom("XX")
     val userId = User.Id.unsafeFrom("2222")
     val invalidUserId = User.Id.unsafeFrom("XXXX")
 
@@ -84,7 +85,7 @@ class RoomRegistrySpec extends AkkaUnitSpec {
     }
 
     class TestRoomRegistry(userService: UserService)
-        extends RoomRegistry(Stream.from(0).map(_.toString), userService) {
+        extends RoomRegistry(Stream.from(0).map(n => Room.Id.unsafeFrom(n.toString)), userService) {
     }
 
     class TestUserService(users: (User.Id, ActorRef)*)

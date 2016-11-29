@@ -2,11 +2,14 @@ package pokey.connection.model
 
 import play.api.libs.json.Json
 import pokey.connection.model.Commands._
-import pokey.room.model.Estimate
+import pokey.room.model.Room.Id
+import pokey.room.model.{Estimate, Room}
 import pokey.test.UnitSpec
 import pokey.user.model.User
 
 class CommandSpecs extends UnitSpec {
+  val roomId: Id = Room.Id.unsafeFrom("8675309")
+
   "A SetNameCommand" should {
     "deserialize from JSON correctly" in {
       val json =
@@ -32,7 +35,7 @@ class CommandSpecs extends UnitSpec {
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe SetTopicCommand("8675309", "Hot Topic")
+      parseCommand(json).value shouldBe SetTopicCommand(roomId, "Hot Topic")
     }
   }
 
@@ -59,7 +62,7 @@ class CommandSpecs extends UnitSpec {
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe JoinRoomCommand("8675309")
+      parseCommand(json).value shouldBe JoinRoomCommand(roomId)
     }
   }
 
@@ -69,7 +72,7 @@ class CommandSpecs extends UnitSpec {
         """
           |{
           |  "command": "submitEstimate",
-          |  "roomId": "1234",
+          |  "roomId": "8675309",
           |  "estimate": {
           |    "value": "XXS",
           |    "comment": "Easy-peasy"
@@ -78,7 +81,7 @@ class CommandSpecs extends UnitSpec {
         """.stripMargin
 
       parseCommand(json).value shouldBe
-        SubmitEstimateCommand("1234", Estimate(Some("XXS"), Some("Easy-peasy")))
+        SubmitEstimateCommand(roomId, Estimate(Some("XXS"), Some("Easy-peasy")))
     }
   }
 
@@ -88,11 +91,11 @@ class CommandSpecs extends UnitSpec {
         """
           |{
           |  "command": "revealRoom",
-          |  "roomId": "1234"
+          |  "roomId": "8675309"
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe RevealRoomCommand("1234")
+      parseCommand(json).value shouldBe RevealRoomCommand(roomId)
     }
   }
 
@@ -102,11 +105,11 @@ class CommandSpecs extends UnitSpec {
         """
           |{
           |  "command": "clearRoom",
-          |  "roomId": "1234"
+          |  "roomId": "8675309"
           |}
         """.stripMargin
 
-      parseCommand(json).value shouldBe ClearRoomCommand("1234")
+      parseCommand(json).value shouldBe ClearRoomCommand(roomId)
     }
   }
 

@@ -3,6 +3,7 @@ package pokey.application.module
 import akka.actor.{ActorRef, ActorSystem}
 import play.api.Configuration
 import pokey.room.actor.RoomRegistry
+import pokey.room.model.Room
 import pokey.room.service.{DefaultRoomService, RoomService}
 import pokey.user.actor.{UserProxyActor, UserRegistry}
 import pokey.user.model.User
@@ -13,8 +14,11 @@ import scaldi.Module
 import scala.concurrent.duration._
 
 class ServiceModule extends Module {
+  // uidStream is guaranteed to return non-empty strings, so we can safely build our Id streams with
+  // unsafeFrom.
+
   bind[Stream[User.Id]] toProvider uidStream.map(User.Id.unsafeFrom)
-  bind[Stream[String]] toProvider uidStream
+  bind[Stream[Room.Id]] toProvider uidStream.map(Room.Id.unsafeFrom)
 
   bind[UserService] to injected[DefaultUserService](
     'userRegistry -> inject[ActorRef](identified by UserRegistry.identifier)
@@ -44,9 +48,9 @@ class ServiceModule extends Module {
   bind[ActorRef] identifiedBy required(RoomRegistry.identifier) to {
     implicit val system = inject[ActorSystem]
     val userService = inject[UserService]
-    val idStream = inject[Stream[User.Id]]
+    val roomIdStream = inject[Stream[Room.Id]]
 
-    system.actorOf(RoomRegistry.props(uidStream, userService), "room-registry")
+    system.actorOf(RoomRegistry.props(roomIdStream, userService), "room-registry")
   }
 
 }

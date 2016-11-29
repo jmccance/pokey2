@@ -1,6 +1,7 @@
 package pokey.room.service
 
 import pokey.room.actor.{RoomProxy, RoomRegistry}
+import pokey.room.model.Room
 import pokey.test.AkkaUnitSpec
 import pokey.user.model.User
 
@@ -11,7 +12,7 @@ class DefaultRoomServiceSpec extends AkkaUnitSpec {
 
   "The DefaultRoomService" when {
     val ownerId = User.Id.unsafeFrom("1234")
-    val roomId = "5678"
+    val roomId = Room.Id.unsafeFrom("5678")
     val someActorRef = system.deadLetters
 
     "creating a room" should {

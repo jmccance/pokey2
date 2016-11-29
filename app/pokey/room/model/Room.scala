@@ -1,12 +1,13 @@
 package pokey.room.model
 
 import org.scalactic.{Bad, Good, Or}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json._
 import pokey.common.error.UnauthorizedErr
 import pokey.user.model.User
+import play.api.libs.functional.syntax._
 
 case class Room(
-    id: String,
+    id: Room.Id,
     ownerId: User.Id,
     topic: String,
     isRevealed: Boolean = false,
@@ -76,7 +77,24 @@ case class Room(
     }
 }
 
-case class RoomInfo(id: String, ownerId: User.Id, topic: String, isRevealed: Boolean)
+object Room {
+  abstract case class Id private (value: String)
+
+  object Id {
+    def from(s: String): Option[Id] = Option(s).filter(_.nonEmpty).map(new Id(_) {})
+
+    def unsafeFrom(s: String): Id = new Id(s) {}
+
+    implicit val writesId: Writes[Id] = Writes.of[String].contramap(_.value)
+
+    implicit val readsId: Reads[Id] = Reads.of[String].map(Id.from).flatMap {
+      case Some(name) => Reads.pure(name)
+      case None => Reads(_ => JsError("error.user.name.empty"))
+    }
+  }
+}
+
+case class RoomInfo(id: Room.Id, ownerId: User.Id, topic: String, isRevealed: Boolean)
 
 object RoomInfo {
   implicit val writer: OWrites[RoomInfo] = OWrites[RoomInfo] {

@@ -1,7 +1,7 @@
 package pokey.connection.model
 
 import play.api.libs.json._
-import pokey.room.model.{PublicEstimate, RoomInfo}
+import pokey.room.model.{PublicEstimate, Room, RoomInfo}
 import pokey.user.model.User
 
 sealed trait Event
@@ -56,7 +56,7 @@ object Events {
    *
    * @param roomId the id of the newly created room
    */
-  case class RoomCreatedEvent(roomId: String) extends Event
+  case class RoomCreatedEvent(roomId: Room.Id) extends Event
 
   object RoomCreatedEvent {
     val writer: OWrites[RoomCreatedEvent] = OWrites {
@@ -83,7 +83,7 @@ object Events {
    * @param roomId the id of the room the user has joined
    * @param user the user that joined
    */
-  case class UserJoinedEvent(roomId: String, user: User) extends Event
+  case class UserJoinedEvent(roomId: Room.Id, user: User) extends Event
 
   object UserJoinedEvent {
     val writer: OWrites[UserJoinedEvent] = OWrites {
@@ -97,7 +97,7 @@ object Events {
    * @param roomId the id of the room that the user has left
    * @param user the user that left
    */
-  case class UserLeftEvent(roomId: String, user: User) extends Event
+  case class UserLeftEvent(roomId: Room.Id, user: User) extends Event
 
   object UserLeftEvent {
     val writer: OWrites[UserLeftEvent] = OWrites {
@@ -113,7 +113,7 @@ object Events {
    * @param estimate the "public-facing" estimate, or None if they do not have an estimate
    */
   case class EstimateUpdatedEvent(
-    roomId: String,
+    roomId: Room.Id,
     userId: User.Id,
     estimate: Option[PublicEstimate]
   ) extends Event
@@ -136,7 +136,7 @@ object Events {
    * @param estimates the revealed estimates for this room
    */
   case class RoomRevealedEvent(
-    roomId: String,
+    roomId: Room.Id,
     estimates: Map[User.Id, Option[PublicEstimate]]
   ) extends Event
 
@@ -158,7 +158,7 @@ object Events {
    *
    * @param roomId the id of the room that has been cleared
    */
-  case class RoomClearedEvent(roomId: String) extends Event
+  case class RoomClearedEvent(roomId: Room.Id) extends Event
 
   object RoomClearedEvent {
     val writer: OWrites[RoomClearedEvent] = OWrites {
@@ -171,7 +171,7 @@ object Events {
    *
    * @param roomId the id of the closed room
    */
-  case class RoomClosedEvent(roomId: String) extends Event
+  case class RoomClosedEvent(roomId: Room.Id) extends Event
 
   object RoomClosedEvent {
     val writer: OWrites[RoomClosedEvent] = OWrites {

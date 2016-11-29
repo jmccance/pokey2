@@ -29,7 +29,7 @@ class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
     }
   }
 
-  override def onPublish(message: Any) = message match {
+  override def onPublish(message: Any): Unit = message match {
     case msg: Closed => context.stop(self)
     case _ => /* No action */
   }
@@ -144,19 +144,19 @@ object RoomProxyActor extends TopicProtocol {
 
   case class RoomUpdated(roomInfo: RoomInfo) extends Event
 
-  case class UserJoined(roomId: String, user: User) extends Event
+  case class UserJoined(roomId: Room.Id, user: User) extends Event
 
-  case class UserLeft(roomId: String, user: User) extends Event
+  case class UserLeft(roomId: Room.Id, user: User) extends Event
 
   case class EstimateUpdated(
-    roomId: String,
+    roomId: Room.Id,
     userId: User.Id,
     estimate: Option[PublicEstimate]
   ) extends Event
 
-  case class Revealed(roomId: String, estimates: Map[User.Id, Option[PublicEstimate]]) extends Event
+  case class Revealed(roomId: Room.Id, estimates: Map[User.Id, Option[PublicEstimate]]) extends Event
 
-  case class Cleared(roomId: String) extends Event
+  case class Cleared(roomId: Room.Id) extends Event
 
-  case class Closed(roomId: String) extends Event
+  case class Closed(roomId: Room.Id) extends Event
 }

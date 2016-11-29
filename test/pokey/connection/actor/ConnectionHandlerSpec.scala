@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import pokey.connection.model.Events._
 import pokey.room.actor.{RoomProxy, RoomProxyActor}
-import pokey.room.model.{Estimate, RoomInfo}
+import pokey.room.model.{Estimate, Room, RoomInfo}
 import pokey.room.service.{RoomService, StubRoomService}
 import pokey.test.AkkaUnitSpec
 import pokey.user.actor.{UserProxy, UserProxyActor}
@@ -23,7 +23,7 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
 
   "A ConnectionHandler" which {
     val userId = User.Id.unsafeFrom("1")
-    val roomId = "42"
+    val roomId = Room.Id.unsafeFrom("42")
     val someUser = User.unsafeFrom("616", "Esme")
     val someEstimate = Estimate(Some("999"), Some("No can do"))
 
@@ -111,14 +111,14 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
       )(_ => expectMsgType[ConnectionInfo])
     }
 
-    class TestRoomService(_rooms: (String, ActorRef)*) extends StubRoomService {
+    class TestRoomService(_rooms: (Room.Id, ActorRef)*) extends StubRoomService {
       private[this] val rooms = Map(_rooms: _*)
 
       // For the purposes of the current specs, this does not actually need to work.
       override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
         Future.successful(RoomProxy(roomId, TestProbe().ref))
 
-      override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
+      override def getRoom(id: Room.Id)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
         Future.successful(rooms.get(id).map(ref => RoomProxy(id, ref)))
     }
   }

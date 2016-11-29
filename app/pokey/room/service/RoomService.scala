@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import pokey.room.actor.{RoomProxy, RoomRegistry}
+import pokey.room.model.Room
 import pokey.user.model.User
 
 import scala.concurrent.duration._
@@ -20,7 +21,7 @@ trait RoomService {
    * @param id the id of the room proxy to retrieve
    * @return a Future containing the proxy for this room, if it exists
    */
-  def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]]
+  def getRoom(id: Room.Id)(implicit ec: ExecutionContext): Future[Option[RoomProxy]]
 }
 
 class DefaultRoomService(roomRegistry: ActorRef) extends RoomService {
@@ -29,6 +30,6 @@ class DefaultRoomService(roomRegistry: ActorRef) extends RoomService {
   override def createRoom(ownerId: User.Id)(implicit ec: ExecutionContext): Future[RoomProxy] =
     (roomRegistry ? RoomRegistry.CreateRoomFor(ownerId)).mapTo[RoomProxy]
 
-  override def getRoom(id: String)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
+  override def getRoom(id: Room.Id)(implicit ec: ExecutionContext): Future[Option[RoomProxy]] =
     (roomRegistry ? RoomRegistry.GetRoomProxy(id)).mapTo[Option[RoomProxy]]
 }

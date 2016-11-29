@@ -26,7 +26,8 @@ object User {
 
     def unsafeFrom(s: String): Id = new Id(s) {}
 
-    implicit val writes: Writes[Id] = Writes(id => JsString(id.value))
+    implicit val writesId: Writes[Id] = Writes.of[String].contramap(_.value)
+
     implicit def writesMapId[A: Writes]: Writes[Map[Id, A]] =
       Writes.of[Map[String, A]].contramap(_.map {
         case (k, v) => (k.value, v)
@@ -43,8 +44,9 @@ object User {
 
     def unsafeFrom(s: String): Name = new Name(s) {}
 
-    implicit val writes: Writes[Name] = Writes(name => JsString(name.value))
-    implicit val reads: Reads[Name] = Reads.of[String].map(Name.from).flatMap {
+    implicit val writesName: Writes[Name] = Writes.of[String].contramap(_.value)
+
+    implicit val readsName: Reads[Name] = Reads.of[String].map(Name.from).flatMap {
       case Some(name) => Reads.pure(name)
       case None => Reads(_ => JsError("error.user.name.empty"))
     }

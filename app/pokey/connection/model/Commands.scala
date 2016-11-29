@@ -2,7 +2,7 @@ package pokey.connection.model
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import pokey.room.model.Estimate
+import pokey.room.model.{Estimate, Room}
 import pokey.user.model.User
 
 sealed trait Command
@@ -46,17 +46,17 @@ object Commands {
     val reader: Reads[Command] = validateType andKeep Reads.pure(CreateRoomCommand)
   }
 
-  case class JoinRoomCommand(roomId: String) extends Command
+  case class JoinRoomCommand(roomId: Room.Id) extends Command
 
   object JoinRoomCommand extends CommandCompanion {
     val jsonId = "joinRoom"
 
     val reader: Reads[Command] =
-      validateType andKeep (JsPath \ "roomId").read[String].map(JoinRoomCommand(_))
+      validateType andKeep (JsPath \ "roomId").read[Room.Id].map(JoinRoomCommand(_))
   }
 
   case class SubmitEstimateCommand(
-    roomId: String,
+    roomId: Room.Id,
     estimate: Estimate
   ) extends Command
 
@@ -65,26 +65,26 @@ object Commands {
 
     val reader: Reads[Command] =
       validateType andKeep
-        ((JsPath \ "roomId").read[String]
+        ((JsPath \ "roomId").read[Room.Id]
           and (JsPath \ "estimate").read[Estimate])(SubmitEstimateCommand.apply _)
   }
 
-  case class RevealRoomCommand(roomId: String) extends Command
+  case class RevealRoomCommand(roomId: Room.Id) extends Command
 
   object RevealRoomCommand extends CommandCompanion {
     val jsonId = "revealRoom"
 
     val reader: Reads[Command] =
-      validateType andKeep (JsPath \ "roomId").read[String].map(RevealRoomCommand(_))
+      validateType andKeep (JsPath \ "roomId").read[Room.Id].map(RevealRoomCommand(_))
   }
 
-  case class ClearRoomCommand(roomId: String) extends Command
+  case class ClearRoomCommand(roomId: Room.Id) extends Command
 
   object ClearRoomCommand extends CommandCompanion {
     val jsonId = "clearRoom"
 
     val reader: Reads[Command] =
-      validateType andKeep (JsPath \ "roomId").read[String].map(ClearRoomCommand(_))
+      validateType andKeep (JsPath \ "roomId").read[Room.Id].map(ClearRoomCommand(_))
   }
 
   /**
@@ -98,14 +98,14 @@ object Commands {
     val reader: Reads[Command] = validateType andKeep Reads.pure(KillConnectionCommand)
   }
 
-  case class SetTopicCommand(roomId: String, topic: String) extends Command
+  case class SetTopicCommand(roomId: Room.Id, topic: String) extends Command
 
   object SetTopicCommand extends CommandCompanion {
     val jsonId = "setTopic"
 
     val reader: Reads[Command] =
       validateType andKeep
-        ((JsPath \ "roomId").read[String]
+        ((JsPath \ "roomId").read[Room.Id]
           and (JsPath \ "topic").read[String])(SetTopicCommand.apply _)
   }
 
