@@ -109,7 +109,7 @@ class EventSpecs extends UnitSpec {
       writeEvent(event) shouldBe obj(
         "event" -> "roomRevealed",
         "roomId" -> someRoom.id,
-        "estimates" -> estimates
+        "estimates" -> estimates.map { case (k, v) => (k.value, v) }
       )
     }
   }

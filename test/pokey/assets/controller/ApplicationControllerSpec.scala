@@ -1,25 +1,18 @@
 package pokey.assets.controller
 
 import org.mockito.Mockito._
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Helpers}
 import pokey.application.ApplicationController
 import pokey.test.PlayUnitSpec
 import pokey.user.model.User
 import pokey.user.service.UserService
-import scaldi.Module
-import scaldi.play.ScaldiApplicationBuilder._
 
 class ApplicationControllerSpec extends PlayUnitSpec {
-  val mockModules = Seq(
-    new Module {
-      bind[Stream[User.Id]]
-    }
-  )
 
-  "An AssetController" when {
+  "An ApplicationController" when {
     "the user_id is not defined" should {
-      "add the user_id to the session" in withScaldiApp() {
+      "add the user_id to the session" in {
         val (controller, _) = init()
 
         val result = controller.assets("/", "")(FakeRequest())
@@ -28,7 +21,7 @@ class ApplicationControllerSpec extends PlayUnitSpec {
     }
 
     "the user_id is defined" should {
-      "not the replace the existing user_id" in withScaldiApp() {
+      "not the replace the existing user_id" in {
         val (controller, _) = init()
         val userId = "1234"
 
@@ -41,9 +34,19 @@ class ApplicationControllerSpec extends PlayUnitSpec {
 
     def init(): (ApplicationController, UserService) = {
       val settings = ApplicationController.Settings(None)
+
       val userService = mock[UserService]
       when(userService.nextUserId()).thenReturn(User.Id.unsafeFrom("asdf"))
-      (new ApplicationController(settings, userService), userService)
+
+      (
+        new ApplicationController(
+          stubAssets(),
+          Helpers.stubControllerComponents(),
+          settings,
+          userService
+        ),
+        userService
+      )
     }
   }
 }

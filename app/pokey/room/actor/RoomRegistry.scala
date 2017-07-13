@@ -61,8 +61,6 @@ class RoomRegistry(
 }
 
 object RoomRegistry {
-  val identifier = 'roomRegistry
-
   def props(
     ids: Stream[Room.Id],
     userService: UserService

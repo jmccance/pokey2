@@ -147,7 +147,7 @@ object Events {
       case RoomRevealedEvent(roomId, estimates) =>
         EventJsObject("roomRevealed")(
           "roomId" -> roomId,
-          "estimates" -> estimates
+          "estimates" -> estimates.map { case (k, v) => (k.value, v) }
         )
     }
   }

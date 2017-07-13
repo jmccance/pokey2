@@ -39,3 +39,7 @@
   width: 8%;
   padding-left: 1em;
 }
+
+#topic-input {
+  width: 100%;
+}

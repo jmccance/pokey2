@@ -40,9 +40,6 @@ class UserRegistry(userProxyProps: UserProxyActor.PropsFactory) extends Actor wi
 }
 
 object UserRegistry {
-  /** Identifier for injecting with Scaldi. */
-  val identifier = 'userRegistry
-
   case class CreateProxyForId(id: User.Id)
 
   case class GetUserProxy(id: User.Id)

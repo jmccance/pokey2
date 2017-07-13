@@ -3,24 +3,27 @@ package pokey.application
 import com.typesafe.config.{Config, ConfigException}
 import controllers.Assets
 import org.scalactic._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import pokey.user.service.UserService
 
 class ApplicationController(
+    assets: Assets,
+    cc: ControllerComponents,
     settings: ApplicationController.Settings,
     userService: UserService
-) extends Controller {
+) extends AbstractController(cc) {
   import settings._
 
-  def assets(path: String, file: String) = Action.async { request =>
+  private[this] implicit lazy val executionContext = defaultExecutionContext
+
+  def assets(path: String, file: String): Action[AnyContent] = Action.async { request =>
     val updatedSession = request.session.get("user_id") match {
-      case Some(sessionId) => request.session
+      case Some(_) => request.session
 
       case None => request.session + ("user_id" -> userService.nextUserId().value)
     }
 
-    Assets.at(path, file)(request).map(_.withSession(updatedSession))
+    assets.at(path, file)(request).map(_.withSession(updatedSession))
   }
 
   def index = Action(Ok(views.html.index(oTrackingId)))

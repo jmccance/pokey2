@@ -1,4 +1,3 @@
-import com.typesafe.sbt.packager.docker._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
@@ -8,18 +7,19 @@ version := "2.0-SNAPSHOT"
 
 enablePlugins(PlayScala)
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.2"
 
 libraryDependencies ++= Seq(
+  "com.typesafe.play" %% "play-json" % "2.6.2",
   "org.scalactic" %% "scalactic" % "3.0.1",
-  "org.scaldi" %% "scaldi" % "0.5.8",
-  "org.scaldi" %% "scaldi-akka" % "0.5.8",
-  "org.scaldi" %% "scaldi-play" % "0.5.15",
+
+  // Test dependencies
+
   "org.mockito" % "mockito-core" % "1.9.5" % Test,
   "org.pegdown" % "pegdown" % "1.5.0" % Test,
   "org.scalatest" %% "scalatest" % "3.0.1" % Test,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0-M1" % Test,
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % Test,
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.3" % Test
 )
 
 scalacOptions in (Compile, compile) ++= Seq(
@@ -27,7 +27,7 @@ scalacOptions in (Compile, compile) ++= Seq(
   "-encoding", "UTF-8",       // yes, this is 2 args
   "-feature",
   "-unchecked",
-  "-Xfatal-warnings",
+//  "-Xfatal-warnings",
   "-Xlint",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",        // N.B. doesn't work well with the ??? hole
@@ -41,11 +41,6 @@ scalacOptions in (Compile, compile) ++= Seq(
 
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
     .setPreference(SpacesAroundMultiImports, false)
-
-////////////////////////
-// Play Configuration
-
-routesGenerator := InjectedRoutesGenerator
 
 ////////////////////////
 // Test Configuration
@@ -64,20 +59,3 @@ coverageExcludedPackages := Seq(
   ".*\\.controller\\.ref",
   "router.*"
 ).mkString(";")
-
-//////////////////////////
-// Docker Configuration
-
-packageName in Docker := "web"
-version in Docker := "latest"
-dockerRepository := Some("registry.heroku.com/pokey")
-
-dockerCommands := dockerCommands.value.filterNot {
-  case ExecCmd("CMD", _*) => true
-  case ExecCmd("ENTRYPOINT", _*) => true
-  case _ => false
-}
-
-dockerCommands ++= Seq(
-  ExecCmd("CMD", "sh", "-c", "bin/pokey -Dhttp.port=$PORT -Dpokey.tracking-id=$TRACKING_ID")
-)

@@ -4,10 +4,10 @@ resolvers ++= Seq(
 )
 
 // Play
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.10")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.1")
 
 // Scoverage for code coverage
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.5")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
 
 // Code formatting
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")

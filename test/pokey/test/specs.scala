@@ -1,12 +1,17 @@
 package pokey.test
 
+import java.io.File
+
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import controllers.{Assets, AssetsConfiguration, DefaultAssetsMetadata}
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.http.{DefaultFileMimeTypes, DefaultHttpErrorHandler, FileMimeTypesConfiguration}
 import play.api.mvc.Results
+import play.api.{Configuration, Environment}
 
 trait BaseSpec
   extends WordSpecLike
@@ -38,13 +43,27 @@ abstract class AkkaUnitSpec(_system: ActorSystem)
     }
   }
 
-  override def afterAll() = {
+  override def afterAll(): Unit = {
     super.afterAll()
     TestKit.shutdownActorSystem(system)
   }
 }
 
 abstract class PlayUnitSpec
-  extends PlaySpec
-  with BaseSpec
-  with Results
+    extends PlaySpec
+    with BaseSpec
+    with Results {
+
+  lazy val env: Environment = Environment.simple(new File("."))
+  lazy val configuration: Configuration = Configuration.load(env)
+  def stubAssets(): Assets = {
+    new Assets(
+      DefaultHttpErrorHandler,
+      new DefaultAssetsMetadata(
+        env,
+        AssetsConfiguration.fromConfiguration(configuration),
+        new DefaultFileMimeTypes(FileMimeTypesConfiguration())
+      )
+    )
+  }
+}

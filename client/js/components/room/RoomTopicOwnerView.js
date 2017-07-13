@@ -1,7 +1,7 @@
-import React from 'react';
-import {Glyphicon, PageHeader} from 'react-bootstrap';
+import React from "react";
+import {PageHeader} from "react-bootstrap";
 
-import PokeyActionCreator from '../../pokey/PokeyActionCreator';
+import PokeyActionCreator from "../../pokey/PokeyActionCreator";
 
 const ESCAPE_KEY = 27;
 const ENTER_KEY = 13;
@@ -42,7 +42,7 @@ export default class extends React.Component {
     return (
       <PageHeader>
         <input
-          style={{width: '100%'}}
+          id='topic-input'
           value={this.state.editedTopic}
           placeholder='Click to set a topic for estimation'
           onBlur={this.handleSubmit}
