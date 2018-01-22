@@ -11,7 +11,7 @@ echo "==> Building client-side assets..."
 (
   set -e
   cd client
-  npm install
+  yarn install
   ./node_modules/.bin/gulp | sed -e 's/^/[gulp] /'
 )
 echo "==> Done!"
@@ -20,7 +20,7 @@ echo
 echo "==> Building application..."
 (
   set -e
-  ./activator universal:packageZipTarball
+  ./sbt universal:packageZipTarball
 )
 echo "==> Done!"
 echo

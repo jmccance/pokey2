@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/.."
 
 if [ -n "$1" ]; then
-  ./activator "testOnly $1"
+  ./sbt "testOnly $1"
 else
-  ./activator coverage test
+  ./sbt coverage test
 fi

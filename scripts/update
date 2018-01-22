@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 echo "==> Updating backend assets..."
 (
   set -e
-  ./activator update
+  ./sbt update
 )
 echo "==> Done!"
 
@@ -19,6 +19,6 @@ echo "==> Updating client-side assets..."
 (
   set -e
   cd client
-  npm install
+  yarn install
 )
 echo "==> Done!"
