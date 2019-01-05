@@ -23,8 +23,7 @@ class ConnectionControllerSpec extends PlayUnitSpec {
         val controller = new ConnectionController(
           Helpers.stubControllerComponents(),
           mockUserService,
-          ConnectionHandler.propsFactory(mock[RoomService], mock[ConnectionHandler.Settings])
-        )(mock[ActorSystem], mock[Materializer])
+          ConnectionHandler.propsFactory(mock[RoomService], mock[ConnectionHandler.Settings]))(mock[ActorSystem], mock[Materializer])
         val result = controller.connect(FakeRequest()).map(_.left.get)
         status(result) mustBe UNAUTHORIZED
       }

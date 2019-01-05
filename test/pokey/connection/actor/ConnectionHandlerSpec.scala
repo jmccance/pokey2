@@ -102,13 +102,10 @@ class ConnectionHandlerSpec extends AkkaUnitSpec {
 
     def init(
       roomService: RoomService = new TestRoomService,
-      userRef: ActorRef = TestProbe().ref
-    ) = {
+      userRef: ActorRef = TestProbe().ref) = {
       using(
         system.actorOf(
-          ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self)
-        )
-      )(_ => expectMsgType[ConnectionInfo])
+          ConnectionHandler.props(roomService, settings)(UserProxy(userId, userRef))(self)))(_ => expectMsgType[ConnectionInfo])
     }
 
     class TestRoomService(_rooms: (Room.Id, ActorRef)*) extends StubRoomService {

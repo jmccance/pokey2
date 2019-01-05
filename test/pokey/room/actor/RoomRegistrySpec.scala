@@ -85,11 +85,11 @@ class RoomRegistrySpec extends AkkaUnitSpec {
     }
 
     class TestRoomRegistry(userService: UserService)
-        extends RoomRegistry(Stream.from(0).map(n => Room.Id.unsafeFrom(n.toString)), userService) {
+      extends RoomRegistry(Stream.from(0).map(n => Room.Id.unsafeFrom(n.toString)), userService) {
     }
 
     class TestUserService(users: (User.Id, ActorRef)*)
-        extends StubUserService {
+      extends StubUserService {
       private[this] val _users = Map(userId -> system.deadLetters) ++ users
 
       override def getUser(id: User.Id)(implicit ec: ExecutionContext): Future[Option[UserProxy]] =

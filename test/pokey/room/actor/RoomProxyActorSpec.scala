@@ -173,8 +173,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
             ownerCtx.connP.send(ctx.rpa, SetTopic(owner.id, someOtherTopic))
 
             ctx.users(someUser.id).connP.expectMsgEventually(
-              RoomUpdated(RoomInfo(roomId, owner.id, someOtherTopic, isRevealed = false))
-            )
+              RoomUpdated(RoomInfo(roomId, owner.id, someOtherTopic, isRevealed = false)))
           }
       }
 
@@ -216,8 +215,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     rpa: ActorRef,
     ownerP: TestProbe,
     connP: TestProbe,
-    users: Map[User.Id, UserContext] = Map.empty
-  )
+    users: Map[User.Id, UserContext] = Map.empty)
 
   case class UserContext(connP: TestProbe, user: User, proxyP: TestProbe) {
     lazy val proxy = UserProxy(user.id, proxyP.ref)
@@ -230,8 +228,7 @@ class RoomProxyActorSpec extends AkkaUnitSpec {
     val conn = TestProbe()
     val rpa = system.actorOf(
       RoomProxyActor.props(room, UserProxy(owner.id, ownerProbe.ref)),
-      s"room-proxy-actor-${now.toMillis}"
-    )
+      s"room-proxy-actor-${now.toMillis}")
 
     val userMap: Map[User.Id, UserContext] = users.map { user =>
       val connP = TestProbe()

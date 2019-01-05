@@ -17,8 +17,7 @@ class EventSpecs extends UnitSpec {
       Room.Id.unsafeFrom("5678"),
       someUser.id,
       "Hot topic",
-      isRevealed = false
-    )
+      isRevealed = false)
 
   private[this] val someEstimate = Some(RevealedEstimate(Some("XXS"), None))
 
@@ -27,8 +26,7 @@ class EventSpecs extends UnitSpec {
       val event = ConnectionInfo(someUser.id)
       writeEvent(event) shouldBe obj(
         "event" -> "connectionInfo",
-        "userId" -> someUser.id
-      )
+        "userId" -> someUser.id)
     }
   }
 
@@ -37,8 +35,7 @@ class EventSpecs extends UnitSpec {
       val event = UserUpdatedEvent(someUser)
       writeEvent(event) shouldBe obj(
         "event" -> "userUpdated",
-        "user" -> someUser
-      )
+        "user" -> someUser)
     }
   }
 
@@ -48,8 +45,7 @@ class EventSpecs extends UnitSpec {
 
       writeEvent(event) shouldBe obj(
         "event" -> "roomCreated",
-        "roomId" -> someRoom.id
-      )
+        "roomId" -> someRoom.id)
     }
   }
 
@@ -59,8 +55,7 @@ class EventSpecs extends UnitSpec {
 
       writeEvent(event) shouldBe obj(
         "event" -> "roomUpdated",
-        "room" -> someRoom
-      )
+        "room" -> someRoom)
     }
   }
 
@@ -71,8 +66,7 @@ class EventSpecs extends UnitSpec {
       writeEvent(event) shouldBe obj(
         "event" -> "userJoined",
         "roomId" -> someRoom.id,
-        "user" -> someUser
-      )
+        "user" -> someUser)
     }
   }
 
@@ -83,8 +77,7 @@ class EventSpecs extends UnitSpec {
       writeEvent(event) shouldBe obj(
         "event" -> "userLeft",
         "roomId" -> someRoom.id,
-        "user" -> someUser
-      )
+        "user" -> someUser)
     }
   }
 
@@ -96,8 +89,7 @@ class EventSpecs extends UnitSpec {
         "event" -> "estimateUpdated",
         "roomId" -> someRoom.id,
         "userId" -> someUser.id,
-        "estimate" -> someEstimate
-      )
+        "estimate" -> someEstimate)
     }
   }
 
@@ -109,8 +101,7 @@ class EventSpecs extends UnitSpec {
       writeEvent(event) shouldBe obj(
         "event" -> "roomRevealed",
         "roomId" -> someRoom.id,
-        "estimates" -> estimates.map { case (k, v) => (k.value, v) }
-      )
+        "estimates" -> estimates.map { case (k, v) => (k.value, v) })
     }
   }
 
@@ -120,8 +111,7 @@ class EventSpecs extends UnitSpec {
 
       writeEvent(event) shouldBe obj(
         "event" -> "roomCleared",
-        "roomId" -> someRoom.id
-      )
+        "roomId" -> someRoom.id)
     }
   }
 
@@ -131,8 +121,7 @@ class EventSpecs extends UnitSpec {
 
       writeEvent(event) shouldBe obj(
         "event" -> "roomClosed",
-        "roomId" -> someRoom.id
-      )
+        "roomId" -> someRoom.id)
     }
   }
 
@@ -151,8 +140,7 @@ class EventSpecs extends UnitSpec {
 
       writeEvent(event) shouldBe obj(
         "event" -> "error",
-        "message" -> event.message
-      )
+        "message" -> event.message)
     }
   }
 
@@ -161,8 +149,7 @@ class EventSpecs extends UnitSpec {
       val event = HeartbeatEvent
 
       writeEvent(event) shouldBe obj(
-        "event" -> "heartbeat"
-      )
+        "event" -> "heartbeat")
     }
   }
 

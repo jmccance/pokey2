@@ -43,10 +43,8 @@ class ApplicationControllerSpec extends PlayUnitSpec {
           stubAssets(),
           Helpers.stubControllerComponents(),
           settings,
-          userService
-        ),
-        userService
-      )
+          userService),
+        userService)
     }
   }
 }

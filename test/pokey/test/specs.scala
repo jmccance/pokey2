@@ -23,11 +23,11 @@ trait BaseSpec
 abstract class UnitSpec extends WordSpec with BaseSpec with Matchers
 
 abstract class AkkaUnitSpec(_system: ActorSystem)
-    extends TestKit(_system)
-    with ImplicitSender
-    with BaseSpec
-    with Matchers
-    with BeforeAndAfterAll {
+  extends TestKit(_system)
+  with ImplicitSender
+  with BaseSpec
+  with Matchers
+  with BeforeAndAfterAll {
 
   def this() = this(ActorSystem())
 
@@ -50,9 +50,9 @@ abstract class AkkaUnitSpec(_system: ActorSystem)
 }
 
 abstract class PlayUnitSpec
-    extends PlaySpec
-    with BaseSpec
-    with Results {
+  extends PlaySpec
+  with BaseSpec
+  with Results {
 
   lazy val env: Environment = Environment.simple(new File("."))
   lazy val configuration: Configuration = Configuration.load(env)
@@ -62,8 +62,6 @@ abstract class PlayUnitSpec
       new DefaultAssetsMetadata(
         env,
         AssetsConfiguration.fromConfiguration(configuration),
-        new DefaultFileMimeTypes(FileMimeTypesConfiguration())
-      )
-    )
+        new DefaultFileMimeTypes(FileMimeTypesConfiguration())))
   }
 }

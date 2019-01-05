@@ -4,7 +4,7 @@
   "description": "Web client for the Pokey planning poker app",
   "repository": "http://github.com/jmccance/pokey2.git",
   "dependencies": {
-    "bootstrap": "3.3.5",
+    "bootstrap": "^3.4.0",
     "debug": "^2.2.0",
     "director": "^1.2.8",
     "flux": "2.0.1",
@@ -12,7 +12,7 @@
     "immutable": "^3.7.5",
     "jquery": "~> 3.0.0",
     "react": "~0.13.1",
-    "react-bootstrap": "^0.24.5"
+    "react-bootstrap": "^0.32.4"
   },
   "devDependencies": {
     "babel-eslint": "^2.0.2",
@@ -21,12 +21,12 @@
     "del": "^1.1.1",
     "eslint": "^0.17.1",
     "gulp": "^3.8.11",
-    "gulp-bower": "0.0.10",
+    "gulp-bower": "0.0.14",
     "gulp-eslint": "^0.7.0",
     "gulp-regex-rename": "^0.1.0",
     "gutil": "^1.6.4",
     "lodash": "^3.7.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.1.2"
+    "watchify": "^3.11.0"
   }
 }

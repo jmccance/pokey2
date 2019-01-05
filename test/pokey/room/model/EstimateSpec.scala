@@ -8,8 +8,7 @@ class EstimateSpec extends UnitSpec {
     Estimate(None, None),
     Estimate(None, Option("No idea")),
     Estimate(Option("5"), None),
-    Estimate(Option("5"), Option("Give or take"))
-  )
+    Estimate(Option("5"), Option("Give or take")))
 
   "An Estimate" when {
     "converted to a hidden estimate" should {
