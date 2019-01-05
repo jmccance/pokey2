@@ -7,11 +7,10 @@ import play.api.mvc._
 import pokey.user.service.UserService
 
 class ApplicationController(
-    assets: Assets,
-    cc: ControllerComponents,
-    settings: ApplicationController.Settings,
-    userService: UserService
-) extends AbstractController(cc) {
+  assets: Assets,
+  cc: ControllerComponents,
+  settings: ApplicationController.Settings,
+  userService: UserService) extends AbstractController(cc) {
   import settings._
 
   private[this] implicit lazy val executionContext = defaultExecutionContext

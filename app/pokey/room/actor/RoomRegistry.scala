@@ -8,10 +8,9 @@ import pokey.user.service.UserService
 
 class RoomRegistry(
   private[this] var ids: Stream[Room.Id],
-  userService: UserService
-)
-    extends Actor
-    with ActorLogging {
+  userService: UserService)
+  extends Actor
+  with ActorLogging {
   import RoomRegistry._
   import context.dispatcher
 
@@ -38,8 +37,7 @@ class RoomRegistry(
       val room = Room(id, ownerProxy.id, DefaultTopic)
       val roomProxy = RoomProxy(
         room.id,
-        context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id.value}")
-      )
+        context.actorOf(RoomProxyActor.props(room, ownerProxy), s"room-proxy-${room.id.value}"))
       context.watch(roomProxy.ref)
       become(rooms + (room.id -> roomProxy))
       log.info("new_room: {}", room)
@@ -63,8 +61,7 @@ class RoomRegistry(
 object RoomRegistry {
   def props(
     ids: Stream[Room.Id],
-    userService: UserService
-  ) = Props(new RoomRegistry(ids, userService))
+    userService: UserService) = Props(new RoomRegistry(ids, userService))
 
   case class GetRoomProxy(id: Room.Id)
 

@@ -16,11 +16,10 @@ import scala.concurrent.Future
 class ConnectionController(
   cc: ControllerComponents,
   userService: UserService,
-  connectionHandlerProps: ConnectionHandler.PropsFactory
-)(implicit
+  connectionHandlerProps: ConnectionHandler.PropsFactory)(implicit
   actorSystem: ActorSystem,
   materializer: Materializer)
-    extends AbstractController(cc) {
+  extends AbstractController(cc) {
 
   private[this] val log = Logger(this.getClass)
   private[this] implicit lazy val executionContext = defaultExecutionContext

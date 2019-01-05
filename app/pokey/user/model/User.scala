@@ -12,8 +12,7 @@ object User {
     case User(id, name) =>
       Json.obj(
         "id" -> id,
-        "name" -> name
-      )
+        "name" -> name)
   }
 
   abstract case class Id private (value: String)

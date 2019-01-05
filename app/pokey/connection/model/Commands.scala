@@ -57,8 +57,7 @@ object Commands {
 
   case class SubmitEstimateCommand(
     roomId: Room.Id,
-    estimate: Estimate
-  ) extends Command
+    estimate: Estimate) extends Command
 
   object SubmitEstimateCommand extends CommandCompanion {
     val jsonId = "submitEstimate"

@@ -15,10 +15,9 @@ class ConnectionHandler(
   roomService: RoomService,
   settings: ConnectionHandler.Settings,
   userProxy: UserProxy,
-  client: ActorRef
-) extends Actor
-    with ActorLogging
-    with CommandLoggers {
+  client: ActorRef) extends Actor
+  with ActorLogging
+  with CommandLoggers {
   import ConnectionHandler._
   import context.dispatcher
   import settings._
@@ -30,8 +29,7 @@ class ConnectionHandler(
       heartbeatInterval,
       heartbeatInterval,
       client,
-      Events.HeartbeatEvent
-    )
+      Events.HeartbeatEvent)
 
   userProxy.ref ! UserProxyActor.NewConnection(self)
   client ! Events.ConnectionInfo(connUserId)
@@ -40,8 +38,7 @@ class ConnectionHandler(
     case req: Command =>
       (
         logCommands(connUserId)
-        andThen handleCommandWith(client, connUserId, rooms, roomService, userProxy)
-      )(req)
+        andThen handleCommandWith(client, connUserId, rooms, roomService, userProxy))(req)
 
     case RoomJoined(roomProxy) =>
       rooms += roomProxy.id -> roomProxy.ref
@@ -104,8 +101,7 @@ object ConnectionHandler {
 
   def props(
     roomService: RoomService,
-    config: Settings
-  )(userProxy: UserProxy)(client: ActorRef) =
+    config: Settings)(userProxy: UserProxy)(client: ActorRef) =
     Props(new ConnectionHandler(roomService, config, userProxy, client))
 
   type PropsFactory = ((UserProxy) => WebSocket.HandlerProps)

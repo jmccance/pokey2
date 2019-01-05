@@ -15,15 +15,14 @@ import pokey.user.model.User
 import scala.concurrent.ExecutionContext
 
 object CommandHandlers {
-  private[this]type Handler[A <: Command] = A => Unit
+  private[this] type Handler[A <: Command] = A => Unit
 
   def handleCommandWith(
     client: ActorRef,
     connUserId: User.Id,
     rooms: Map[Room.Id, ActorRef],
     roomService: RoomService,
-    userProxy: UserProxy
-  )(implicit
+    userProxy: UserProxy)(implicit
     self: ActorRef,
     ec: ExecutionContext): Command => Unit = {
     // The pattern of assigning the handler to a value before invoking it seems to be necessary
@@ -74,8 +73,7 @@ object CommandHandlers {
   def handleClearRoomCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[Room.Id, ActorRef]
-  )(implicit self: ActorRef): Handler[ClearRoomCommand] = {
+    rooms: Map[Room.Id, ActorRef])(implicit self: ActorRef): Handler[ClearRoomCommand] = {
     case ClearRoomCommand(roomId) =>
       rooms.get(roomId) match {
         case Some(roomProxy) => roomProxy ! RoomProxyActor.ClearFor(connUserId)
@@ -87,8 +85,7 @@ object CommandHandlers {
   def handleCreateRoomCommand(
     client: ActorRef,
     connUserId: User.Id,
-    roomService: RoomService
-  )(implicit self: ActorRef, ec: ExecutionContext): Handler[CreateRoomCommand.type] = { _ =>
+    roomService: RoomService)(implicit self: ActorRef, ec: ExecutionContext): Handler[CreateRoomCommand.type] = { _ =>
     roomService
       .createRoom(connUserId)
       .map(proxy => Events.RoomCreatedEvent(proxy.id))
@@ -100,8 +97,7 @@ object CommandHandlers {
   def handleJoinRoomCommand(
     client: ActorRef,
     roomService: RoomService,
-    userProxy: UserProxy
-  )(implicit
+    userProxy: UserProxy)(implicit
     self: ActorRef,
     ec: ExecutionContext): Handler[JoinRoomCommand] = {
     case JoinRoomCommand(roomId) =>
@@ -120,8 +116,7 @@ object CommandHandlers {
   def handleRevealRoomCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[Room.Id, ActorRef]
-  )(implicit self: ActorRef): Handler[RevealRoomCommand] = {
+    rooms: Map[Room.Id, ActorRef])(implicit self: ActorRef): Handler[RevealRoomCommand] = {
     case RevealRoomCommand(roomId) =>
       rooms.get(roomId) match {
         case Some(roomProxy) => roomProxy ! RoomProxyActor.RevealFor(connUserId)
@@ -131,16 +126,14 @@ object CommandHandlers {
   }
 
   def handleSetNameCommand(
-    userProxy: UserProxy
-  )(implicit self: ActorRef): Handler[SetNameCommand] = {
+    userProxy: UserProxy)(implicit self: ActorRef): Handler[SetNameCommand] = {
     case SetNameCommand(name) => userProxy.ref ! UserProxyActor.SetName(name)
   }
 
   def handleSetTopicCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[Room.Id, ActorRef]
-  )(implicit self: ActorRef): Handler[SetTopicCommand] = {
+    rooms: Map[Room.Id, ActorRef])(implicit self: ActorRef): Handler[SetTopicCommand] = {
     case SetTopicCommand(roomId, topic) =>
       rooms.get(roomId) match {
         case Some(roomProxy) =>
@@ -154,8 +147,7 @@ object CommandHandlers {
   def handleSubmitEstimateCommand(
     client: ActorRef,
     connUserId: User.Id,
-    rooms: Map[Room.Id, ActorRef]
-  )(implicit self: ActorRef): Handler[SubmitEstimateCommand] = {
+    rooms: Map[Room.Id, ActorRef])(implicit self: ActorRef): Handler[SubmitEstimateCommand] = {
     case SubmitEstimateCommand(roomId, estimate) =>
       rooms.get(roomId) match {
         case Some(roomProxy) =>
@@ -167,8 +159,7 @@ object CommandHandlers {
   }
 
   def handleInvalidCommand(
-    client: ActorRef, connUserId: User.Id
-  )(implicit self: ActorRef): Handler[InvalidCommand] = {
+    client: ActorRef, connUserId: User.Id)(implicit self: ActorRef): Handler[InvalidCommand] = {
     case InvalidCommand(json) => client ! Events.ErrorEvent("Invalid command")
   }
 }

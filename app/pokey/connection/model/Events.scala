@@ -115,8 +115,7 @@ object Events {
   case class EstimateUpdatedEvent(
     roomId: Room.Id,
     userId: User.Id,
-    estimate: Option[PublicEstimate]
-  ) extends Event
+    estimate: Option[PublicEstimate]) extends Event
 
   object EstimateUpdatedEvent {
     val writer: OWrites[EstimateUpdatedEvent] = OWrites {
@@ -124,8 +123,7 @@ object Events {
         EventJsObject("estimateUpdated")(
           "roomId" -> roomId,
           "userId" -> userId,
-          "estimate" -> estimate
-        )
+          "estimate" -> estimate)
     }
   }
 
@@ -137,8 +135,7 @@ object Events {
    */
   case class RoomRevealedEvent(
     roomId: Room.Id,
-    estimates: Map[User.Id, Option[PublicEstimate]]
-  ) extends Event
+    estimates: Map[User.Id, Option[PublicEstimate]]) extends Event
 
   object RoomRevealedEvent {
     import play.api.libs.json.Json._
@@ -147,8 +144,7 @@ object Events {
       case RoomRevealedEvent(roomId, estimates) =>
         EventJsObject("roomRevealed")(
           "roomId" -> roomId,
-          "estimates" -> estimates.map { case (k, v) => (k.value, v) }
-        )
+          "estimates" -> estimates.map { case (k, v) => (k.value, v) })
     }
   }
 

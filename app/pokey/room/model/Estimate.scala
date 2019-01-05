@@ -30,8 +30,7 @@ object RevealedEstimate {
     case RevealedEstimate(value, comment) =>
       Json.obj(
         "value" -> value,
-        "comment" -> comment
-      )
+        "comment" -> comment)
   }
 }
 

@@ -21,9 +21,8 @@ trait UserService {
 }
 
 class DefaultUserService(
-    userRegistry: ActorRef,
-    private[this] var ids: Stream[User.Id]
-) extends UserService {
+  userRegistry: ActorRef,
+  private[this] var ids: Stream[User.Id]) extends UserService {
   private[this] implicit val timeout = Timeout(2.seconds)
 
   override def nextUserId(): User.Id = ids.synchronized {

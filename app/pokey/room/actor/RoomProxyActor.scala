@@ -8,9 +8,9 @@ import pokey.user.model.User
 import pokey.util.{Subscribable, TopicProtocol}
 
 class RoomProxyActor(initialRoom: Room, ownerProxy: UserProxy)
-    extends Actor
-    with ActorLogging
-    with Subscribable {
+  extends Actor
+  with ActorLogging
+  with Subscribable {
   import pokey.room.actor.RoomProxyActor._
 
   override protected val protocol: TopicProtocol = RoomProxyActor
@@ -151,8 +151,7 @@ object RoomProxyActor extends TopicProtocol {
   case class EstimateUpdated(
     roomId: Room.Id,
     userId: User.Id,
-    estimate: Option[PublicEstimate]
-  ) extends Event
+    estimate: Option[PublicEstimate]) extends Event
 
   case class Revealed(roomId: Room.Id, estimates: Map[User.Id, Option[PublicEstimate]]) extends Event
 

@@ -10,9 +10,9 @@ import pokey.util.{Subscribable, TopicProtocol}
 import scala.concurrent.duration._
 
 class UserProxyActor(settings: Settings, initialUser: User)
-    extends Actor
-    with ActorLogging
-    with Subscribable {
+  extends Actor
+  with ActorLogging
+  with Subscribable {
 
   import UserProxyActor._
   import context.dispatcher
@@ -66,8 +66,7 @@ class UserProxyActor(settings: Settings, initialUser: User)
       if (connections.isEmpty) {
         log.info(
           "user_cleanup_scheduled, user_id: {}, eviction_time: {}",
-          user.id, Instant.now().plusMillis(settings.maxIdleDuration.toMillis)
-        )
+          user.id, Instant.now().plusMillis(settings.maxIdleDuration.toMillis))
         oCancellableEviction = Option {
           context.system.scheduler.scheduleOnce(settings.maxIdleDuration, self, EvictUser)
         }

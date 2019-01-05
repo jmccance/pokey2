@@ -40,16 +40,14 @@ trait WebComponents { this: AssetsComponents with ConfigComponents with ServiceC
     val settings =
       ApplicationController.Settings.from(pokeyConfig).fold(
         identity,
-        errors => sys.error(errors.toString)
-      )
+        errors => sys.error(errors.toString))
 
     new ApplicationController(assets, controllerComponents, settings, userService)
   }
 
   lazy val connectionController: ConnectionController = {
     val settings = ConnectionHandler.Settings(
-      pokeyConfig.getDuration("connection.heartbeat-interval", TimeUnit.MILLISECONDS).millis
-    )
+      pokeyConfig.getDuration("connection.heartbeat-interval", TimeUnit.MILLISECONDS).millis)
 
     new ConnectionController(controllerComponents, userService, ConnectionHandler.propsFactory(roomService, settings))
   }

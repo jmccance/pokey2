@@ -7,9 +7,8 @@ import pokey.application.ApplicationController
 import pokey.connection.controller.ConnectionController
 
 class AppRouter(
-    appController: ApplicationController,
-    connectionController: ConnectionController
-) extends SimpleRouter {
+  appController: ApplicationController,
+  connectionController: ConnectionController) extends SimpleRouter {
   override def routes: Routes = {
     case GET(p"/connect") => connectionController.connect
     case GET(p"/") => appController.index

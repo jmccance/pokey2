@@ -7,13 +7,12 @@ import pokey.user.model.User
 import play.api.libs.functional.syntax._
 
 case class Room(
-    id: Room.Id,
-    ownerId: User.Id,
-    topic: String,
-    isRevealed: Boolean = false,
-    private val usersById: Map[User.Id, User] = Map.empty,
-    estimates: Map[User.Id, Option[Estimate]] = Map.empty
-) {
+  id: Room.Id,
+  ownerId: User.Id,
+  topic: String,
+  isRevealed: Boolean = false,
+  private val usersById: Map[User.Id, User] = Map.empty,
+  estimates: Map[User.Id, Option[Estimate]] = Map.empty) {
   lazy val users = usersById.values
   lazy val roomInfo: RoomInfo = RoomInfo(id, ownerId, topic, isRevealed)
 
@@ -103,7 +102,6 @@ object RoomInfo {
         "id" -> id,
         "ownerId" -> ownerId,
         "topic" -> topic,
-        "isRevealed" -> isRevealed
-      )
+        "isRevealed" -> isRevealed)
   }
 }
